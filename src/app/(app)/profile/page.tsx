@@ -1,12 +1,12 @@
 "use client";
 
-import { ChevronRight, RotateCcw, Trash2 } from "lucide-react";
+import { ChevronRight, RotateCcw, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BACK, PageTransition } from "@/components/page-transition";
 import { HealthDot } from "@/components/toilet-card";
 import { replayIntro } from "@/lib/onboarding";
-import { KINDS, ago, clearToilets, removeToilet, useToilets } from "@/lib/toilets";
+import { KINDS, addDemoToilets, ago, clearToilets, removeToilet, useToilets } from "@/lib/toilets";
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
@@ -81,6 +81,19 @@ export default function ProfilePage() {
                 <ChevronRight className="size-5 shrink-0 text-haze" aria-hidden />
               </button>
             </li>
+            {!toilets.some((t) => !t.mine) && (
+              <li>
+                <button type="button" onClick={addDemoToilets} className="flex w-full items-center gap-4 py-4 text-left">
+                  <Users className="size-5 shrink-0 text-haze" aria-hidden />
+                  <span className="flex-1">
+                    <span className="block">Add codes from other people</span>
+                    <span className="block text-sm text-haze">
+                      Demo: three codes near Deák tér you didn&apos;t share, to try suggesting a new code.
+                    </span>
+                  </span>
+                </button>
+              </li>
+            )}
             <li>
               {confirmClear ? (
                 <div className="flex items-center gap-3 py-3">

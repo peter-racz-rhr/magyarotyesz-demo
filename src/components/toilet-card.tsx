@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, Eye, ThumbsDown, ThumbsUp } from "lucide-react";
+import { Check, Copy, Eye, Pencil, ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState, type FormEvent } from "react";
 import {
@@ -9,9 +9,11 @@ import {
   KINDS,
   ago,
   confirmCode,
+  dismissSuggestion,
+  editToilet,
   health,
-  replaceCode,
   reportCode,
+  suggestCode,
   type Toilet,
 } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
@@ -28,10 +30,44 @@ export function HealthDot({ toilet, className }: { toilet: Toilet; className?: s
   );
 }
 
+const field =
+  "h-11 w-full rounded-full border border-dusk-edge bg-night px-4 outline-none placeholder:text-haze/60 focus:border-good";
+const codeField = `${field} font-mono tracking-[0.12em] placeholder:font-sans placeholder:tracking-normal`;
+const pill = "h-11 shrink-0 rounded-full px-5 text-[0.9375rem] font-semibold transition-transform active:scale-[0.97]";
+
+/** The person who shared it can change the name, code and note. */
+function EditForm({ toilet, onDone }: { toilet: Toilet; onDone: () => void }) {
+  const [name, setName] = useState(toilet.name);
+  const [code, setCode] = useState(toilet.code);
+  const [note, setNote] = useState(toilet.note);
+  const save = (event: FormEvent) => {
+    event.preventDefault();
+    if (!name.trim() || !code.trim()) return;
+    editToilet(toilet.id, { name: name.trim(), code: code.trim(), note: note.trim() });
+    onDone();
+  };
+  return (
+    <form onSubmit={save} className="flex flex-col gap-2">
+      <input aria-label="Place" value={name} onChange={(e) => setName(e.target.value)} className={field} />
+      <input aria-label="Code" value={code} onChange={(e) => setCode(e.target.value)} autoComplete="off" className={codeField} />
+      <input aria-label="Note" placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} className={field} />
+      <div className="mt-1 flex justify-end gap-2">
+        <button type="button" onClick={onDone} className={cn(pill, "text-haze")}>
+          Cancel
+        </button>
+        <button type="submit" disabled={!name.trim() || !code.trim()} className={cn(pill, "bg-ink text-night disabled:opacity-40")}>
+          Save
+        </button>
+      </div>
+    </form>
+  );
+}
+
 /**
  * Everything about one toilet: the code (hidden until you tap, so it isn't
- * on show to everyone around you), when it last worked, and the two buttons
- * that keep it honest.
+ * on show to everyone around you), when it last worked, and the buttons
+ * that keep it honest. Only the person who shared a code can edit it;
+ * everyone else can suggest a new one.
  */
 export function ToiletCard({
   toilet,
@@ -45,9 +81,12 @@ export function ToiletCard({
 }) {
   const [shown, setShown] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [voted, setVoted] = useState<"works" | "broken" | null>(null);
+  const [editing, setEditing] = useState(false);
+  // After a vote: thanks, or (after "doesn't work") asking for the new code.
+  const [step, setStep] = useState<null | "thanks" | "new-code" | "suggested">(null);
   const [newCode, setNewCode] = useState("");
   const state = health(toilet);
+  const suggestions = toilet.mine ? (toilet.suggestions ?? []) : [];
 
   const copy = async () => {
     try {
@@ -61,33 +100,61 @@ export function ToiletCard({
 
   const works = () => {
     confirmCode(toilet.id);
-    setVoted("works");
+    setStep("thanks");
   };
   const broken = () => {
     reportCode(toilet.id);
-    setVoted("broken");
+    setStep("new-code");
   };
-  const saveNewCode = (event: FormEvent) => {
+  const sendNewCode = (event: FormEvent) => {
     event.preventDefault();
-    if (!newCode.trim()) return;
-    replaceCode(toilet.id, newCode.trim());
+    const code = newCode.trim();
+    if (!code) return;
+    if (toilet.mine) {
+      editToilet(toilet.id, { code });
+      setStep("thanks");
+      setShown(true);
+    } else {
+      suggestCode(toilet.id, code);
+      setStep("suggested");
+    }
     setNewCode("");
-    setVoted("works");
-    setShown(true);
   };
+
+  if (editing) {
+    return (
+      <div className={cn("text-left", className)}>
+        <p className="mb-3 text-sm font-semibold text-haze">Edit your code</p>
+        <EditForm toilet={toilet} onDone={() => setEditing(false)} />
+      </div>
+    );
+  }
 
   return (
     <div className={cn("text-left", className)}>
-      {inList ? (
-        <p className="text-sm text-haze">{ACCESS[toilet.access]}</p>
-      ) : (
-        <>
-          <p className="font-semibold leading-tight">{toilet.name}</p>
-          <p className="mt-0.5 text-sm text-haze">
-            {KINDS[toilet.kind]} · {ACCESS[toilet.access]}
-          </p>
-        </>
-      )}
+      <div className="flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          {inList ? (
+            <p className="text-sm text-haze">{ACCESS[toilet.access]}</p>
+          ) : (
+            <>
+              <p className="font-semibold leading-tight">{toilet.name}</p>
+              <p className="mt-0.5 text-sm text-haze">
+                {KINDS[toilet.kind]} · {ACCESS[toilet.access]}
+              </p>
+            </>
+          )}
+        </div>
+        {toilet.mine && (
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="-mt-1 -mr-1 inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-haze hover:text-ink"
+          >
+            <Pencil className="size-3.5" aria-hidden /> Edit
+          </button>
+        )}
+      </div>
 
       {/* The code */}
       <div className="mt-3 flex items-center gap-2">
@@ -128,7 +195,7 @@ export function ToiletCard({
             type="button"
             onClick={copy}
             aria-label="Copy the code"
-            className="grid size-14 shrink-0 place-items-center rounded-2xl border border-dusk-edge bg-night text-haze active:scale-95 transition-transform"
+            className="grid size-14 shrink-0 place-items-center rounded-2xl border border-dusk-edge bg-night text-haze transition-transform active:scale-95"
           >
             {copied ? <Check className="size-5 text-good" /> : <Copy className="size-5" />}
           </button>
@@ -137,51 +204,86 @@ export function ToiletCard({
 
       <p className={cn("mt-2 flex items-center gap-2 text-sm", HEALTH[state].text)}>
         <HealthDot toilet={toilet} className="size-2" />
-        {state === "bad"
-          ? `Reported not working ${ago(toilet.reportedAt!)}`
-          : `Worked ${ago(toilet.confirmedAt)}`}
+        {state === "bad" ? `Reported not working ${ago(toilet.reportedAt!)}` : `Worked ${ago(toilet.confirmedAt)}`}
       </p>
 
+      {/* New codes people suggested, for the person who shared it */}
+      {suggestions.length > 0 && (
+        <div className="mt-3 rounded-2xl border border-dusk-edge p-3">
+          <p className="text-sm font-semibold">Suggested new {suggestions.length === 1 ? "code" : "codes"}</p>
+          <ul className="mt-2 flex flex-col gap-2">
+            {suggestions.map((s) => (
+              <li key={s.id} className="flex items-center gap-2">
+                <span className="min-w-0 flex-1">
+                  <span className="block font-mono tracking-[0.12em]">{s.code}</span>
+                  <span className="block text-xs text-haze">{ago(s.at)}</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => dismissSuggestion(toilet.id, s.id)}
+                  className="h-9 rounded-full px-3 text-sm font-semibold text-haze"
+                >
+                  Dismiss
+                </button>
+                <button
+                  type="button"
+                  onClick={() => editToilet(toilet.id, { code: s.code })}
+                  className="h-9 rounded-full bg-ink px-4 text-sm font-semibold text-night"
+                >
+                  Use it
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Keep it honest */}
-      {voted === null ? (
+      {step === null && (
         <div className="mt-3 grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={works}
-            className="inline-flex h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-2 bg-good/15 text-[0.875rem] font-semibold text-good active:scale-[0.97] transition-transform"
+            className="inline-flex h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-good/15 px-2 text-[0.875rem] font-semibold text-good transition-transform active:scale-[0.97]"
           >
             <ThumbsUp className="size-4" aria-hidden /> Still works
           </button>
           <button
             type="button"
             onClick={broken}
-            className="inline-flex h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-2 bg-bad/15 text-[0.875rem] font-semibold text-bad active:scale-[0.97] transition-transform"
+            className="inline-flex h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-bad/15 px-2 text-[0.875rem] font-semibold text-bad transition-transform active:scale-[0.97]"
           >
             <ThumbsDown className="size-4" aria-hidden /> Doesn&apos;t work
           </button>
         </div>
-      ) : voted === "works" ? (
-        <p className="mt-3 text-sm text-haze">Thanks, that helps the next person.</p>
-      ) : (
-        <form onSubmit={saveNewCode} className="mt-3">
-          <p className="text-sm text-haze">Thanks. Know the new code?</p>
+      )}
+      {step === "thanks" && <p className="mt-3 text-sm text-haze">Thanks, that helps the next person.</p>}
+      {step === "suggested" && (
+        <p className="mt-3 text-sm text-haze">Thanks. We&apos;ll ask the person who shared it to update the code.</p>
+      )}
+      {step === "new-code" && (
+        <form onSubmit={sendNewCode} className="mt-3">
+          <p className="text-sm text-haze">Thanks. Do you know the new code?</p>
           <div className="mt-2 flex gap-2">
             <input
               value={newCode}
               onChange={(e) => setNewCode(e.target.value)}
               placeholder="New code"
-              inputMode="text"
+              aria-label="New code"
               autoComplete="off"
-              className="h-11 min-w-0 flex-1 rounded-full border border-dusk-edge bg-night px-4 font-mono tracking-[0.12em] outline-none placeholder:font-sans placeholder:tracking-normal placeholder:text-haze/60 focus:border-good"
+              className={cn(codeField, "min-w-0 flex-1")}
             />
-            <button
-              type="submit"
-              disabled={!newCode.trim()}
-              className="h-11 shrink-0 rounded-full bg-ink px-5 text-[0.9375rem] font-semibold text-night disabled:opacity-40"
-            >
-              Save
+            <button type="submit" disabled={!newCode.trim()} className={cn(pill, "bg-ink text-night disabled:opacity-40")}>
+              {toilet.mine ? "Save" : "Suggest"}
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => setStep("thanks")}
+            className="mt-2 h-10 w-full rounded-full text-sm font-semibold text-haze hover:text-ink"
+          >
+            I don&apos;t know it
+          </button>
         </form>
       )}
 

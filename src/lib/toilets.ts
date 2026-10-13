@@ -39,9 +39,13 @@ export type Toilet = {
   reportedAt: string | null;
   confirms: number;
   reports: number;
-  /** Added on this phone. */
+  /** Shared from this phone: only the person who shared a code can edit it. */
   mine: boolean;
+  /** New codes other people suggested, for the person who shared it to accept. */
+  suggestions?: Suggestion[];
 };
+
+export type Suggestion = { id: string; code: string; at: string };
 
 const store = createLocalStore<Toilet[]>("magyarotyesz:toilets", []);
 export const useToilets = store.useValue;
@@ -75,19 +79,62 @@ export const confirmCode = (id: string) =>
 export const reportCode = (id: string) =>
   update(id, (t) => ({ ...t, reportedAt: new Date().toISOString(), reports: t.reports + 1 }));
 
-/** Someone typed in the new code: it counts as a fresh confirmation. */
-export const replaceCode = (id: string, code: string) =>
+/**
+ * The person who shared it edits it. A new code counts as a fresh
+ * confirmation and clears any "doesn't work" report.
+ */
+export function editToilet(id: string, change: Partial<Pick<Toilet, "name" | "code" | "note">>) {
+  update(id, (t) => {
+    if (!t.mine) return t;
+    const next = { ...t, ...change };
+    if (change.code !== undefined && change.code !== t.code) {
+      next.confirmedAt = new Date().toISOString();
+      next.reportedAt = null;
+      next.confirms = t.confirms + 1;
+      next.suggestions = (t.suggestions ?? []).filter((s) => s.code !== change.code);
+    }
+    return next;
+  });
+}
+
+/** Anyone else can only suggest a new code. */
+export const suggestCode = (id: string, code: string) =>
   update(id, (t) => ({
     ...t,
-    code,
-    confirmedAt: new Date().toISOString(),
-    reportedAt: null,
-    confirms: t.confirms + 1,
+    suggestions: [{ id: crypto.randomUUID(), code, at: new Date().toISOString() }, ...(t.suggestions ?? [])],
   }));
+
+export const dismissSuggestion = (id: string, suggestionId: string) =>
+  update(id, (t) => ({ ...t, suggestions: (t.suggestions ?? []).filter((s) => s.id !== suggestionId) }));
 
 export const removeToilet = (id: string) => store.set((list) => list.filter((t) => t.id !== id));
 
 export const clearToilets = () => store.set([]);
+
+/**
+ * Demo only: until there are accounts, everything on this phone is yours.
+ * These stand in for codes other people shared, so you can try suggesting.
+ */
+export function addDemoToilets() {
+  const day = 24 * 60 * 60 * 1000;
+  const at = (daysAgo: number) => new Date(Date.now() - daysAgo * day).toISOString();
+  const others: Toilet[] = [
+    { name: "Fröccsterasz", code: "2580", kind: "bar", access: "customers", latitude: 47.4983, longitude: 19.0528, confirmedAt: at(1), reportedAt: null },
+    { name: "WestEnd City Center", code: "1990#", kind: "mall", access: "free", latitude: 47.5131, longitude: 19.0573, confirmedAt: at(12), reportedAt: null },
+    { name: "Café Kör", code: "7741", kind: "cafe", access: "customers", latitude: 47.5008, longitude: 19.0507, confirmedAt: at(9), reportedAt: at(2) },
+  ].map((t) => ({
+    ...t,
+    kind: t.kind as Kind,
+    access: t.access as Access,
+    id: crypto.randomUUID(),
+    note: "",
+    addedAt: at(30),
+    confirms: 4,
+    reports: t.reportedAt ? 1 : 0,
+    mine: false,
+  }));
+  store.set((list) => [...list, ...others]);
+}
 
 /*
   How much to trust a code:
