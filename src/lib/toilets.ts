@@ -41,6 +41,8 @@ export type Toilet = {
   reports: number;
   /** Shared from this phone: only the person who shared a code can edit it. */
   mine: boolean;
+  /** This phone's own vote: one per person, and changing it moves it. */
+  myVote?: "works" | "broken";
   /** New codes other people suggested, for the person who shared it to accept. */
   suggestions?: Suggestion[];
 };
@@ -63,6 +65,7 @@ export function addToilet(
     confirms: 1,
     reports: 0,
     mine: true,
+    myVote: "works",
   };
   store.set((list) => [toilet, ...list]);
   return toilet;
@@ -71,13 +74,25 @@ export function addToilet(
 const update = (id: string, change: (t: Toilet) => Toilet) =>
   store.set((list) => list.map((t) => (t.id === id ? change(t) : t)));
 
-/** "Still works": the code is fresh again. */
+/** "Still works": the code is fresh again. One vote per phone; switching moves it. */
 export const confirmCode = (id: string) =>
-  update(id, (t) => ({ ...t, confirmedAt: new Date().toISOString(), confirms: t.confirms + 1 }));
+  update(id, (t) => ({
+    ...t,
+    confirmedAt: new Date().toISOString(),
+    confirms: t.myVote === "works" ? t.confirms : t.confirms + 1,
+    reports: t.myVote === "broken" ? Math.max(0, t.reports - 1) : t.reports,
+    myVote: "works",
+  }));
 
 /** "Doesn't work". */
 export const reportCode = (id: string) =>
-  update(id, (t) => ({ ...t, reportedAt: new Date().toISOString(), reports: t.reports + 1 }));
+  update(id, (t) => ({
+    ...t,
+    reportedAt: new Date().toISOString(),
+    reports: t.myVote === "broken" ? t.reports : t.reports + 1,
+    confirms: t.myVote === "works" ? Math.max(0, t.confirms - 1) : t.confirms,
+    myVote: "broken",
+  }));
 
 /**
  * The person who shared it edits it. A new code counts as a fresh
@@ -88,9 +103,12 @@ export function editToilet(id: string, change: Partial<Pick<Toilet, "name" | "co
     if (!t.mine) return t;
     const next = { ...t, ...change };
     if (change.code !== undefined && change.code !== t.code) {
+      // A new code starts fresh: the old votes were about the old one.
       next.confirmedAt = new Date().toISOString();
       next.reportedAt = null;
-      next.confirms = t.confirms + 1;
+      next.confirms = 1;
+      next.reports = 0;
+      next.myVote = "works";
       next.suggestions = (t.suggestions ?? []).filter((s) => s.code !== change.code);
     }
     return next;
@@ -119,9 +137,9 @@ export function addDemoToilets() {
   const day = 24 * 60 * 60 * 1000;
   const at = (daysAgo: number) => new Date(Date.now() - daysAgo * day).toISOString();
   const others: Toilet[] = [
-    { name: "Fröccsterasz", code: "2580", kind: "bar", access: "customers", latitude: 47.4983, longitude: 19.0528, confirmedAt: at(1), reportedAt: null },
-    { name: "WestEnd City Center", code: "1990#", kind: "mall", access: "free", latitude: 47.5131, longitude: 19.0573, confirmedAt: at(12), reportedAt: null },
-    { name: "Café Kör", code: "7741", kind: "cafe", access: "customers", latitude: 47.5008, longitude: 19.0507, confirmedAt: at(9), reportedAt: at(2) },
+    { name: "Fröccsterasz", code: "2580", kind: "bar", access: "customers", latitude: 47.4983, longitude: 19.0528, confirmedAt: at(1), reportedAt: at(20), confirms: 9, reports: 1 },
+    { name: "WestEnd City Center", code: "1990#", kind: "mall", access: "free", latitude: 47.5131, longitude: 19.0573, confirmedAt: at(3), reportedAt: at(2), confirms: 5, reports: 4 },
+    { name: "Café Kör", code: "7741", kind: "cafe", access: "customers", latitude: 47.5008, longitude: 19.0507, confirmedAt: at(9), reportedAt: at(1), confirms: 1, reports: 6 },
   ].map((t) => ({
     ...t,
     kind: t.kind as Kind,
@@ -129,33 +147,27 @@ export function addDemoToilets() {
     id: crypto.randomUUID(),
     note: "",
     addedAt: at(30),
-    confirms: 4,
-    reports: t.reportedAt ? 1 : 0,
     mine: false,
   }));
   store.set((list) => [...list, ...others]);
 }
 
-/*
-  How much to trust a code:
-  - good: someone said it works in the last 7 days
-  - stale: it worked once, but not confirmed lately
-  - bad: the latest word is that it doesn't work
-*/
-export type Health = "good" | "stale" | "bad";
-const FRESH_DAYS = 7;
-
-export function health(t: Toilet, now = Date.now()): Health {
-  if (t.reportedAt && t.reportedAt > t.confirmedAt) return "bad";
-  const age = now - new Date(t.confirmedAt).getTime();
-  return age < FRESH_DAYS * 24 * 60 * 60 * 1000 ? "good" : "stale";
+/**
+ * How much to trust a code, from 0 to 1: the share of people who said it
+ * works. Nobody voted yet = in the middle.
+ */
+export function trust(t: Toilet) {
+  const votes = t.confirms + t.reports;
+  return votes === 0 ? 0.5 : t.confirms / votes;
 }
 
-export const HEALTH: Record<Health, { label: string; color: string; text: string }> = {
-  good: { label: "Works", color: "var(--good)", text: "text-good" },
-  stale: { label: "Not checked lately", color: "var(--stale)", text: "text-stale" },
-  bad: { label: "Reported not working", color: "var(--bad)", text: "text-bad" },
-};
+/** Red (nobody gets in) through orange to green (everybody does). */
+export function trustColor(t: Toilet) {
+  const s = trust(t);
+  return s < 0.5
+    ? `color-mix(in oklch, var(--stale) ${Math.round(s * 200)}%, var(--bad))`
+    : `color-mix(in oklch, var(--good) ${Math.round((s - 0.5) * 200)}%, var(--stale))`;
+}
 
 /** Straight-line distance in metres. */
 export function distance(a: { latitude: number; longitude: number }, b: { latitude: number; longitude: number }) {

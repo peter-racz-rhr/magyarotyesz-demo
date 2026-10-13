@@ -5,13 +5,12 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState, type FormEvent } from "react";
 import {
   ACCESS,
-  HEALTH,
   KINDS,
   ago,
   confirmCode,
   dismissSuggestion,
   editToilet,
-  health,
+  trustColor,
   reportCode,
   suggestCode,
   type Toilet,
@@ -20,7 +19,7 @@ import { cn } from "@/lib/utils";
 
 /** The coloured dot used on the map and in lists. */
 export function HealthDot({ toilet, className }: { toilet: Toilet; className?: string }) {
-  const color = HEALTH[health(toilet)].color;
+  const color = trustColor(toilet);
   return (
     <span
       aria-hidden
@@ -85,7 +84,6 @@ export function ToiletCard({
   // After a vote: thanks, or (after "doesn't work") asking for the new code.
   const [step, setStep] = useState<null | "thanks" | "new-code" | "suggested">(null);
   const [newCode, setNewCode] = useState("");
-  const state = health(toilet);
   const suggestions = toilet.mine ? (toilet.suggestions ?? []) : [];
 
   const copy = async () => {
@@ -202,9 +200,16 @@ export function ToiletCard({
         )}
       </div>
 
-      <p className={cn("mt-2 flex items-center gap-2 text-sm", HEALTH[state].text)}>
+      {/* How many got in, and how many didn't */}
+      <p className="mt-2 flex items-center gap-2 text-sm">
         <HealthDot toilet={toilet} className="size-2" />
-        {state === "bad" ? `Reported not working ${ago(toilet.reportedAt!)}` : `Worked ${ago(toilet.confirmedAt)}`}
+        <span style={{ color: trustColor(toilet) }}>
+          {toilet.confirms} said it works · {toilet.reports} said it didn&apos;t
+        </span>
+      </p>
+      <p className="mt-0.5 pl-4 text-xs text-haze">
+        Last worked {ago(toilet.confirmedAt)}
+        {toilet.reportedAt && toilet.reportedAt > toilet.confirmedAt && `, last failed ${ago(toilet.reportedAt)}`}
       </p>
 
       {/* New codes people suggested, for the person who shared it */}
