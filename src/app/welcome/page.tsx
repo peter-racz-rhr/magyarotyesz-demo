@@ -55,7 +55,7 @@ function Keypad({ typed, tone, pressed }: { typed: string; tone: Tone; pressed: 
           );
         })}
       </motion.div>
-      <p className={cn("mt-3 h-5 text-sm transition-colors", tone === "wrong" ? "text-bad" : tone === "right" ? "text-good" : "text-transparent")}>
+      <p className={cn("mt-3 h-5 text-[0.75rem] font-bold tracking-[0.14em] uppercase transition-colors", tone === "wrong" ? "text-bad" : tone === "right" ? "text-good" : "text-transparent")}>
         {tone === "wrong" ? "Wrong code" : tone === "right" ? "Open" : "·"}
       </p>
 
@@ -69,7 +69,7 @@ function Keypad({ typed, tone, pressed }: { typed: string; tone: Tone; pressed: 
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 + i * 0.03, duration: 0.5, ease: EASE_OUT }}
-              className="relative grid size-[4.25rem] place-items-center rounded-full border border-dusk-edge bg-dusk text-[1.75rem] font-medium tabular-nums"
+              className="relative grid size-[4.25rem] place-items-center rounded-full border border-dusk-edge bg-dusk text-[1.75rem] font-semibold tabular-nums"
             >
               {/* A press: the key lights up and dips, then lets go */}
               <motion.span
@@ -170,7 +170,7 @@ export default function WelcomePage() {
           />
           <div className="relative flex min-h-dvh flex-col px-6 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1.5rem)]">
             <div className="flex h-12 items-center">
-              <Wordmark className="text-[1.375rem]" />
+              <Wordmark className="text-[1.375rem] font-bold tracking-[-0.04em]" />
             </div>
             <AnimatePresence>
               {open && (
@@ -181,13 +181,15 @@ export default function WelcomePage() {
                   variants={{ shown: { transition: { staggerChildren: reduce ? 0 : 0.09, delayChildren: reduce ? 0 : 0.35 } } }}
                 >
                   {[
-                    <h1 key="h" className="t-display">
+                    <h1 key="h" className="text-[3.5rem] leading-[0.94] font-bold tracking-[-0.035em] [font-stretch:90%]">
                       Never guess
                       <br />
-                      the code again.
+                      the code
+                      <br />
+                      again.
                     </h1>,
-                    <p key="p" className="mt-4 max-w-[30ch] text-[1.0625rem] leading-snug text-haze">
-                      Toilet codes for cafés, bars and malls across Budapest, shared by people who needed them too.
+                    <p key="p" className="mt-5 max-w-[26ch] text-[1.0625rem] leading-snug font-medium text-haze">
+                      Every toilet code in Budapest, shared by the people who got in.
                     </p>,
                     <div key="b" className="mt-9 flex flex-col gap-2">
                       <ActionButton onClick={() => enter(true)} disabled={locating}>
