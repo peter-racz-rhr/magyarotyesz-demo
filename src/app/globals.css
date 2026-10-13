@@ -1,0 +1,275 @@
+/* Liquefy UI glass styles load before Tailwind so utilities win. */
+@import "../styles/liquefy-ui.css";
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/*
+  Tokens. True black, quiet type, and colour only where it means something:
+  a code that works is green, one nobody checked lately is amber, one that
+  was reported broken is red.
+*/
+:root {
+  --night: #000000;
+  --ink: #f4efe9; /* text, primary button */
+  --haze: #9a938c; /* secondary text */
+  --dusk: #1c1a19; /* fields, secondary surfaces */
+  --dusk-edge: #34302d; /* field borders */
+  --ember: #ff7a3d; /* the sunset line */
+  --gold: #ffb54d;
+  --rose: #f0648c;
+  --ok: #7fd6a4;
+  --good: #4fe08a; /* code works */
+  --stale: #ffc247; /* not checked lately */
+  --bad: #ff5f57; /* reported not working */
+  --error: #ff8a7a;
+
+  --background: var(--night);
+  --foreground: var(--ink);
+  --muted-foreground: var(--haze);
+  --border: var(--dusk-edge);
+  --input: var(--dusk-edge);
+  --ring: var(--good);
+  --radius: 1rem;
+  --popover: var(--dusk);
+  --popover-foreground: var(--ink);
+  --accent: var(--dusk-edge);
+  --muted: var(--dusk);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-night: var(--night);
+  --color-ink: var(--ink);
+  --color-haze: var(--haze);
+  --color-dusk: var(--dusk);
+  --color-dusk-edge: var(--dusk-edge);
+  --color-ember: var(--ember);
+  --color-gold: var(--gold);
+  --color-rose: var(--rose);
+  --color-ok: var(--ok);
+  --color-good: var(--good);
+  --color-stale: var(--stale);
+  --color-bad: var(--bad);
+  --color-error: var(--error);
+  --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-heading: var(--font-sans);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/60;
+  }
+  html {
+    @apply font-sans;
+    background: var(--night);
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground;
+    overscroll-behavior: none;
+  }
+  .maplibregl-popup-content {
+    @apply bg-transparent! shadow-none! p-0! rounded-none!;
+  }
+  .maplibregl-popup-tip {
+    @apply hidden!;
+  }
+  .maplibregl-ctrl-attrib {
+    @apply bg-background! text-muted-foreground! border-border! rounded-md! border! shadow-sm!;
+  }
+  .maplibregl-ctrl-attrib a {
+    @apply text-muted-foreground!;
+  }
+  .maplibregl-ctrl-attrib a:hover {
+    @apply text-foreground!;
+  }
+  .maplibregl-ctrl-attrib-button {
+    @apply bg-transparent!;
+    /* MapLibre draws a dark "i"; flip it to light for our dark map. */
+    filter: invert(1);
+    opacity: 0.55;
+  }
+  .maplibregl-ctrl-attrib.maplibregl-compact {
+    @apply bg-night/60! border-dusk-edge! shadow-none!;
+  }
+  /* Keep the map credits out from under the dock: top right, small. */
+  .maplibregl-ctrl-bottom-right {
+    top: max(env(safe-area-inset-top), 0.5rem);
+    bottom: auto !important;
+  }
+}
+
+/*
+  Type scale. One family (Instrument Sans); headings use its narrower
+  widths for character, body text stays at normal width.
+*/
+@layer components {
+  .t-display {
+    font-size: 2.75rem;
+    line-height: 1.02;
+    font-weight: 600;
+    font-stretch: 90%;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  .t-title {
+    font-size: 2.125rem;
+    line-height: 1.05;
+    font-weight: 600;
+    font-stretch: 92%;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  .t-card-title {
+    font-size: 1.625rem;
+    line-height: 1.1;
+    font-weight: 600;
+    font-stretch: 94%;
+    letter-spacing: -0.02em;
+  }
+  .t-section {
+    font-size: 1.25rem;
+    line-height: 1.2;
+    font-weight: 600;
+    font-stretch: 95%;
+    letter-spacing: -0.01em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Page transitions (see components/page-transition.tsx) */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-old(.nav-forward) {
+  --slide-offset: -48px;
+  animation:
+    160ms ease-in both page-fade reverse,
+    420ms cubic-bezier(0.22, 1, 0.36, 1) both page-slide reverse;
+}
+::view-transition-new(.nav-forward) {
+  --slide-offset: 48px;
+  animation:
+    260ms ease-out 120ms both page-fade,
+    420ms cubic-bezier(0.22, 1, 0.36, 1) both page-slide;
+}
+::view-transition-old(.nav-back) {
+  --slide-offset: 48px;
+  animation:
+    160ms ease-in both page-fade reverse,
+    420ms cubic-bezier(0.22, 1, 0.36, 1) both page-slide reverse;
+}
+::view-transition-new(.nav-back) {
+  --slide-offset: -48px;
+  animation:
+    260ms ease-out 120ms both page-fade,
+    420ms cubic-bezier(0.22, 1, 0.36, 1) both page-slide;
+}
+::view-transition-old(.page-fade) {
+  animation: 160ms ease-in both page-fade reverse;
+}
+::view-transition-new(.page-fade) {
+  animation: 260ms ease-out 100ms both page-fade;
+}
+@keyframes page-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes page-slide {
+  from {
+    translate: var(--slide-offset) 0;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/*
+  Glass surface for controls that float over the map and photos.
+  Placeholder until the Liquefy UI liquid glass is installed.
+*/
+.glass {
+  background: color-mix(in oklab, var(--dusk) 55%, transparent);
+  border: 1px solid color-mix(in oklab, white 14%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 18%, transparent),
+    0 10px 30px -10px rgb(0 0 0 / 0.6);
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+}
+
+/*
+  Tailwind's preflight (base layer) resets button corners to 0 and outranks
+  the liquefy-ui layer, so restore Liquefy's own rounded, squishy shape.
+*/
+@layer components {
+  .lq-button {
+    border-radius: calc(var(--lq-button-radius) + var(--lq-squish) * 5px);
+  }
+}
+
+/* Liquid glass: a slightly thicker rim than Liquefy's 1.6px default. */
+@layer components {
+  .lq-surface,
+  .lq-button {
+    --lq-rim-width: 2.4px;
+  }
+}
+
+/*
+  During page transitions only the pages animate. Everything else (the dock)
+  is shown live instead of cross-fading two snapshots, so it stays still and
+  its active disc keeps sliding.
+*/
+::view-transition-old(root) {
+  display: none;
+}
+::view-transition-new(root) {
+  animation: none;
+}
+
+/* Sheets that need the bottom of the screen (saving a spot) tuck the dock away. */
+html[data-sheet="open"] .app-dock {
+  translate: 0 140%;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* The sunlight fan on the map is decoration: taps go through to the map. */
+.maplibregl-marker.sun-light {
+  pointer-events: none;
+}
