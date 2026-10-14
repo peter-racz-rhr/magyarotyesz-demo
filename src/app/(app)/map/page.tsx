@@ -1,7 +1,7 @@
 "use client";
 
 import "@/lib/maplibre-worker";
-import { Accessibility, Baby, ChevronDown, LocateFixed, Zap, X } from "lucide-react";
+import { Accessibility, Baby, ChevronUp, LocateFixed, Zap, X } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { PageTransition } from "@/components/page-transition";
@@ -133,63 +133,87 @@ function Toggle({ on, onChange, icon, children }: { on: boolean; onChange: (on: 
   );
 }
 
-/** Pulling further than this (px) counts as a swipe. */
-const SWIPE_PX = 40;
+/** Pulling further than this (px) counts as a pull, not a tap. */
+const PULL_PX = 8;
 
 /**
- * Swipe handlers for the add sheet: pull up for the details, pull down to
- * fold them away (and, with nothing folded, to close the sheet). A plain tap
- * still reaches the button underneath.
+ * The add sheet's details follow your finger: pull the top of the sheet up
+ * and they open as far as you pull; let go past a third of the way and they
+ * snap open, otherwise they fold back. Pulling down folds them away, and
+ * pulling down with nothing left to fold closes the sheet.
  */
-function useSheetSwipe({ onUp, onDown }: { onUp: () => void; onDown: () => void }) {
-  const sheet = useRef<HTMLFormElement>(null);
-  const press = useRef<{ y: number; moved: boolean } | null>(null);
+function useSheetPull({ onOpenChange, onClose }: { onOpenChange: (open: boolean) => void; onClose: () => void }) {
+  const box = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  const open = useRef(false);
+  const press = useRef<{ y: number; from: number; moved: boolean } | null>(null);
   const swallow = useRef(false);
 
-  const settle = () => {
-    if (!sheet.current) return;
-    sheet.current.style.transition = "transform 200ms ease-out";
-    sheet.current.style.transform = "";
+  const full = () => inner.current?.scrollHeight ?? 0;
+  const height = () => box.current?.getBoundingClientRect().height ?? 0;
+
+  /** Glide to open or folded from wherever it is now. */
+  const settle = (to: boolean) => {
+    const el = box.current;
+    if (!el) return;
+    open.current = to;
+    onOpenChange(to);
+    el.style.transition = "height 280ms cubic-bezier(0.2, 0.8, 0.2, 1)";
+    el.style.height = `${height()}px`;
+    void el.offsetHeight;
+    el.style.height = `${to ? full() : 0}px`;
+    const done = () => {
+      el.removeEventListener("transitionend", done);
+      el.style.transition = "";
+      // Open means "as tall as it needs", so choosing Paid or Set hours can grow it.
+      if (open.current) el.style.height = "auto";
+    };
+    el.addEventListener("transitionend", done);
   };
 
   const grip = {
     onPointerDown: (e: ReactPointerEvent) => {
-      press.current = { y: e.clientY, moved: false };
+      open.current = height() > 0;
+      press.current = { y: e.clientY, from: height(), moved: false };
     },
     onPointerMove: (e: ReactPointerEvent) => {
       const state = press.current;
-      if (!state) return;
+      const el = box.current;
+      if (!state || !el) return;
       const dy = e.clientY - state.y;
-      if (!state.moved && Math.abs(dy) < 8) return;
+      if (!state.moved && Math.abs(dy) < PULL_PX) return;
       state.moved = true;
-      // The sheet leans with the finger a little, so it feels attached to it.
-      if (sheet.current) {
-        sheet.current.style.transition = "none";
-        sheet.current.style.transform = `translateY(${Math.max(-24, Math.min(80, dy * 0.5))}px)`;
-      }
+      el.style.transition = "none";
+      el.style.height = `${Math.max(0, Math.min(full(), state.from - dy))}px`;
     },
     onPointerUp: (e: ReactPointerEvent) => {
       const state = press.current;
       press.current = null;
       if (!state?.moved) return;
-      const dy = e.clientY - state.y;
       swallow.current = true;
       window.setTimeout(() => (swallow.current = false), 0);
-      settle();
-      if (dy <= -SWIPE_PX) onUp();
-      else if (dy >= SWIPE_PX) onDown();
+      const dy = e.clientY - state.y;
+      const wasOpen = state.from > 0;
+      // Folded and pulled down: that's "close this sheet".
+      if (!wasOpen && dy > 60) {
+        settle(false);
+        onClose();
+        return;
+      }
+      const shown = height() / Math.max(1, full());
+      settle(wasOpen ? shown > 0.7 : shown > 0.3);
     },
     onPointerCancel: () => {
       press.current = null;
-      settle();
+      settle(open.current);
     },
-    onClickCapture: (e: ReactPointerEvent | React.MouseEvent) => {
+    onClickCapture: (e: React.MouseEvent) => {
       if (!swallow.current) return;
       e.preventDefault();
       e.stopPropagation();
     },
   };
-  return { sheet, grip };
+  return { box, inner, grip };
 }
 
 export default function MapPage() {
@@ -292,10 +316,7 @@ export default function MapPage() {
     }, 220);
   };
 
-  const { sheet: sheetRef, grip: swipe } = useSheetSwipe({
-    onUp: () => setDetails(true),
-    onDown: () => (details ? setDetails(false) : closeSheet()),
-  });
+  const { box: detailsBox, inner: detailsInner, grip } = useSheetPull({ onOpenChange: setDetails, onClose: closeSheet });
 
   const locate = async () => {
     if (here.coords) {
@@ -518,7 +539,6 @@ export default function MapPage() {
         {/* Add sheet */}
         {draft && (
           <form
-            ref={sheetRef}
             noValidate
             onSubmit={submit}
             className={cn(
@@ -528,24 +548,26 @@ export default function MapPage() {
                 : "animate-in slide-in-from-bottom duration-300 ease-out",
             )}
           >
-            {/* The grip: pull the sheet up for details, down to fold it away */}
-            <div {...swipe} className="-mx-5 flex touch-none justify-center px-5 pt-2 pb-3">
-              <span aria-hidden className="h-1 w-10 rounded-full bg-dusk-edge" />
-            </div>
-            {/* Add sits up top so it stays reachable above the keyboard. */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={closeSheet}
-                aria-label={t.add.cancel}
-                className="-ml-2 grid size-10 shrink-0 place-items-center rounded-full text-haze hover:text-ink"
-              >
-                <X className="size-5" />
-              </button>
-              <h2 className="t-section min-w-0 flex-1 truncate">{t.add.title}</h2>
-              <button type="submit" disabled={busy} className={cn(btn.primary, "h-10 px-5 text-[0.9375rem]")}>
-                {busy ? "…" : t.add.add}
-              </button>
+            {/* Pull this part up for the details, down to fold them away */}
+            <div {...grip} className="-mx-5 touch-none px-5">
+              <div className="flex justify-center pt-2 pb-3">
+                <span aria-hidden className="h-1 w-10 rounded-full bg-dusk-edge" />
+              </div>
+              {/* Add sits up top so it stays reachable above the keyboard. */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={closeSheet}
+                  aria-label={t.add.cancel}
+                  className="-ml-2 grid size-10 shrink-0 place-items-center rounded-full text-haze hover:text-ink"
+                >
+                  <X className="size-5" />
+                </button>
+                <h2 className="t-section min-w-0 flex-1 truncate">{t.add.title}</h2>
+                <button type="submit" disabled={busy} className={cn(btn.primary, "h-10 px-5 text-[0.9375rem]")}>
+                  {busy ? "…" : t.add.add}
+                </button>
+              </div>
             </div>
 
             <div className="mt-4 flex flex-col gap-3">
@@ -563,22 +585,13 @@ export default function MapPage() {
                 autoComplete="off"
                 className={cn(field, "h-14 font-mono text-[1.375rem] tracking-[0.16em] placeholder:font-sans placeholder:text-base placeholder:tracking-normal")}
               />
-              {/* Everything else is optional, folded away */}
-              <button
-                type="button"
-                {...swipe}
-                onClick={() => setDetails((d) => !d)}
-                aria-expanded={details}
-                className="flex touch-none items-center gap-3 rounded-2xl py-1 text-left"
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="block font-semibold">{t.add.more}</span>
-                  {!details && <span className="block truncate text-sm text-haze">{t.add.moreSub}</span>}
-                </span>
-                <ChevronDown className={cn("size-5 shrink-0 text-haze transition-transform duration-300", details && "rotate-180")} aria-hidden />
-              </button>
-              {details && (
-              <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+              {/* Everything else is optional: pull the sheet up and it opens */}
+              <div {...grip} className={cn("-mx-5 flex touch-none items-center justify-center gap-2 px-5 py-1.5 text-sm text-haze transition-opacity", details && "hidden")}>
+                <ChevronUp className="size-4" aria-hidden />
+                {t.add.pullUp}
+              </div>
+              <div ref={detailsBox} inert={!details} style={{ height: 0 }} className="-mx-1 overflow-hidden px-1">
+              <div ref={detailsInner} className="flex flex-col gap-3 pb-1">
               <Choice label={t.add.kind} keys={KIND_KEYS} labels={t.kinds} value={kind} onChange={setKind} />
               <Choice label={t.add.who} keys={ACCESS_KEYS} labels={t.access} value={access} onChange={setAccess} />
               {access === "paid" && (
@@ -629,7 +642,7 @@ export default function MapPage() {
 
               <input aria-label={t.add.note} placeholder={t.add.note} value={note} onChange={(e) => setNote(e.target.value)} className={field} />
               </div>
-              )}
+              </div>
             </div>
           </form>
         )}

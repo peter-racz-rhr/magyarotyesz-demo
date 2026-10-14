@@ -55,8 +55,7 @@ const en = {
     errPrice: "How much does it cost?",
     errLimit: "That's 10 codes today. Come back tomorrow.",
     errCity: "magyarotyesz only covers Budapest for now.",
-    more: "More details",
-    moreSub: "Pull up or tap: kind, access, hours, more",
+    pullUp: "Pull up for more details",
   },
 
   spot: {
@@ -248,8 +247,7 @@ const hu: Dict = {
     errPrice: "Mennyibe kerül?",
     errLimit: "Ma már 10 kódot hozzáadtál. Holnap folytathatod.",
     errCity: "A magyarotyesz egyelőre csak Budapestet fedi le.",
-    more: "További részletek",
-    moreSub: "Húzd fel vagy koppints: típus, hozzáférés, nyitvatartás",
+    pullUp: "Húzd fel a további részletekért",
   },
 
   spot: {
