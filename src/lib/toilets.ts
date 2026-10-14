@@ -1,6 +1,7 @@
 "use client";
 
 import { REMOTE } from "./api";
+import { LIMITS, cleanCode, tidy } from "./limits";
 import { createLocalStore } from "./local-store";
 import {
   addsLeft,
@@ -84,7 +85,9 @@ export function addedToday(now = Date.now()) {
 export const inBudapest = (p: { latitude: number; longitude: number }) =>
   p.latitude >= 47.35 && p.latitude <= 47.62 && p.longitude >= 18.92 && p.longitude <= 19.34;
 
-export function addToilet(input: ToiletInput, location?: Location) {
+export function addToilet(raw: ToiletInput, location?: Location) {
+  // Whatever the form did, nothing outside the limits goes any further.
+  const input = { ...raw, name: tidy(raw.name, LIMITS.name), code: cleanCode(raw.code), note: tidy(raw.note, LIMITS.note) };
   const now = new Date().toISOString();
   const id = crypto.randomUUID();
   if (REMOTE) {
@@ -161,6 +164,7 @@ export function editToilet(
   id: string,
   change: Partial<Pick<Toilet, "name" | "code" | "note" | "access" | "price" | "hours" | "wheelchair" | "babyChanging">>,
 ) {
+  if (change.code !== undefined) change = { ...change, code: cleanCode(change.code) };
   if (REMOTE) {
     const current = getRemoteToilets().find((t) => t.id === id);
     if (!current?.mine) return;
@@ -189,7 +193,8 @@ export function editToilet(
 }
 
 /** Anyone else can only suggest a new code. */
-export function suggestCode(id: string, code: string) {
+export function suggestCode(id: string, rawCode: string) {
+  const code = cleanCode(rawCode);
   if (REMOTE) return void enqueue("suggest_code", { toiletId: id, code }, { name: nameOf(id) });
   update(id, (t) => ({
     ...t,

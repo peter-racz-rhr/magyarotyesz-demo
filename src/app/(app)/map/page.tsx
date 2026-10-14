@@ -7,11 +7,13 @@ import { createPortal } from "react-dom";
 import { PageTransition } from "@/components/page-transition";
 import { HealthDot, ToiletCard } from "@/components/toilet-card";
 import { btn } from "@/components/ui/buttons";
+import { LimitedInput } from "@/components/limited-input";
 import { LiquidIconButton } from "@/components/ui/liquid-icon-button";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { Map, MapMarker, MapPopup, MarkerContent, useMap, type MapRef } from "@/components/ui/map";
 import { spotMessage, useT } from "@/lib/i18n";
 import { requestLocation } from "@/lib/location";
+import { LIMITS, cleanCode, cleanText, tidy, validCode, validName } from "@/lib/limits";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
 import {
   ACCESS_KEYS,
@@ -368,9 +370,13 @@ export default function MapPage() {
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!draft) return;
-    if (!name.trim()) return setError(t.add.errName);
+    const cleanName = tidy(name, LIMITS.name);
+    const cleanedCode = cleanCode(code);
+    if (!cleanName || !validName(cleanName)) return setError(t.add.errName);
     if (!code.trim()) return setError(t.add.errCode);
+    if (!validCode(cleanedCode)) return setError(t.add.errCodeChars);
     if (access === "paid" && !(Number(price) > 0)) return setError(t.add.errPrice);
+    if (access === "paid" && Number(price) > LIMITS.price) return setError(t.add.errPriceMax(LIMITS.price));
     if (!inBudapest(draft)) return setError(t.add.errCity);
     if (addedToday() >= DAILY_LIMIT) return setError(t.add.errLimit);
     setBusy(true);
@@ -382,15 +388,15 @@ export default function MapPage() {
     const hours: Hours | undefined =
       hoursMode === "always" ? "24/7" : hoursMode === "set" ? { open: opens, close: closes } : undefined;
     const toilet = addToilet({
-      name: name.trim(),
-      code: code.trim(),
+      name: cleanName,
+      code: cleanedCode,
       kind,
       access,
       price: access === "paid" ? Number(price) : undefined,
       hours,
       wheelchair: wheelchair || undefined,
       babyChanging: baby || undefined,
-      note: note.trim(),
+      note: tidy(note, LIMITS.note),
       ...draft,
     }, spot.location);
     closeSheet();
@@ -576,14 +582,33 @@ export default function MapPage() {
                   {error}
                 </p>
               )}
-              <input aria-label={t.add.place} placeholder={t.add.place} value={name} onChange={(e) => setName(e.target.value)} className={field} />
-              <input
+              <LimitedInput
+                aria-label={t.add.place}
+                placeholder={t.add.place}
+                value={name}
+                onValueChange={(v) => {
+                  setName(v);
+                  setError(null);
+                }}
+                max={LIMITS.name}
+                clean={(v) => cleanText(v, LIMITS.name)}
+                rejectedHint={t.add.textHint}
+                className={cn(field, "w-full")}
+              />
+              <LimitedInput
                 aria-label={t.add.code}
                 placeholder={t.add.code}
                 value={code}
-                onChange={(e) => setCode(e.target.value)}
+                onValueChange={(v) => {
+                  setCode(v);
+                  setError(null);
+                }}
+                max={LIMITS.code}
+                clean={cleanCode}
+                rejectedHint={t.add.codeHint}
                 autoComplete="off"
-                className={cn(field, "h-14 font-mono text-[1.375rem] tracking-[0.16em] placeholder:font-sans placeholder:text-base placeholder:tracking-normal")}
+                autoCapitalize="characters"
+                className={cn(field, "h-14 w-full font-mono text-[1.375rem] tracking-[0.16em] placeholder:font-sans placeholder:text-base placeholder:tracking-normal")}
               />
               {/* Everything else is optional: pull the sheet up and it opens */}
               <div {...grip} className={cn("-mx-5 flex touch-none items-center justify-center gap-2 px-5 py-1.5 text-sm text-haze transition-opacity", details && "hidden")}>
@@ -600,11 +625,21 @@ export default function MapPage() {
                   <input
                     inputMode="numeric"
                     value={price}
-                    onChange={(e) => setPrice(e.target.value.replace(/\D/g, ""))}
+                    maxLength={String(LIMITS.price).length}
+                    onChange={(e) => {
+                      setPrice(e.target.value.replace(/\D/g, "").replace(/^0+/, ""));
+                      setError(null);
+                    }}
                     placeholder="300"
-                    className={cn(field, "h-10 w-24")}
+                    aria-invalid={Number(price) > LIMITS.price}
+                    className={cn(field, "h-10 w-24", Number(price) > LIMITS.price && "border-bad focus:border-bad")}
                   />
                   <span className="text-sm text-haze">Ft</span>
+                  {Number(price) > LIMITS.price && (
+                    <span role="alert" className="text-sm text-bad">
+                      {t.add.priceMax(LIMITS.price)}
+                    </span>
+                  )}
                 </label>
               )}
 
@@ -640,7 +675,16 @@ export default function MapPage() {
                 </Toggle>
               </div>
 
-              <input aria-label={t.add.note} placeholder={t.add.note} value={note} onChange={(e) => setNote(e.target.value)} className={field} />
+              <LimitedInput
+                aria-label={t.add.note}
+                placeholder={t.add.note}
+                value={note}
+                onValueChange={setNote}
+                max={LIMITS.note}
+                clean={(v) => cleanText(v, LIMITS.note)}
+                rejectedHint={t.add.textHint}
+                className={cn(field, "w-full")}
+              />
               </div>
               </div>
             </div>

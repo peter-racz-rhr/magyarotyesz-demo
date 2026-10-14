@@ -3,8 +3,10 @@
 import { Accessibility, Baby, Check, Copy, Eye, Navigation, Pencil, ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState, type FormEvent, type ReactNode } from "react";
+import { LimitedInput } from "@/components/limited-input";
 import { btn } from "@/components/ui/buttons";
 import { spotMessage, useT } from "@/lib/i18n";
+import { LIMITS, cleanCode, cleanText, tidy, validCode, validName } from "@/lib/limits";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
 import {
   ago,
@@ -74,20 +76,48 @@ function EditForm({ toilet, onDone }: { toilet: Toilet; onDone: () => void }) {
   const [note, setNote] = useState(toilet.note);
   const save = (event: FormEvent) => {
     event.preventDefault();
-    if (!name.trim() || !code.trim()) return;
-    editToilet(toilet.id, { name: name.trim(), code: code.trim(), note: note.trim() });
+    const cleanName = tidy(name, LIMITS.name);
+    const cleanedCode = cleanCode(code);
+    if (!validName(cleanName) || !validCode(cleanedCode)) return;
+    editToilet(toilet.id, { name: cleanName, code: cleanedCode, note: tidy(note, LIMITS.note) });
     onDone();
   };
   return (
     <form onSubmit={save} className="flex flex-col gap-2">
-      <input aria-label={t.add.place} value={name} onChange={(e) => setName(e.target.value)} className={field} />
-      <input aria-label={t.add.code} value={code} onChange={(e) => setCode(e.target.value)} autoComplete="off" className={codeField} />
-      <input aria-label={t.add.note} placeholder={t.add.note} value={note} onChange={(e) => setNote(e.target.value)} className={field} />
+      <LimitedInput
+        aria-label={t.add.place}
+        value={name}
+        onValueChange={setName}
+        max={LIMITS.name}
+        clean={(v) => cleanText(v, LIMITS.name)}
+        rejectedHint={t.add.textHint}
+        className={field}
+      />
+      <LimitedInput
+        aria-label={t.add.code}
+        value={code}
+        onValueChange={setCode}
+        max={LIMITS.code}
+        clean={cleanCode}
+        rejectedHint={t.add.codeHint}
+        autoComplete="off"
+        className={codeField}
+      />
+      <LimitedInput
+        aria-label={t.add.note}
+        placeholder={t.add.note}
+        value={note}
+        onValueChange={setNote}
+        max={LIMITS.note}
+        clean={(v) => cleanText(v, LIMITS.note)}
+        rejectedHint={t.add.textHint}
+        className={field}
+      />
       <div className="mt-1 flex justify-end gap-2">
         <button type="button" onClick={onDone} className={cn(btn.quiet, btn.md)}>
           {t.card.cancel}
         </button>
-        <button type="submit" disabled={!name.trim() || !code.trim()} className={cn(btn.primary, btn.md)}>
+        <button type="submit" disabled={!validName(tidy(name, LIMITS.name)) || !validCode(cleanCode(code))} className={cn(btn.primary, btn.md)}>
           {t.card.save}
         </button>
       </div>
@@ -154,8 +184,8 @@ export function ToiletCard({
 
   const sendNewCode = (event: FormEvent) => {
     event.preventDefault();
-    const code = newCode.trim();
-    if (!code) return;
+    const code = cleanCode(newCode);
+    if (!validCode(code)) return;
     if (toilet.mine) {
       editToilet(toilet.id, { code });
       setStep("thanks");
@@ -335,15 +365,19 @@ export function ToiletCard({
         <form onSubmit={sendNewCode} className="mt-3 border-t border-dusk-edge pt-3">
           <p className="text-sm text-haze">{t.card.knowNew}</p>
           <div className="mt-2 flex gap-2">
-            <input
+            <LimitedInput
               value={newCode}
-              onChange={(e) => setNewCode(e.target.value)}
+              onValueChange={setNewCode}
+              max={LIMITS.code}
+              clean={cleanCode}
+              rejectedHint={t.add.codeHint}
               placeholder={t.card.newCode}
               aria-label={t.card.newCode}
               autoComplete="off"
-              className={cn(codeField, "min-w-0 flex-1")}
+              wrapperClassName="min-w-0 flex-1"
+              className={codeField}
             />
-            <button type="submit" disabled={!newCode.trim()} className={cn(btn.primary, btn.md)}>
+            <button type="submit" disabled={!validCode(cleanCode(newCode))} className={cn(btn.primary, btn.md)}>
               {toilet.mine ? t.card.save : t.card.suggest}
             </button>
           </div>

@@ -55,6 +55,11 @@ const en = {
     errPrice: "How much does it cost?",
     errLimit: "That's 10 codes today. Come back tomorrow.",
     errCity: "magyarotyesz only covers Budapest for now.",
+    errCodeChars: "A code can use letters, numbers and # * + - . / only.",
+    errPriceMax: (n: number) => `Toilets here cost up to ${n} Ft. Check the price.`,
+    priceMax: (n: number) => `Up to ${n} Ft`,
+    codeHint: "Letters, numbers and # * + - . / only",
+    textHint: "No emoji, please",
     pullUp: "Pull up for more details",
   },
 
@@ -247,6 +252,11 @@ const hu: Dict = {
     errPrice: "Mennyibe kerül?",
     errLimit: "Ma már 10 kódot hozzáadtál. Holnap folytathatod.",
     errCity: "A magyarotyesz egyelőre csak Budapestet fedi le.",
+    errCodeChars: "A kód csak betűt, számot és a # * + - . / jeleket tartalmazhat.",
+    errPriceMax: (n: number) => `Itt a mosdók ára legfeljebb ${n} Ft. Nézd át az árat.`,
+    priceMax: (n: number) => `Legfeljebb ${n} Ft`,
+    codeHint: "Csak betű, szám és # * + - . /",
+    textHint: "Emoji nélkül, kérlek",
     pullUp: "Húzd fel a további részletekért",
   },
 
