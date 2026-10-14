@@ -8,7 +8,7 @@ import { PageTransition } from "@/components/page-transition";
 import { HealthDot, ToiletCard } from "@/components/toilet-card";
 import { LiquidIconButton } from "@/components/ui/liquid-icon-button";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
-import { Map, MapMarker, MapPopup, MarkerContent, MarkerPopup, useMap, type MapRef } from "@/components/ui/map";
+import { Map, MapMarker, MapPopup, MarkerContent, useMap, type MapRef } from "@/components/ui/map";
 import { useT } from "@/lib/i18n";
 import { requestLocation } from "@/lib/location";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
@@ -41,14 +41,16 @@ type Draft = { latitude: number; longitude: number };
 type Filters = { open: boolean; free: boolean; works: boolean };
 
 /**
- * Tapping empty map starts adding a toilet there. A tap that lands on a
- * dot, or that only closes an open card, is left alone.
+ * Tapping empty map starts adding a toilet there. If a card is open, that
+ * tap just closes it; a tap on a dot is left to the dot.
  */
-function TapToAdd({ onTap }: { onTap: (draft: Draft) => void }) {
+function TapToAdd({ onTap, onDismiss }: { onTap: (draft: Draft) => void; onDismiss: () => void }) {
   const { map } = useMap();
   const onTapRef = useRef(onTap);
+  const onDismissRef = useRef(onDismiss);
   useEffect(() => {
     onTapRef.current = onTap;
+    onDismissRef.current = onDismiss;
   });
 
   useEffect(() => {
@@ -59,7 +61,8 @@ function TapToAdd({ onTap }: { onTap: (draft: Draft) => void }) {
     };
     const click = (event: { lngLat: { lat: number; lng: number }; originalEvent: Event }) => {
       const target = event.originalEvent.target as Element | null;
-      if (popupWasOpen || target?.closest(".maplibregl-marker, .maplibregl-popup")) return;
+      if (target?.closest(".maplibregl-marker, .maplibregl-popup")) return;
+      if (popupWasOpen) return onDismissRef.current();
       onTapRef.current({ latitude: event.lngLat.lat, longitude: event.lngLat.lng });
     };
     map.on("mousedown", down);
@@ -179,18 +182,39 @@ export default function MapPage() {
   const sheetOpen = draft !== null;
   useEffect(() => {
     if (!sheetOpen) return;
-    const root = document.documentElement;
     const meta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
     const originalViewport = meta?.content;
-    root.dataset.sheet = "open";
     if (meta && originalViewport && !originalViewport.includes("interactive-widget")) {
       meta.content = `${originalViewport}, interactive-widget=resizes-content`;
     }
     return () => {
-      delete root.dataset.sheet;
       if (meta && originalViewport !== undefined) meta.content = originalViewport;
     };
   }, [sheetOpen]);
+
+  // While a card or the add sheet is open, the dock and its buttons step
+  // aside so nothing covers it.
+  const covered = sheetOpen || focus !== null;
+  useEffect(() => {
+    if (!covered) return;
+    const root = document.documentElement;
+    root.dataset.sheet = "open";
+    return () => {
+      delete root.dataset.sheet;
+    };
+  }, [covered]);
+
+  /** Open a toilet's card: the dot glides near the top, the card opens below it. */
+  const openCard = (toilet: Toilet, zoom?: number) => {
+    setFocus(toilet);
+    const height = mapRef.current?.getContainer().clientHeight ?? window.innerHeight;
+    mapRef.current?.easeTo({
+      center: [toilet.longitude, toilet.latitude],
+      offset: [0, Math.round(150 - height / 2)],
+      ...(zoom ? { zoom } : {}),
+      duration: zoom ? 1400 : 500,
+    });
+  };
 
   const flash = (text: string) => {
     setNotice(text);
@@ -230,8 +254,7 @@ export default function MapPage() {
       .map((toilet) => ({ toilet, metres: distance(from, toilet) }))
       .sort((a, b) => a.metres - b.metres)[0];
     if (!best) return flash(t.map.nearestNone);
-    setFocus(best.toilet);
-    mapRef.current?.flyTo({ center: [best.toilet.longitude, best.toilet.latitude], zoom: 17, offset: [0, 140], duration: 1400 });
+    openCard(best.toilet, 17);
   };
 
   const startDraft = (next: Draft) => {
@@ -298,13 +321,18 @@ export default function MapPage() {
           zoom={here.coords ? 15 : 12}
           className="h-full w-full"
         >
-          <TapToAdd onTap={startDraft} />
+          <TapToAdd onTap={startDraft} onDismiss={() => setFocus(null)} />
 
           {visible.map((toilet) => (
             <MapMarker key={toilet.id} latitude={toilet.latitude} longitude={toilet.longitude}>
               {/* A small dot, coloured by how many got in, with a finger-sized tap area */}
               <MarkerContent>
-                <span role="button" aria-label={toilet.name} className="relative grid size-8 place-items-center">
+                <span
+                  role="button"
+                  aria-label={toilet.name}
+                  onClick={() => openCard(toilet)}
+                  className="relative grid size-8 place-items-center"
+                >
                   {justAdded?.id === toilet.id && (
                     <span aria-hidden className="absolute size-2.5 animate-ping rounded-full bg-good/70" />
                   )}
@@ -317,20 +345,20 @@ export default function MapPage() {
                   />
                 </span>
               </MarkerContent>
-              <MarkerPopup className="w-[19rem] rounded-[1.25rem] border-dusk-edge p-4">
-                <ToiletCard toilet={toilet} />
-              </MarkerPopup>
             </MapMarker>
           ))}
 
-          {/* The nearest one, opened for you */}
+          {/* The open card, hanging below its dot; it scrolls if it's taller than the screen */}
           {focus && (
             <MapPopup
               key={focus.id}
               latitude={focus.latitude}
               longitude={focus.longitude}
-              onClose={() => setFocus(null)}
-              className="w-[19rem] rounded-[1.25rem] border-dusk-edge p-4"
+              anchor="top"
+              offset={18}
+              closeOnClick={false}
+              onClose={() => setFocus((f) => (f?.id === focus.id ? null : f))}
+              className="max-h-[calc(100dvh-13rem)] w-[20rem] max-w-[calc(100vw-2rem)] overflow-y-auto overscroll-contain rounded-[1.25rem] border-dusk-edge p-4"
             >
               <ToiletCard toilet={toilets.find((x) => x.id === focus.id) ?? focus} />
             </MapPopup>

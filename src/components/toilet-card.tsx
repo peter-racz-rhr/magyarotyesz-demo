@@ -183,7 +183,7 @@ export function ToiletCard({
             <p className="text-sm text-haze">{access}</p>
           ) : (
             <>
-              <p className="font-semibold leading-tight">{toilet.name}</p>
+              <p className="text-[1.0625rem] font-semibold leading-tight">{toilet.name}</p>
               <p className="mt-0.5 text-sm text-haze">
                 {t.kinds[toilet.kind]} · {access}
               </p>
