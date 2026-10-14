@@ -17,6 +17,7 @@ import {
   useTransform,
 } from "motion/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 export type DockItem = {
@@ -29,6 +30,9 @@ export type DockItem = {
   badge?: number;
 };
 
+/** Further than this (px) and a press counts as a slide, not a tap. */
+const SLIDE_PX = 10;
+
 export const FloatingDock = ({
   items,
   activeHref,
@@ -38,26 +42,97 @@ export const FloatingDock = ({
   activeHref?: string;
   className?: string;
 }) => {
+  const router = useRouter();
+  const nav = useRef<HTMLElement>(null);
   const pointerX = useMotionValue(Infinity);
+  const drag = useRef<{ startX: number; moved: boolean } | null>(null);
+  const swallowClick = useRef(false);
+  // The tab the lit disc sits on while a finger is sliding along the dock.
+  const [sliding, setSliding] = useState<number | null>(null);
+  // Mirrors `sliding` so a release in the same frame as the last move still sees it.
+  const slidingNow = useRef<number | null>(null);
+  const slideTo = (index: number | null) => {
+    slidingNow.current = index;
+    setSliding(index);
+  };
+
+  const activeIndex = items.findIndex((item) => item.href === activeHref);
+
+  /** Which tab is closest to this x position. */
+  const nearest = (x: number) => {
+    const cells = nav.current?.querySelectorAll<HTMLElement>("[data-dock-item]") ?? [];
+    let best = 0;
+    let bestGap = Infinity;
+    cells.forEach((cell, index) => {
+      const box = cell.getBoundingClientRect();
+      const gap = Math.abs(x - (box.left + box.width / 2));
+      if (gap < bestGap) {
+        best = index;
+        bestGap = gap;
+      }
+    });
+    return best;
+  };
+
   const release = () => pointerX.set(Infinity);
+
+  const finish = (commit: boolean) => {
+    const slid = drag.current?.moved ?? false;
+    drag.current = null;
+    release();
+    if (!slid) return;
+    // The click that follows a slide must not also open whatever is under the finger.
+    swallowClick.current = true;
+    window.setTimeout(() => (swallowClick.current = false), 0);
+    const target = slidingNow.current !== null ? items[slidingNow.current] : undefined;
+    slideTo(null);
+    if (commit && target && target.href !== activeHref) {
+      router.push(target.href, { transitionTypes: target.transitionTypes });
+    }
+  };
 
   return (
     <motion.nav
+      ref={nav}
       aria-label="Main"
-      onPointerMove={(e) => pointerX.set(e.clientX)}
-      onPointerLeave={release}
-      onPointerUp={release}
-      onPointerCancel={release}
+      onPointerDown={(e) => {
+        drag.current = { startX: e.clientX, moved: false };
+      }}
+      onPointerMove={(e) => {
+        pointerX.set(e.clientX);
+        const state = drag.current;
+        if (!state || (e.pointerType === "mouse" && e.buttons === 0)) return;
+        if (!state.moved && Math.abs(e.clientX - state.startX) < SLIDE_PX) return;
+        state.moved = true;
+        const index = nearest(e.clientX);
+        if (index !== slidingNow.current) {
+          slideTo(index);
+          navigator.vibrate?.(8);
+        }
+      }}
+      onPointerUp={() => finish(true)}
+      onPointerCancel={() => finish(false)}
+      onPointerLeave={() => {
+        if (drag.current) finish(false);
+        else release();
+      }}
+      onClickCapture={(e) => {
+        if (!swallowClick.current) return;
+        e.preventDefault();
+        e.stopPropagation();
+      }}
       className={cn(
         "mx-auto flex h-[4.5rem] touch-none items-end justify-around gap-4 rounded-full border border-dusk-edge bg-dusk/85 px-5 pb-3 backdrop-blur-xl",
         className,
       )}
     >
-      {items.map((item) => (
+      {items.map((item, index) => (
         <IconContainer
           pointerX={pointerX}
           key={item.title}
           active={item.href === activeHref}
+          lit={index === (sliding ?? activeIndex)}
+          sliding={sliding !== null}
           {...item}
         />
       ))}
@@ -74,8 +149,17 @@ function IconContainer({
   href,
   transitionTypes,
   active,
+  lit,
+  sliding,
   badge,
-}: DockItem & { pointerX: MotionValue<number>; active: boolean }) {
+}: DockItem & {
+  pointerX: MotionValue<number>;
+  /** The current page. */
+  active: boolean;
+  /** Where the disc is now: the current page, or the tab under a sliding finger. */
+  lit: boolean;
+  sliding: boolean;
+}) {
   const ref = useRef<HTMLDivElement>(null);
 
   const distance = useTransform(pointerX, (val) => {
@@ -96,6 +180,7 @@ function IconContainer({
 
   return (
     <Link
+      data-dock-item
       href={href}
       transitionTypes={transitionTypes}
       aria-label={badge ? `${title} (${badge})` : title}
@@ -111,20 +196,20 @@ function IconContainer({
         className={cn(
           "relative flex aspect-square items-center justify-center rounded-full transition-colors",
           // Outline icons straight on the glass; the current tab gets a soft lit disc.
-          active ? "text-ink" : "text-ink/65",
+          lit ? "text-ink" : "text-ink/65",
         )}
       >
         {/* One shared disc that glides to whichever tab is current. */}
-        {active && (
+        {lit && (
           <motion.span
             layoutId="dock-active-disc"
             aria-hidden
-            className="absolute inset-0 rounded-full bg-white/14"
+            className={cn("absolute inset-0 rounded-full transition-colors", sliding ? "bg-white/22" : "bg-white/14")}
             transition={{ type: "spring", duration: 0.55, bounce: 0.12 }}
           />
         )}
         <AnimatePresence>
-          {pressed && (
+          {(pressed || (sliding && lit)) && (
             <motion.div
               initial={{ opacity: 0, y: 10, x: "-50%" }}
               animate={{ opacity: 1, y: 0, x: "-50%" }}
