@@ -10,7 +10,7 @@ import { btn } from "@/components/ui/buttons";
 import { LiquidIconButton } from "@/components/ui/liquid-icon-button";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { Map, MapMarker, MapPopup, MarkerContent, useMap, type MapRef } from "@/components/ui/map";
-import { useT } from "@/lib/i18n";
+import { spotMessage, useT } from "@/lib/i18n";
 import { requestLocation } from "@/lib/location";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
 import {
@@ -19,6 +19,7 @@ import {
   KIND_KEYS,
   addToilet,
   addedToday,
+  inBudapest,
   distance,
   isOpen,
   trust,
@@ -285,12 +286,13 @@ export default function MapPage() {
     if (!name.trim()) return setError(t.add.errName);
     if (!code.trim()) return setError(t.add.errCode);
     if (access === "paid" && !(Number(price) > 0)) return setError(t.add.errPrice);
+    if (!inBudapest(draft)) return setError(t.add.errCity);
     if (addedToday() >= DAILY_LIMIT) return setError(t.add.errLimit);
     setBusy(true);
     setError(null);
     const spot = await checkOnTheSpot(draft);
     setBusy(false);
-    if (!spot.ok) return setError(spot.reason === "far" ? t.spot.far(spot.metres) : t.spot.location);
+    if (!spot.ok) return setError(spotMessage(t, spot));
 
     const hours: Hours | undefined =
       hoursMode === "always" ? "24/7" : hoursMode === "set" ? { open: opens, close: closes } : undefined;
@@ -305,7 +307,7 @@ export default function MapPage() {
       babyChanging: baby || undefined,
       note: note.trim(),
       ...draft,
-    });
+    }, spot.location);
     closeSheet();
     setJustAdded({ id: toilet.id, name: toilet.name });
     window.setTimeout(() => setJustAdded(null), 2600);

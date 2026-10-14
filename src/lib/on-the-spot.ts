@@ -1,6 +1,7 @@
 "use client";
 
-import type { Coordinates } from "./location";
+import { REMOTE } from "./api";
+import type { Location } from "./sync";
 import { getSettings } from "./settings";
 import { distance } from "./toilets";
 
@@ -13,23 +14,36 @@ export const NEAR_METRES = 150;
 
 /** Where you are right now: a fresh fix, never one older than 30 seconds. */
 function whereAmI() {
-  return new Promise<Coordinates>((resolve, reject) => {
+  return new Promise<Location>((resolve, reject) => {
     if (!("geolocation" in navigator)) return reject(new Error("unsupported"));
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) => resolve({ latitude: coords.latitude, longitude: coords.longitude }),
+      ({ coords }) => resolve({ latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy }),
       reject,
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 },
     );
   });
 }
 
-export type SpotCheck = { ok: true } | { ok: false; reason: "location" } | { ok: false; reason: "far"; metres: number };
+/** Anything vaguer than this and a position says little about which door you're at. */
+export const MAX_ACCURACY = 100;
 
+export type SpotCheck =
+  | { ok: true; location?: Location }
+  | { ok: false; reason: "location" }
+  | { ok: false; reason: "vague"; metres: number }
+  | { ok: false; reason: "far"; metres: number };
+
+/**
+ * Connected mode always checks (the server does too, and needs the position
+ * sent along); the demo can switch the check off in Profile.
+ */
 export async function checkOnTheSpot(place: { latitude: number; longitude: number }): Promise<SpotCheck> {
-  if (!getSettings().nearbyCheck) return { ok: true };
+  if (!REMOTE && !getSettings().nearbyCheck) return { ok: true };
   try {
-    const metres = distance(await whereAmI(), place);
-    return metres <= NEAR_METRES ? { ok: true } : { ok: false, reason: "far", metres };
+    const location = await whereAmI();
+    if (location.accuracy > MAX_ACCURACY) return { ok: false, reason: "vague", metres: Math.round(location.accuracy) };
+    const metres = distance(location, place);
+    return metres <= NEAR_METRES ? { ok: true, location } : { ok: false, reason: "far", metres };
   } catch {
     return { ok: false, reason: "location" };
   }

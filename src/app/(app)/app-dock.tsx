@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation";
 import { BACK, FORWARD } from "@/components/page-transition";
 import { FloatingDock, type DockItem } from "@/components/ui/floating-dock";
 import { useT } from "@/lib/i18n";
+import { useNotices } from "@/lib/sync";
 import { useAlerts } from "@/lib/toilets";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
 
 export function AppDock() {
   const pathname = usePathname();
   const { t } = useT();
-  const unread = useAlerts().filter((a) => !a.read).length;
+  const unread = useAlerts().filter((a) => !a.read).length + useNotices().length;
   const ITEMS: DockItem[] = [
     { title: t.tabs.map, href: "/map", icon: <Map strokeWidth={1.75} /> },
     { title: t.tabs.nearby, href: "/nearby", icon: <List strokeWidth={1.75} /> },

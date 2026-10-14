@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/instrument-sans/wdth.css";
 import "./globals.css";
 import { ServiceWorker } from "@/components/service-worker";
+import { SyncRunner } from "@/components/sync-runner";
 
 export const metadata: Metadata = {
   title: "magyarotyesz",
@@ -34,6 +35,7 @@ export default function RootLayout({
       <body className="min-h-full">
         {children}
         <ServiceWorker />
+        <SyncRunner />
       </body>
     </html>
   );

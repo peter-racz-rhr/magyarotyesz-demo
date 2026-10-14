@@ -4,10 +4,11 @@ import { Accessibility, Baby, Check, Copy, Eye, Navigation, Pencil, ThumbsDown, 
 import { AnimatePresence, motion } from "motion/react";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { btn } from "@/components/ui/buttons";
-import { useT } from "@/lib/i18n";
+import { spotMessage, useT } from "@/lib/i18n";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
 import {
   ago,
+  acceptSuggestion,
   confirmCode,
   directionsUrl,
   dismissSuggestion,
@@ -139,14 +140,14 @@ export function ToiletCard({
     const spot = await checkOnTheSpot(toilet);
     setChecking(false);
     if (!spot.ok) {
-      setBlocked(spot.reason === "far" ? t.spot.far(spot.metres) : t.spot.location);
+      setBlocked(spotMessage(t, spot));
       return;
     }
     if (works) {
-      confirmCode(toilet.id);
+      confirmCode(toilet.id, spot.location);
       setStep("thanks");
     } else {
-      reportCode(toilet.id);
+      reportCode(toilet.id, spot.location);
       setStep("new-code");
     }
   };
@@ -188,6 +189,12 @@ export function ToiletCard({
             {access}
           </p>
           {toilet.hours && <HoursLine toilet={toilet} className="mt-0.5 block text-sm" />}
+          {toilet.pending && (
+            <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-haze">
+              <span aria-hidden className="size-1.5 rounded-full bg-stale" />
+              {t.sync.pendingTag}
+            </p>
+          )}
         </div>
         {toilet.mine && (
           <button
@@ -293,7 +300,7 @@ export function ToiletCard({
                 <button type="button" onClick={() => dismissSuggestion(toilet.id, s.id)} className={cn(btn.quiet, btn.sm, "px-3")}>
                   {t.card.dismiss}
                 </button>
-                <button type="button" onClick={() => editToilet(toilet.id, { code: s.code })} className={cn(btn.primary, btn.sm)}>
+                <button type="button" onClick={() => acceptSuggestion(toilet.id, s.id)} className={cn(btn.primary, btn.sm)}>
                   {t.card.useIt}
                 </button>
               </li>

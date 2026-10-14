@@ -6,10 +6,12 @@ import { useEffect, useState, type ReactNode } from "react";
 import { BACK, PageTransition } from "@/components/page-transition";
 import { HealthDot } from "@/components/toilet-card";
 import { btn } from "@/components/ui/buttons";
+import { REMOTE } from "@/lib/api";
 import { useT } from "@/lib/i18n";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
 import { updateSettings, useSettings, type Lang } from "@/lib/settings";
+import { dismissNotice, syncNow, usePendingCount, useNotices, useSyncStatus } from "@/lib/sync";
 import {
   addDemoToilets,
   ago,
@@ -62,6 +64,9 @@ export default function ProfilePage() {
   const settings = useSettings();
   const toilets = useToilets();
   const alerts = useAlerts();
+  const notices = useNotices();
+  const pending = usePendingCount();
+  const sync = useSyncStatus();
   const [confirmClear, setConfirmClear] = useState(false);
   const [notifyBlocked, setNotifyBlocked] = useState(false);
   const mine = toilets.filter((x) => x.mine);
@@ -104,6 +109,57 @@ export default function ProfilePage() {
           <h1 className="t-display">{t.profile.title}</h1>
           <p className="mt-3 text-[1.0625rem] text-haze">{t.profile.summary(mine.length, checks)}</p>
         </header>
+
+        {REMOTE && (
+          <section className="mt-8" aria-label={t.sync.statusTitle}>
+            <div className="flex items-center gap-3 text-sm text-haze">
+              <span
+                aria-hidden
+                className={cn(
+                  "size-2 shrink-0 rounded-full",
+                  sync.syncing ? "animate-pulse bg-stale" : sync.online === false ? "bg-bad" : pending > 0 ? "bg-stale" : "bg-good",
+                )}
+              />
+              <span data-testid="sync-status" className="flex-1">
+                {sync.syncing
+                  ? t.sync.syncing
+                  : sync.online === false
+                    ? t.sync.offline
+                    : pending > 0
+                      ? t.sync.waiting(pending)
+                      : t.sync.synced}
+              </span>
+              {(pending > 0 || sync.online === false) && !sync.syncing && (
+                <button type="button" onClick={() => void syncNow()} className="font-semibold text-ink">
+                  {t.sync.sendNow}
+                </button>
+              )}
+            </div>
+            {sync.online === false && pending > 0 && <p className="mt-1 pl-5 text-sm text-haze">{t.sync.waiting(pending)}</p>}
+          </section>
+        )}
+
+        {notices.length > 0 && (
+          <section className="mt-8" aria-labelledby="notices-heading">
+            <h2 id="notices-heading" className="t-section">
+              {t.sync.noticesTitle}
+            </h2>
+            <ul className="mt-3 divide-y divide-dusk-edge border-y border-dusk-edge">
+              {notices.map((notice) => (
+                <li key={notice.id} className="flex items-start gap-3 py-3.5">
+                  <span aria-hidden className="mt-2 size-2 shrink-0 rounded-full bg-bad" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block">{t.sync.notice(notice.type, notice.name)}</span>
+                    <span className="block text-sm text-haze">{t.sync.errors[notice.code] ?? notice.message}</span>
+                  </span>
+                  <button type="button" onClick={() => dismissNotice(notice.id)} className="text-sm font-semibold text-haze hover:text-ink">
+                    {t.sync.dismiss}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {/* Alerts about your codes */}
         <section className="mt-10" aria-labelledby="alerts-heading">
@@ -163,7 +219,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => removeToilet(toilet.id)}
-                    aria-label={t.profile.remove(toilet.name)}
+                    aria-label={REMOTE ? `${t.profile.remove(toilet.name)}. ${t.sync.removeNote}` : t.profile.remove(toilet.name)}
                     className="-mr-2 grid size-10 place-items-center rounded-full text-haze hover:text-bad"
                   >
                     <Trash2 className="size-4" />
@@ -200,6 +256,7 @@ export default function ProfilePage() {
                 ))}
               </div>
             </li>
+            {!REMOTE && (
             <li>
               <SwitchRow
                 icon={<MapPinCheck className="size-5" />}
@@ -209,6 +266,7 @@ export default function ProfilePage() {
                 onChange={(on) => updateSettings({ nearbyCheck: on })}
               />
             </li>
+            )}
             <li>
               <SwitchRow
                 icon={<Bell className="size-5" />}
@@ -228,6 +286,7 @@ export default function ProfilePage() {
                 <ChevronRight className="size-5 shrink-0 text-haze" aria-hidden />
               </button>
             </li>
+            {!REMOTE && (
             <li>
               {confirmClear ? (
                 <div className="flex items-center gap-3 py-3">
@@ -254,11 +313,12 @@ export default function ProfilePage() {
                 </button>
               )}
             </li>
+            )}
           </ul>
         </section>
 
         {/* Demo tools, kept apart from the real settings */}
-        {(mine.length > 0 || !toilets.some((x) => !x.mine)) && (
+        {!REMOTE && (mine.length > 0 || !toilets.some((x) => !x.mine)) && (
           <section className="mt-12" aria-labelledby="demo-heading">
             <h2 id="demo-heading" className="t-section">
               {t.profile.demo}
@@ -291,7 +351,7 @@ export default function ProfilePage() {
           </section>
         )}
 
-        <footer className="mt-10 pb-6 text-[0.8125rem] leading-relaxed text-haze">{t.profile.footer}</footer>
+        <footer className="mt-10 pb-6 text-[0.8125rem] leading-relaxed text-haze">{REMOTE ? t.sync.footer : t.profile.footer}</footer>
       </main>
     </PageTransition>
   );

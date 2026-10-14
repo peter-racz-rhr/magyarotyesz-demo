@@ -44,5 +44,5 @@ export function createLocalStore<T>(key: string, initial: T) {
   const useValue = () =>
     useSyncExternalStore(subscribe, read, () => initial);
 
-  return { get: read, set, useValue };
+  return { get: read, set, subscribe, useValue };
 }

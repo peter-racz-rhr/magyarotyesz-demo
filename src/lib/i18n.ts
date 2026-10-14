@@ -1,5 +1,6 @@
 "use client";
 
+import type { SpotCheck } from "./on-the-spot";
 import { useSettings, type Lang } from "./settings";
 import { formatDistance, type Access, type Kind } from "./toilets";
 
@@ -53,6 +54,7 @@ const en = {
     errCode: "Add the code, that's the whole point.",
     errPrice: "How much does it cost?",
     errLimit: "That's 10 codes today. Come back tomorrow.",
+    errCity: "magyarotyesz only covers Budapest for now.",
     more: "More details",
     moreSub: "Kind of place, who can use it, hours, accessibility",
   },
@@ -61,7 +63,49 @@ const en = {
     far: (m: number) =>
       `You're ${formatDistance(m)} away. Codes can only be added or checked on the spot, within 150 m. (For the demo you can turn this off in Profile.)`,
     location: "Turn on location: codes can only be added or checked on the spot.",
+    vague: (m: number) => `Your location is too vague right now (about ${m} m). Step outside or wait a moment, then try again.`,
     checking: "Checking you're there…",
+  },
+
+  sync: {
+    waiting: (n: number) => `${n} waiting to send`,
+    syncing: "Syncing…",
+    offline: "Offline. Your changes are saved and go out when you're back online.",
+    synced: "Up to date",
+    loading: "Getting the toilets…",
+    pendingTag: "waiting to send",
+    sendNow: "Try again",
+    noticesTitle: "Couldn't be sent",
+    dismiss: "Dismiss",
+    notice: (type: string, name?: string) => {
+      const what: Record<string, string> = {
+        add_toilet: "adding",
+        vote: "your check of",
+        suggest_code: "your suggestion for",
+        edit_toilet: "your change to",
+        accept_suggestion: "taking the suggestion for",
+        dismiss_suggestion: "dismissing the suggestion for",
+        delete_toilet: "removing",
+      };
+      const text = `${what[type] ?? "your change to"} ${name ?? "a toilet"} didn't go through`;
+      return text[0].toUpperCase() + text.slice(1);
+    },
+    errors: {
+      too_far: "You were too far from the toilet.",
+      no_location: "No location was sent.",
+      daily_limit: "You can add 10 codes a day.",
+      not_owner: "Only the person who shared a code can change it.",
+      own_toilet: "You shared this one: edit the code instead.",
+      suggestion_limit: "You already have 3 open suggestions here.",
+      not_found: "That toilet or suggestion no longer exists.",
+      already_exists: "That toilet is already there.",
+      banned: "This phone is blocked.",
+      validation: "Something in it wasn't valid.",
+    } as Record<string, string>,
+    statusTitle: "Sync",
+    server: "Shared with everyone through the magyarotyesz server.",
+    removeNote: "Removes it for everyone.",
+    footer: "Codes are shared through the server and saved on this phone, so they work offline. Map © CARTO, © OpenStreetMap contributors.",
   },
 
   card: {
@@ -203,6 +247,7 @@ const hu: Dict = {
     errCode: "Add meg a kódot, ez a lényeg.",
     errPrice: "Mennyibe kerül?",
     errLimit: "Ma már 10 kódot hozzáadtál. Holnap folytathatod.",
+    errCity: "A magyarotyesz egyelőre csak Budapestet fedi le.",
     more: "További részletek",
     moreSub: "A hely típusa, ki használhatja, nyitvatartás, akadálymentesség",
   },
@@ -210,8 +255,49 @@ const hu: Dict = {
   spot: {
     far: (m: number) =>
       `${formatDistance(m)}-re vagy. Kódot csak a helyszínen, 150 m-en belül lehet hozzáadni vagy ellenőrizni. (A demóhoz kikapcsolhatod a Profilban.)`,
+    vague: (m: number) => `A helyzeted most túl pontatlan (kb. ${m} m). Menj ki, vagy várj egy kicsit, aztán próbáld újra.`,
     location: "Kapcsold be a helymeghatározást: kódot csak a helyszínen lehet hozzáadni vagy ellenőrizni.",
     checking: "Ellenőrizzük, hogy ott vagy…",
+  },
+
+  sync: {
+    waiting: (n: number) => `${n} küldésre vár`,
+    syncing: "Szinkronizálás…",
+    offline: "Nincs net. A változásaid elmentve, és visszatérő internetnél mennek ki.",
+    synced: "Naprakész",
+    loading: "Mosdók letöltése…",
+    pendingTag: "küldésre vár",
+    sendNow: "Újra",
+    noticesTitle: "Nem sikerült elküldeni",
+    dismiss: "Értem",
+    notice: (type: string, name?: string) => {
+      const what: Record<string, string> = {
+        add_toilet: "hozzáadás",
+        vote: "ellenőrzés",
+        suggest_code: "kódjavaslat",
+        edit_toilet: "módosítás",
+        accept_suggestion: "javaslat elfogadása",
+        dismiss_suggestion: "javaslat elvetése",
+        delete_toilet: "törlés",
+      };
+      return `${name ?? "Egy mosdó"}: ${what[type] ?? "módosítás"} nem sikerült`;
+    },
+    errors: {
+      too_far: "Túl messze voltál a mosdótól.",
+      no_location: "Nem ment el helyadat.",
+      daily_limit: "Naponta 10 kódot adhatsz hozzá.",
+      not_owner: "Kódot csak az módosíthat, aki megosztotta.",
+      own_toilet: "Ezt te osztottad meg: szerkeszd a kódot.",
+      suggestion_limit: "Már van 3 nyitott javaslatod itt.",
+      not_found: "Ez a mosdó vagy javaslat már nem létezik.",
+      already_exists: "Ez a mosdó már fent van.",
+      banned: "Ez a telefon le van tiltva.",
+      validation: "Valami nem volt érvényes benne.",
+    } as Record<string, string>,
+    statusTitle: "Szinkron",
+    server: "A magyarotyesz szerveren át mindenkivel megosztva.",
+    removeNote: "Mindenki számára törli.",
+    footer: "A kódok a szerveren át megosztottak, és ezen a telefonon is el vannak mentve, így net nélkül is működnek. Térkép © CARTO, © OpenStreetMap közreműködők.",
   },
 
   card: {
@@ -301,6 +387,13 @@ const hu: Dict = {
     footer: "Demó: a kódok ezen a telefonon vannak elmentve, és internet nélkül is elérhetők. Térkép © CARTO, © OpenStreetMap közreműködők.",
   },
 };
+
+/** The sentence for a failed on-the-spot check. */
+export function spotMessage(t: Dict, spot: SpotCheck & { ok: false }) {
+  if (spot.reason === "far") return t.spot.far(spot.metres);
+  if (spot.reason === "vague") return t.spot.vague(spot.metres);
+  return t.spot.location;
+}
 
 const DICTS: Record<Lang, Dict> = { en, hu };
 

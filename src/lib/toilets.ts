@@ -1,10 +1,23 @@
 "use client";
 
+import { REMOTE } from "./api";
 import { createLocalStore } from "./local-store";
+import {
+  addsLeft,
+  clearRemoteAlerts,
+  enqueue,
+  getRemoteToilets,
+  markRemoteAlertsRead,
+  useRemoteAlerts,
+  useRemoteToilets,
+  type Location,
+} from "./sync";
 
 /*
-  A toilet and its door code, as people shared it. For the demo everything
-  lives on this device; swap the stores for a shared database to go live.
+  A toilet and its door code, as people shared it. Two modes:
+  - demo (no NEXT_PUBLIC_API_URL): everything lives on this device
+  - connected: the shared server is the truth; this phone keeps a copy and a
+    queue of what it still has to send (see sync.ts)
 */
 
 export const KIND_KEYS = ["cafe", "restaurant", "bar", "mall", "station", "other"] as const;
@@ -43,6 +56,8 @@ export type Toilet = {
   myVote?: "works" | "broken";
   /** New codes other people suggested, for the person who shared it to accept. */
   suggestions?: Suggestion[];
+  /** Done on this phone, not yet confirmed by the server. */
+  pending?: boolean;
 };
 
 export type Suggestion = { id: string; code: string; at: string };
@@ -53,22 +68,49 @@ export type ToiletInput = Pick<
 >;
 
 const store = createLocalStore<Toilet[]>("magyarotyesz:toilets", []);
-export const useToilets = store.useValue;
-export const getToilets = store.get;
+export const useToilets: () => Toilet[] = REMOTE ? useRemoteToilets : store.useValue;
+export const getToilets: () => Toilet[] = REMOTE ? getRemoteToilets : store.get;
 
 /* Against spam: one phone can add at most this many codes a day. */
 export const DAILY_LIMIT = 10;
 const addLog = createLocalStore<string[]>("magyarotyesz:adds", []);
 
 export function addedToday(now = Date.now()) {
+  if (REMOTE) return DAILY_LIMIT - addsLeft();
   return addLog.get().filter((at) => now - new Date(at).getTime() < 24 * 60 * 60 * 1000).length;
 }
 
-export function addToilet(input: ToiletInput) {
+/** The server only knows Budapest. */
+export const inBudapest = (p: { latitude: number; longitude: number }) =>
+  p.latitude >= 47.35 && p.latitude <= 47.62 && p.longitude >= 18.92 && p.longitude <= 19.34;
+
+export function addToilet(input: ToiletInput, location?: Location) {
   const now = new Date().toISOString();
+  const id = crypto.randomUUID();
+  if (REMOTE) {
+    enqueue(
+      "add_toilet",
+      {
+        id,
+        name: input.name,
+        code: input.code,
+        kind: input.kind,
+        access: input.access,
+        price: input.access === "paid" ? (input.price ?? null) : null,
+        hours: input.hours ?? null,
+        wheelchair: !!input.wheelchair,
+        babyChanging: !!input.babyChanging,
+        note: input.note,
+        latitude: input.latitude,
+        longitude: input.longitude,
+      },
+      { location, name: input.name },
+    );
+    return getRemoteToilets().find((t) => t.id === id)!;
+  }
   const toilet: Toilet = {
     ...input,
-    id: crypto.randomUUID(),
+    id,
     addedAt: now,
     confirmedAt: now,
     reportedAt: null,
@@ -85,8 +127,11 @@ export function addToilet(input: ToiletInput) {
 const update = (id: string, change: (t: Toilet) => Toilet) =>
   store.set((list) => list.map((t) => (t.id === id ? change(t) : t)));
 
+const nameOf = (id: string) => getRemoteToilets().find((t) => t.id === id)?.name;
+
 /** "Still works": the code is fresh again. One vote per phone; switching moves it. */
-export const confirmCode = (id: string) =>
+export function confirmCode(id: string, location?: Location) {
+  if (REMOTE) return void enqueue("vote", { toiletId: id, works: true }, { location, name: nameOf(id) });
   update(id, (t) => ({
     ...t,
     confirmedAt: new Date().toISOString(),
@@ -94,9 +139,11 @@ export const confirmCode = (id: string) =>
     reports: t.myVote === "broken" ? Math.max(0, t.reports - 1) : t.reports,
     myVote: "works",
   }));
+}
 
 /** "Doesn't work". */
-export const reportCode = (id: string) =>
+export function reportCode(id: string, location?: Location) {
+  if (REMOTE) return void enqueue("vote", { toiletId: id, works: false }, { location, name: nameOf(id) });
   update(id, (t) => ({
     ...t,
     reportedAt: new Date().toISOString(),
@@ -104,6 +151,7 @@ export const reportCode = (id: string) =>
     confirms: t.myVote === "works" ? Math.max(0, t.confirms - 1) : t.confirms,
     myVote: "broken",
   }));
+}
 
 /**
  * The person who shared it edits it. A new code starts the votes fresh:
@@ -113,6 +161,18 @@ export function editToilet(
   id: string,
   change: Partial<Pick<Toilet, "name" | "code" | "note" | "access" | "price" | "hours" | "wheelchair" | "babyChanging">>,
 ) {
+  if (REMOTE) {
+    const current = getRemoteToilets().find((t) => t.id === id);
+    if (!current?.mine) return;
+    // Only send what actually changed.
+    const changes: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(change)) {
+      if (value === undefined && !["price", "hours"].includes(key)) continue;
+      if (JSON.stringify(value) !== JSON.stringify(current[key as keyof Toilet])) changes[key] = value ?? null;
+    }
+    if (Object.keys(changes).length) enqueue("edit_toilet", { toiletId: id, changes }, { name: current.name });
+    return;
+  }
   update(id, (t) => {
     if (!t.mine) return t;
     const next = { ...t, ...change };
@@ -129,18 +189,37 @@ export function editToilet(
 }
 
 /** Anyone else can only suggest a new code. */
-export const suggestCode = (id: string, code: string) =>
+export function suggestCode(id: string, code: string) {
+  if (REMOTE) return void enqueue("suggest_code", { toiletId: id, code }, { name: nameOf(id) });
   update(id, (t) => ({
     ...t,
     suggestions: [{ id: crypto.randomUUID(), code, at: new Date().toISOString() }, ...(t.suggestions ?? [])],
   }));
+}
 
-export const dismissSuggestion = (id: string, suggestionId: string) =>
+/** The owner takes a suggested code (the votes start fresh, like any new code). */
+export function acceptSuggestion(id: string, suggestionId: string) {
+  if (REMOTE) {
+    return void enqueue("accept_suggestion", { toiletId: id, suggestionId }, { name: nameOf(id) });
+  }
+  const code = store.get().find((t) => t.id === id)?.suggestions?.find((s) => s.id === suggestionId)?.code;
+  if (code) editToilet(id, { code });
+}
+
+export function dismissSuggestion(id: string, suggestionId: string) {
+  if (REMOTE) return void enqueue("dismiss_suggestion", { toiletId: id, suggestionId }, { name: nameOf(id) });
   update(id, (t) => ({ ...t, suggestions: (t.suggestions ?? []).filter((s) => s.id !== suggestionId) }));
+}
 
-export const removeToilet = (id: string) => store.set((list) => list.filter((t) => t.id !== id));
+export function removeToilet(id: string) {
+  if (REMOTE) return void enqueue("delete_toilet", { toiletId: id }, { name: nameOf(id) });
+  store.set((list) => list.filter((t) => t.id !== id));
+}
 
-export const clearToilets = () => store.set([]);
+/** Demo only. Connected mode has no "delete everything": the codes are shared. */
+export const clearToilets = () => {
+  if (!REMOTE) store.set([]);
+};
 
 /* ------------------------------------------------------------------ */
 /* Alerts: what happened to the codes you shared                       */
@@ -157,9 +236,10 @@ export type Alert = {
 };
 
 const alertStore = createLocalStore<Alert[]>("magyarotyesz:alerts", []);
-export const useAlerts = alertStore.useValue;
-export const markAlertsRead = () => alertStore.set((list) => list.map((a) => ({ ...a, read: true })));
-export const clearAlerts = () => alertStore.set([]);
+export const useAlerts: () => Alert[] = REMOTE ? useRemoteAlerts : alertStore.useValue;
+export const markAlertsRead = () =>
+  REMOTE ? markRemoteAlertsRead() : alertStore.set((list) => list.map((a) => ({ ...a, read: true })));
+export const clearAlerts = () => (REMOTE ? clearRemoteAlerts() : alertStore.set([]));
 
 /**
  * Demo only: there is nobody else yet, so this plays someone else finding

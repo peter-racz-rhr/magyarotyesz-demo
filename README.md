@@ -32,3 +32,7 @@ the internet.
 pnpm install
 pnpm dev
 ```
+
+## Server
+
+By default the app is a demo that keeps everything on the phone. Set `NEXT_PUBLIC_API_URL` to share codes through the magyarotyesz server: see [docs/connect-to-server.md](docs/connect-to-server.md).
