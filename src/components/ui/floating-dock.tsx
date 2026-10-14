@@ -122,7 +122,7 @@ export const FloatingDock = ({
         e.stopPropagation();
       }}
       className={cn(
-        "mx-auto flex h-[4.5rem] touch-none items-end justify-around gap-4 rounded-full border border-dusk-edge bg-dusk/85 px-5 pb-3 backdrop-blur-xl",
+        "mx-auto flex h-[4.5rem] touch-none items-center justify-around gap-4 rounded-full border border-dusk-edge bg-dusk/85 px-5 backdrop-blur-xl",
         className,
       )}
     >
@@ -204,7 +204,11 @@ function IconContainer({
           <motion.span
             layoutId="dock-active-disc"
             aria-hidden
-            className={cn("absolute inset-0 rounded-full transition-colors", sliding ? "bg-white/22" : "bg-white/14")}
+            // Its own fixed size, centred on the tab: it never grows past the bar.
+            className={cn(
+              "absolute top-1/2 left-1/2 size-[3.75rem] -translate-x-1/2 -translate-y-1/2 rounded-full transition-colors",
+              sliding ? "bg-white/22" : "bg-white/14",
+            )}
             transition={{ type: "spring", duration: 0.55, bounce: 0.12 }}
           />
         )}
