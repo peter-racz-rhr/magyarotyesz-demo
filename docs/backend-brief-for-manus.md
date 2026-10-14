@@ -371,10 +371,32 @@ Write step-by-step instructions a beginner can follow:
 3. **Moving between them:** stop, copy `DATA_DIR`, start.
 4. How to set `ALLOWED_ORIGINS` to the Vercel URL.
 
-## 11. Deliverables
+## 11. Where the code goes (GitHub)
 
-- A Git repository (TypeScript source, tests, `Dockerfile`,
-  `docker-compose.yml`, `Caddyfile`, `.env.example`, `scripts/backup.sh`).
+- **Repository:** `peter-racz-rhr/magyarotyesz-server`. It's a **new,
+  separate repo**: create it yourself if it doesn't exist (owner
+  `peter-racz-rhr`, **private**, no template). If your GitHub connection
+  can't create repositories, stop and tell me, and I'll create an empty one
+  and you push to it.
+- **Never touch `peter-racz-rhr/magyarotyesz-demo`.** That is the mobile app
+  (it's deployed automatically on every push). Don't push, branch or open a
+  pull request there.
+- **Branch:** push everything to `main`. The repo is new and empty, so there
+  is nothing to merge into.
+- **How to commit:** small commits with clear messages as you go (for
+  example: "File store with atomic writes", "Sync endpoints", "Action
+  processing", "Tests", "Docker and deploy docs"), not one huge commit at the
+  end. Push after each major piece so the work is visible.
+- **Never commit:** `.env`, tokens, anything under `data/`, `backups/`,
+  `node_modules/`, `dist/`. Add a `.gitignore` for these in the first commit.
+- **When you finish:** reply with the repo URL, the final commit hash, how to
+  run it, and the result of `npm test`. If any requirement could not be met,
+  list it clearly instead of hiding it.
+
+## 12. Deliverables
+
+- The repository above, containing TypeScript source, tests, `Dockerfile`,
+  `docker-compose.yml`, `Caddyfile`, `.env.example` and `scripts/backup.sh`.
 - `openapi.yaml` describing every endpoint above.
 - `README.md`: what it is, how to run locally, how to test, how to deploy
   (section 10), the file format (section 3), and `curl` examples for every
