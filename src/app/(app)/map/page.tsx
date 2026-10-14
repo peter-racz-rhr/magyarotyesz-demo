@@ -2,7 +2,7 @@
 
 import "@/lib/maplibre-worker";
 import { Accessibility, Baby, ChevronDown, LocateFixed, Zap, X } from "lucide-react";
-import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { PageTransition } from "@/components/page-transition";
 import { HealthDot, ToiletCard } from "@/components/toilet-card";
@@ -133,6 +133,65 @@ function Toggle({ on, onChange, icon, children }: { on: boolean; onChange: (on: 
   );
 }
 
+/** Pulling further than this (px) counts as a swipe. */
+const SWIPE_PX = 40;
+
+/**
+ * Swipe handlers for the add sheet: pull up for the details, pull down to
+ * fold them away (and, with nothing folded, to close the sheet). A plain tap
+ * still reaches the button underneath.
+ */
+function useSheetSwipe({ onUp, onDown }: { onUp: () => void; onDown: () => void }) {
+  const sheet = useRef<HTMLFormElement>(null);
+  const press = useRef<{ y: number; moved: boolean } | null>(null);
+  const swallow = useRef(false);
+
+  const settle = () => {
+    if (!sheet.current) return;
+    sheet.current.style.transition = "transform 200ms ease-out";
+    sheet.current.style.transform = "";
+  };
+
+  const grip = {
+    onPointerDown: (e: ReactPointerEvent) => {
+      press.current = { y: e.clientY, moved: false };
+    },
+    onPointerMove: (e: ReactPointerEvent) => {
+      const state = press.current;
+      if (!state) return;
+      const dy = e.clientY - state.y;
+      if (!state.moved && Math.abs(dy) < 8) return;
+      state.moved = true;
+      // The sheet leans with the finger a little, so it feels attached to it.
+      if (sheet.current) {
+        sheet.current.style.transition = "none";
+        sheet.current.style.transform = `translateY(${Math.max(-24, Math.min(80, dy * 0.5))}px)`;
+      }
+    },
+    onPointerUp: (e: ReactPointerEvent) => {
+      const state = press.current;
+      press.current = null;
+      if (!state?.moved) return;
+      const dy = e.clientY - state.y;
+      swallow.current = true;
+      window.setTimeout(() => (swallow.current = false), 0);
+      settle();
+      if (dy <= -SWIPE_PX) onUp();
+      else if (dy >= SWIPE_PX) onDown();
+    },
+    onPointerCancel: () => {
+      press.current = null;
+      settle();
+    },
+    onClickCapture: (e: ReactPointerEvent | React.MouseEvent) => {
+      if (!swallow.current) return;
+      e.preventDefault();
+      e.stopPropagation();
+    },
+  };
+  return { sheet, grip };
+}
+
 export default function MapPage() {
   const { t } = useT();
   const mapRef = useRef<MapRef>(null);
@@ -232,6 +291,11 @@ export default function MapPage() {
       setClosing(false);
     }, 220);
   };
+
+  const { sheet: sheetRef, grip: swipe } = useSheetSwipe({
+    onUp: () => setDetails(true),
+    onDown: () => (details ? setDetails(false) : closeSheet()),
+  });
 
   const locate = async () => {
     if (here.coords) {
@@ -454,6 +518,7 @@ export default function MapPage() {
         {/* Add sheet */}
         {draft && (
           <form
+            ref={sheetRef}
             noValidate
             onSubmit={submit}
             className={cn(
@@ -463,7 +528,10 @@ export default function MapPage() {
                 : "animate-in slide-in-from-bottom duration-300 ease-out",
             )}
           >
-            <div aria-hidden className="mx-auto mb-2 h-1 w-10 rounded-full bg-dusk-edge" />
+            {/* The grip: pull the sheet up for details, down to fold it away */}
+            <div {...swipe} className="-mx-5 flex touch-none justify-center px-5 pt-2 pb-3">
+              <span aria-hidden className="h-1 w-10 rounded-full bg-dusk-edge" />
+            </div>
             {/* Add sits up top so it stays reachable above the keyboard. */}
             <div className="flex items-center gap-2">
               <button
@@ -498,9 +566,10 @@ export default function MapPage() {
               {/* Everything else is optional, folded away */}
               <button
                 type="button"
+                {...swipe}
                 onClick={() => setDetails((d) => !d)}
                 aria-expanded={details}
-                className="flex items-center gap-3 rounded-2xl py-1 text-left"
+                className="flex touch-none items-center gap-3 rounded-2xl py-1 text-left"
               >
                 <span className="min-w-0 flex-1">
                   <span className="block font-semibold">{t.add.more}</span>

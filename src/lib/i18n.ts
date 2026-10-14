@@ -56,7 +56,7 @@ const en = {
     errLimit: "That's 10 codes today. Come back tomorrow.",
     errCity: "magyarotyesz only covers Budapest for now.",
     more: "More details",
-    moreSub: "Kind of place, who can use it, hours, accessibility",
+    moreSub: "Pull up or tap: kind, access, hours, more",
   },
 
   spot: {
@@ -249,7 +249,7 @@ const hu: Dict = {
     errLimit: "Ma már 10 kódot hozzáadtál. Holnap folytathatod.",
     errCity: "A magyarotyesz egyelőre csak Budapestet fedi le.",
     more: "További részletek",
-    moreSub: "A hely típusa, ki használhatja, nyitvatartás, akadálymentesség",
+    moreSub: "Húzd fel vagy koppints: típus, hozzáférés, nyitvatartás",
   },
 
   spot: {
