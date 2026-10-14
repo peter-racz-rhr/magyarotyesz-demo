@@ -1,11 +1,12 @@
 "use client";
 
 import "@/lib/maplibre-worker";
-import { Accessibility, Baby, LocateFixed, Zap, X } from "lucide-react";
+import { Accessibility, Baby, ChevronDown, LocateFixed, Zap, X } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { PageTransition } from "@/components/page-transition";
 import { HealthDot, ToiletCard } from "@/components/toilet-card";
+import { btn } from "@/components/ui/buttons";
 import { LiquidIconButton } from "@/components/ui/liquid-icon-button";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { Map, MapMarker, MapPopup, MarkerContent, useMap, type MapRef } from "@/components/ui/map";
@@ -148,7 +149,7 @@ export default function MapPage() {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
-  const [kind, setKind] = useState<Kind>("cafe");
+  const [kind, setKind] = useState<Kind>("other");
   const [access, setAccess] = useState<Access>("customers");
   const [price, setPrice] = useState("");
   const [hoursMode, setHoursMode] = useState<"unknown" | "always" | "set">("unknown");
@@ -157,6 +158,7 @@ export default function MapPage() {
   const [wheelchair, setWheelchair] = useState(false);
   const [baby, setBaby] = useState(false);
   const [note, setNote] = useState("");
+  const [details, setDetails] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [justAdded, setJustAdded] = useState<{ id: string; name: string } | null>(null);
@@ -262,12 +264,13 @@ export default function MapPage() {
       setName("");
       setCode("");
       setNote("");
-      setKind("cafe");
+      setKind("other");
       setAccess("customers");
       setPrice("");
       setHoursMode("unknown");
       setWheelchair(false);
       setBaby(false);
+      setDetails(false);
       setError(null);
     }
     setFocus(null);
@@ -384,23 +387,26 @@ export default function MapPage() {
           )}
         </Map>
 
-        {/* Filters */}
+        {/* Filters: one glass bar, the same material as the dock. It sits in
+            the middle when it fits and scrolls sideways when it doesn't. */}
         {!draft && (
-          <div className="absolute inset-x-0 top-[max(env(safe-area-inset-top),0.75rem)] z-10 flex justify-center gap-2 overflow-x-auto px-4">
-            {(Object.keys(t.map.filters) as (keyof Filters)[]).map((key) => (
-              <button
-                key={key}
-                type="button"
-                aria-pressed={filters[key]}
-                onClick={() => setFilters((f) => ({ ...f, [key]: !f[key] }))}
-                className={cn(
-                  "h-9 shrink-0 rounded-full border px-3.5 text-sm font-semibold backdrop-blur-xl transition-colors",
-                  filters[key] ? "border-good bg-good/20 text-good" : "border-white/10 bg-black/45 text-ink/85",
-                )}
-              >
-                {t.map.filters[key]}
-              </button>
-            ))}
+          <div className="absolute inset-x-0 top-[max(env(safe-area-inset-top),0.75rem)] z-10 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <LiquidSurface radius={999} veil={0.5} className="mx-auto flex w-max gap-1 p-1">
+              {(Object.keys(t.map.filters) as (keyof Filters)[]).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  aria-pressed={filters[key]}
+                  onClick={() => setFilters((f) => ({ ...f, [key]: !f[key] }))}
+                  className={cn(
+                    "h-9 shrink-0 rounded-full px-3.5 text-sm font-semibold whitespace-nowrap transition-colors [text-shadow:0_1px_6px_rgb(0_0_0/0.5)]",
+                    filters[key] ? "bg-good/25 text-good" : "text-ink/90",
+                  )}
+                >
+                  {t.map.filters[key]}
+                </button>
+              ))}
+            </LiquidSurface>
           </div>
         )}
 
@@ -467,11 +473,7 @@ export default function MapPage() {
                 <X className="size-5" />
               </button>
               <h2 className="t-section min-w-0 flex-1 truncate">{t.add.title}</h2>
-              <button
-                type="submit"
-                disabled={busy}
-                className="h-10 shrink-0 rounded-full bg-ink px-5 text-[0.9375rem] font-semibold text-night transition-transform active:scale-[0.97] disabled:opacity-60"
-              >
+              <button type="submit" disabled={busy} className={cn(btn.primary, "h-10 px-5 text-[0.9375rem]")}>
                 {busy ? "…" : t.add.add}
               </button>
             </div>
@@ -491,6 +493,21 @@ export default function MapPage() {
                 autoComplete="off"
                 className={cn(field, "h-14 font-mono text-[1.375rem] tracking-[0.16em] placeholder:font-sans placeholder:text-base placeholder:tracking-normal")}
               />
+              {/* Everything else is optional, folded away */}
+              <button
+                type="button"
+                onClick={() => setDetails((d) => !d)}
+                aria-expanded={details}
+                className="flex items-center gap-3 rounded-2xl py-1 text-left"
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="block font-semibold">{t.add.more}</span>
+                  {!details && <span className="block truncate text-sm text-haze">{t.add.moreSub}</span>}
+                </span>
+                <ChevronDown className={cn("size-5 shrink-0 text-haze transition-transform duration-300", details && "rotate-180")} aria-hidden />
+              </button>
+              {details && (
+              <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
               <Choice label={t.add.kind} keys={KIND_KEYS} labels={t.kinds} value={kind} onChange={setKind} />
               <Choice label={t.add.who} keys={ACCESS_KEYS} labels={t.access} value={access} onChange={setAccess} />
               {access === "paid" && (
@@ -540,6 +557,8 @@ export default function MapPage() {
               </div>
 
               <input aria-label={t.add.note} placeholder={t.add.note} value={note} onChange={(e) => setNote(e.target.value)} className={field} />
+              </div>
+              )}
             </div>
           </form>
         )}

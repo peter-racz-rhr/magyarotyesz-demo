@@ -1,8 +1,9 @@
 "use client";
 
-import { Accessibility, Baby, Check, Clock, Copy, Eye, Navigation, Pencil, ThumbsDown, ThumbsUp } from "lucide-react";
+import { Accessibility, Baby, Check, Copy, Eye, Navigation, Pencil, ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState, type FormEvent, type ReactNode } from "react";
+import { btn } from "@/components/ui/buttons";
 import { useT } from "@/lib/i18n";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
 import {
@@ -14,19 +15,29 @@ import {
   isOpen,
   reportCode,
   suggestCode,
+  trust,
   trustColor,
   type Toilet,
 } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
 
-/** The coloured dot used on the map and in lists. */
+/**
+ * The dot on the map and in lists. Colour follows the votes (red through
+ * orange to green), and so colour isn't the only clue, a code most people
+ * couldn't use is a hollow ring instead of a filled dot.
+ */
 export function HealthDot({ toilet, className }: { toilet: Toilet; className?: string }) {
   const color = trustColor(toilet);
+  const doubtful = trust(toilet) < 0.5;
   return (
     <span
       aria-hidden
       className={cn("block size-2.5 shrink-0 rounded-full", className)}
-      style={{ background: color, boxShadow: `0 0 0 2px #000, 0 0 10px 2px color-mix(in srgb, ${color} 55%, transparent)` }}
+      style={
+        doubtful
+          ? { background: "#000", boxShadow: `inset 0 0 0 2.5px ${color}, 0 0 0 1.5px #000, 0 0 8px 1px color-mix(in srgb, ${color} 45%, transparent)` }
+          : { background: color, boxShadow: `0 0 0 2px #000, 0 0 10px 2px color-mix(in srgb, ${color} 55%, transparent)` }
+      }
     />
   );
 }
@@ -34,7 +45,6 @@ export function HealthDot({ toilet, className }: { toilet: Toilet; className?: s
 const field =
   "h-11 w-full rounded-full border border-dusk-edge bg-night px-4 outline-none placeholder:text-haze/60 focus:border-good";
 const codeField = `${field} font-mono tracking-[0.12em] placeholder:font-sans placeholder:tracking-normal`;
-const pill = "h-11 shrink-0 rounded-full px-5 text-[0.9375rem] font-semibold transition-transform active:scale-[0.97]";
 
 /** "Open · until 22:00", "Closed · opens 08:00", "Open 24/7", or nothing. */
 export function HoursLine({ toilet, className }: { toilet: Toilet; className?: string }) {
@@ -42,17 +52,8 @@ export function HoursLine({ toilet, className }: { toilet: Toilet; className?: s
   if (!toilet.hours) return null;
   const open = isOpen(toilet);
   const text =
-    toilet.hours === "24/7"
-      ? t.card.open247
-      : open
-        ? t.card.openUntil(toilet.hours.close)
-        : t.card.closedOpens(toilet.hours.open);
-  return (
-    <span className={cn("inline-flex items-center gap-1.5", open ? "text-good" : "text-bad", className)}>
-      <Clock className="size-3.5" aria-hidden />
-      {text}
-    </span>
-  );
+    toilet.hours === "24/7" ? t.card.open247 : open ? t.card.openUntil(toilet.hours.close) : t.card.closedOpens(toilet.hours.open);
+  return <span className={cn(open ? "text-good" : "text-bad", className)}>{text}</span>;
 }
 
 function Chip({ icon, children }: { icon: ReactNode; children: ReactNode }) {
@@ -82,10 +83,10 @@ function EditForm({ toilet, onDone }: { toilet: Toilet; onDone: () => void }) {
       <input aria-label={t.add.code} value={code} onChange={(e) => setCode(e.target.value)} autoComplete="off" className={codeField} />
       <input aria-label={t.add.note} placeholder={t.add.note} value={note} onChange={(e) => setNote(e.target.value)} className={field} />
       <div className="mt-1 flex justify-end gap-2">
-        <button type="button" onClick={onDone} className={cn(pill, "text-haze")}>
+        <button type="button" onClick={onDone} className={cn(btn.quiet, btn.md)}>
           {t.card.cancel}
         </button>
-        <button type="submit" disabled={!name.trim() || !code.trim()} className={cn(pill, "bg-ink text-night disabled:opacity-40")}>
+        <button type="submit" disabled={!name.trim() || !code.trim()} className={cn(btn.primary, btn.md)}>
           {t.card.save}
         </button>
       </div>
@@ -94,10 +95,11 @@ function EditForm({ toilet, onDone }: { toilet: Toilet; onDone: () => void }) {
 }
 
 /**
- * Everything about one toilet: the code (hidden until you tap, so it isn't
- * on show to everyone around you), whether it's open, how many got in, and
- * the buttons that keep it honest. Only the person who shared a code can
- * edit it; everyone else can suggest a new one. Votes count only on the spot.
+ * One toilet. The code comes first (hidden until you tap, so it isn't on
+ * show to everyone around you), then whether it's open and the way there,
+ * then the quieter part: how many got in, and "Did the code work?".
+ * Only the person who shared a code can edit it; everyone else suggests.
+ * Votes count only from someone standing there.
  */
 export function ToiletCard({
   toilet,
@@ -113,12 +115,13 @@ export function ToiletCard({
   const [shown, setShown] = useState(false);
   const [copied, setCopied] = useState(false);
   const [editing, setEditing] = useState(false);
-  // After a vote: thanks, or (after "doesn't work") asking for the new code.
+  // After a vote: thanks, or (after "no") asking for the new code.
   const [step, setStep] = useState<null | "thanks" | "new-code" | "suggested">(null);
   const [newCode, setNewCode] = useState("");
   const [checking, setChecking] = useState(false);
   const [blocked, setBlocked] = useState<string | null>(null);
   const suggestions = toilet.mine ? (toilet.suggestions ?? []) : [];
+  const votes = toilet.confirms + toilet.reports;
 
   const copy = async () => {
     try {
@@ -130,7 +133,6 @@ export function ToiletCard({
     }
   };
 
-  // Votes only count from someone standing there.
   const vote = async (works: boolean) => {
     setBlocked(null);
     setChecking(true);
@@ -173,40 +175,26 @@ export function ToiletCard({
     );
   }
 
-  const access = toilet.access === "paid" && toilet.price ? `${t.access.paid} · ${toilet.price} Ft` : t.access[toilet.access];
+  const access = toilet.access === "paid" && toilet.price ? `${t.access.paid} ${toilet.price} Ft` : t.access[toilet.access];
 
   return (
     <div className={cn("text-left", className)}>
+      {/* What and where */}
       <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1">
-          {inList ? (
-            <p className="text-sm text-haze">{access}</p>
-          ) : (
-            <>
-              <p className="text-[1.0625rem] font-semibold leading-tight">{toilet.name}</p>
-              <p className="mt-0.5 text-sm text-haze">
-                {t.kinds[toilet.kind]} · {access}
-              </p>
-            </>
-          )}
-          <HoursLine toilet={toilet} className="mt-1 text-sm" />
+          {!inList && <p className="text-[1.0625rem] leading-tight font-semibold">{toilet.name}</p>}
+          <p className={cn("text-sm text-haze", !inList && "mt-0.5")}>
+            {!inList && <>{t.kinds[toilet.kind]} · </>}
+            {access}
+          </p>
+          {toilet.hours && <HoursLine toilet={toilet} className="mt-0.5 block text-sm" />}
         </div>
-        <a
-          href={directionsUrl(toilet)}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={t.card.directions}
-          title={t.card.directions}
-          className="-mt-1 grid size-9 shrink-0 place-items-center rounded-full bg-good/15 text-good transition-transform active:scale-95"
-        >
-          <Navigation className="size-4" aria-hidden />
-        </a>
         {toilet.mine && (
           <button
             type="button"
             onClick={() => setEditing(true)}
             aria-label={t.card.edit}
-            className="-mt-1 -mr-1 grid size-8 shrink-0 place-items-center rounded-full text-haze hover:text-ink"
+            className={cn(btn.quiet, "-mt-1 -mr-1 size-9")}
           >
             <Pencil className="size-4" aria-hidden />
           </button>
@@ -220,13 +208,13 @@ export function ToiletCard({
         </div>
       )}
 
-      {/* The code, and the way there */}
-      <div className="mt-3 flex items-center gap-2">
+      {/* The code: the reason you're here */}
+      <div className="mt-3 flex items-stretch gap-2">
         <button
           type="button"
           onClick={() => setShown((s) => !s)}
           aria-label={shown ? t.card.hide : t.card.show}
-          className="relative flex h-14 min-w-0 flex-1 items-center justify-center overflow-hidden rounded-2xl border border-dusk-edge bg-night px-4"
+          className="relative flex h-16 min-w-0 flex-1 items-center justify-center overflow-hidden rounded-2xl border border-good/40 bg-good/[0.07]"
         >
           <AnimatePresence mode="wait" initial={false}>
             {shown ? (
@@ -236,7 +224,7 @@ export function ToiletCard({
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 exit={{ opacity: 0, y: -8, filter: "blur(6px)" }}
                 transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                className="truncate font-mono text-[1.625rem] font-semibold tracking-[0.18em] tabular-nums"
+                className="truncate pr-11 pl-4 font-mono text-[1.75rem] font-bold tracking-[0.1em] tabular-nums"
               >
                 {toilet.code}
               </motion.span>
@@ -247,29 +235,44 @@ export function ToiletCard({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
-                className="inline-flex items-center gap-2 text-[0.9375rem] font-semibold text-haze"
+                className="inline-flex items-center gap-2 text-base font-semibold text-ink"
               >
-                <Eye className="size-4" aria-hidden /> {t.card.tapToShow}
+                <Eye className="size-5 text-good" aria-hidden /> {t.card.tapToShow}
               </motion.span>
             )}
           </AnimatePresence>
+          {shown && (
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.stopPropagation();
+                void copy();
+              }}
+              aria-label={t.card.copy}
+              className="absolute right-2 grid size-10 place-items-center rounded-full text-haze hover:text-ink"
+            >
+              {copied ? <Check className="size-5 text-good" /> : <Copy className="size-5" />}
+            </span>
+          )}
         </button>
-        {shown && (
-          <button
-            type="button"
-            onClick={copy}
-            aria-label={t.card.copy}
-            className="grid size-14 shrink-0 place-items-center rounded-2xl border border-dusk-edge bg-night text-haze transition-transform active:scale-95"
-          >
-            {copied ? <Check className="size-5 text-good" /> : <Copy className="size-5" />}
-          </button>
-        )}
+        <a
+          href={directionsUrl(toilet)}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={t.card.directions}
+          className={cn(btn.secondary, "h-16 w-16 flex-col gap-0.5 rounded-2xl px-0 text-[0.6875rem]")}
+        >
+          <Navigation className="size-5 text-good" aria-hidden />
+          {t.card.directions}
+        </a>
       </div>
 
-      {/* How many got in, and how many didn't */}
-      <p className="mt-2 flex items-center gap-2 text-sm">
+      {/* How many got in: plain words, the dot carries the colour */}
+      <p className="mt-3 flex items-center gap-2 text-sm text-ink/85">
         <HealthDot toilet={toilet} className="size-2" />
-        <span style={{ color: trustColor(toilet) }}>{t.card.votes(toilet.confirms, toilet.reports)}</span>
+        {votes > 0 && <span className="font-semibold">{t.card.gotIn(Math.round(trust(toilet) * 100))}</span>}
+        <span className="text-haze">{t.card.votes(toilet.confirms, toilet.reports)}</span>
       </p>
       <p className="mt-0.5 pl-4 text-xs text-haze">
         {t.card.lastWorked(ago(toilet.confirmedAt, lang))}
@@ -287,18 +290,10 @@ export function ToiletCard({
                   <span className="block font-mono tracking-[0.12em]">{s.code}</span>
                   <span className="block text-xs text-haze">{ago(s.at, lang)}</span>
                 </span>
-                <button
-                  type="button"
-                  onClick={() => dismissSuggestion(toilet.id, s.id)}
-                  className="h-9 rounded-full px-3 text-sm font-semibold text-haze"
-                >
+                <button type="button" onClick={() => dismissSuggestion(toilet.id, s.id)} className={cn(btn.quiet, btn.sm, "px-3")}>
                   {t.card.dismiss}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => editToilet(toilet.id, { code: s.code })}
-                  className="h-9 rounded-full bg-ink px-4 text-sm font-semibold text-night"
-                >
+                <button type="button" onClick={() => editToilet(toilet.id, { code: s.code })} className={cn(btn.primary, btn.sm)}>
                   {t.card.useIt}
                 </button>
               </li>
@@ -307,25 +302,16 @@ export function ToiletCard({
         </div>
       )}
 
-      {/* Keep it honest */}
+      {/* Keep it honest, quietly */}
       {step === null && (
         <>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => vote(true)}
-              disabled={checking}
-              className="inline-flex h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-good/15 px-2 text-[0.875rem] font-semibold text-good transition-transform active:scale-[0.97] disabled:opacity-60"
-            >
-              <ThumbsUp className="size-4" aria-hidden /> {t.card.stillWorks}
+          <div className="mt-3 flex items-center gap-2 border-t border-dusk-edge pt-3">
+            <span className="min-w-0 flex-1 text-sm text-haze">{t.card.didItWork}</span>
+            <button type="button" onClick={() => vote(true)} disabled={checking} className={cn(btn.secondary, btn.sm, "px-3.5")}>
+              <ThumbsUp className="size-4 text-good" aria-hidden /> {t.card.yes}
             </button>
-            <button
-              type="button"
-              onClick={() => vote(false)}
-              disabled={checking}
-              className="inline-flex h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-bad/15 px-2 text-[0.875rem] font-semibold text-bad transition-transform active:scale-[0.97] disabled:opacity-60"
-            >
-              <ThumbsDown className="size-4" aria-hidden /> {t.card.doesntWork}
+            <button type="button" onClick={() => vote(false)} disabled={checking} className={cn(btn.secondary, btn.sm, "px-3.5")}>
+              <ThumbsDown className="size-4 text-bad" aria-hidden /> {t.card.no}
             </button>
           </div>
           {checking && <p className="mt-2 text-sm text-haze">{t.spot.checking}</p>}
@@ -336,10 +322,10 @@ export function ToiletCard({
           )}
         </>
       )}
-      {step === "thanks" && <p className="mt-3 text-sm text-haze">{t.card.thanks}</p>}
-      {step === "suggested" && <p className="mt-3 text-sm text-haze">{t.card.suggested}</p>}
+      {step === "thanks" && <p className="mt-3 border-t border-dusk-edge pt-3 text-sm text-haze">{t.card.thanks}</p>}
+      {step === "suggested" && <p className="mt-3 border-t border-dusk-edge pt-3 text-sm text-haze">{t.card.suggested}</p>}
       {step === "new-code" && (
-        <form onSubmit={sendNewCode} className="mt-3">
+        <form onSubmit={sendNewCode} className="mt-3 border-t border-dusk-edge pt-3">
           <p className="text-sm text-haze">{t.card.knowNew}</p>
           <div className="mt-2 flex gap-2">
             <input
@@ -350,15 +336,11 @@ export function ToiletCard({
               autoComplete="off"
               className={cn(codeField, "min-w-0 flex-1")}
             />
-            <button type="submit" disabled={!newCode.trim()} className={cn(pill, "bg-ink text-night disabled:opacity-40")}>
+            <button type="submit" disabled={!newCode.trim()} className={cn(btn.primary, btn.md)}>
               {toilet.mine ? t.card.save : t.card.suggest}
             </button>
           </div>
-          <button
-            type="button"
-            onClick={() => setStep("thanks")}
-            className="mt-2 h-10 w-full rounded-full text-sm font-semibold text-haze hover:text-ink"
-          >
+          <button type="button" onClick={() => setStep("thanks")} className={cn(btn.quiet, btn.sm, "mt-1 w-full")}>
             {t.card.dontKnow}
           </button>
         </form>

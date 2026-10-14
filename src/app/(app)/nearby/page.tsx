@@ -54,6 +54,21 @@ export default function NearbyPage() {
   const input = useRef<HTMLInputElement>(null);
   useKeyboardMode(focused);
 
+  // The search bar slides away while you scroll down the list, and comes
+  // back as soon as you scroll up, so it never sits on top of what you read.
+  const [tucked, setTucked] = useState(false);
+  useEffect(() => {
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (Math.abs(y - lastY) < 8) return;
+      setTucked(y > lastY && y > 80);
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   // Addresses as you type (after a short pause), kept to Budapest.
   const q = query.trim();
   useEffect(() => {
@@ -194,15 +209,17 @@ export default function NearbyPage() {
       {focused && <div aria-hidden onClick={done} className="fixed inset-0 z-40 bg-black/50 animate-in fade-in" />}
       <div
         className={cn(
-          "pointer-events-none fixed inset-x-0 z-50 flex justify-center transition-[bottom] duration-300 ease-out",
+          "pointer-events-none fixed inset-x-0 z-50 flex justify-center transition-[bottom,translate,opacity] duration-300 ease-out",
           focused
             ? "bottom-[max(env(safe-area-inset-bottom),0.75rem)]"
             : "bottom-[calc(max(env(safe-area-inset-bottom),0.75rem)+5.25rem)]",
+          tucked && !focused && "translate-y-24 opacity-0",
         )}
       >
         <div
           className={cn(
-            "pointer-events-auto transition-[width] duration-300 ease-out",
+            "transition-[width] duration-300 ease-out",
+            !(tucked && !focused) && "pointer-events-auto",
             focused ? "w-[min(calc(100vw-2rem),28rem)]" : "w-[min(calc(100vw-5rem),22rem)]",
           )}
         >

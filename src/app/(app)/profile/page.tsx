@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { BACK, PageTransition } from "@/components/page-transition";
 import { HealthDot } from "@/components/toilet-card";
+import { btn } from "@/components/ui/buttons";
 import { useT } from "@/lib/i18n";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
@@ -227,6 +228,43 @@ export default function ProfilePage() {
                 <ChevronRight className="size-5 shrink-0 text-haze" aria-hidden />
               </button>
             </li>
+            <li>
+              {confirmClear ? (
+                <div className="flex items-center gap-3 py-3">
+                  <span className="flex-1 text-sm">{t.profile.deleteConfirm}</span>
+                  <button type="button" onClick={() => setConfirmClear(false)} className={cn(btn.quiet, btn.sm)}>
+                    {t.profile.keep}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearToilets();
+                      clearAlerts();
+                      setConfirmClear(false);
+                    }}
+                    className={cn(btn.sm, "inline-flex items-center rounded-full bg-bad font-semibold text-night active:scale-[0.97]")}
+                  >
+                    {t.profile.delete}
+                  </button>
+                </div>
+              ) : (
+                <button type="button" onClick={() => setConfirmClear(true)} className="flex w-full items-center gap-4 py-4 text-left text-bad">
+                  <Trash2 className="size-5 shrink-0" aria-hidden />
+                  <span className="flex-1">{t.profile.deleteAll}</span>
+                </button>
+              )}
+            </li>
+          </ul>
+        </section>
+
+        {/* Demo tools, kept apart from the real settings */}
+        {(mine.length > 0 || !toilets.some((x) => !x.mine)) && (
+          <section className="mt-12" aria-labelledby="demo-heading">
+            <h2 id="demo-heading" className="t-section">
+              {t.profile.demo}
+            </h2>
+            <p className="mt-1 text-sm text-haze">{t.profile.demoSub}</p>
+            <ul className="mt-3 divide-y divide-dusk-edge border-y border-dusk-edge">
             {!toilets.some((x) => !x.mine) && (
               <li>
                 <button type="button" onClick={addDemoToilets} className="flex w-full items-center gap-4 py-4 text-left">
@@ -249,34 +287,9 @@ export default function ProfilePage() {
                 </button>
               </li>
             )}
-            <li>
-              {confirmClear ? (
-                <div className="flex items-center gap-3 py-3">
-                  <span className="flex-1 text-sm">{t.profile.deleteConfirm}</span>
-                  <button type="button" onClick={() => setConfirmClear(false)} className="h-10 rounded-full px-4 text-sm font-semibold text-haze">
-                    {t.profile.keep}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      clearToilets();
-                      clearAlerts();
-                      setConfirmClear(false);
-                    }}
-                    className="h-10 rounded-full bg-bad px-4 text-sm font-semibold text-night"
-                  >
-                    {t.profile.delete}
-                  </button>
-                </div>
-              ) : (
-                <button type="button" onClick={() => setConfirmClear(true)} className="flex w-full items-center gap-4 py-4 text-left text-bad">
-                  <Trash2 className="size-5 shrink-0" aria-hidden />
-                  <span className="flex-1">{t.profile.deleteAll}</span>
-                </button>
-              )}
-            </li>
-          </ul>
-        </section>
+            </ul>
+          </section>
+        )}
 
         <footer className="mt-10 pb-6 text-[0.8125rem] leading-relaxed text-haze">{t.profile.footer}</footer>
       </main>
