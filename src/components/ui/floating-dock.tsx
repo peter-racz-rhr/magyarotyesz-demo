@@ -1,6 +1,6 @@
 "use client";
 /**
- * Aceternity UI Floating Dock, adapted for Naplemente:
+ * Aceternity UI Floating Dock, adapted for this app:
  * - the magnifying dock is used on phones too, driven by pointer events so
  *   it follows a dragging thumb as well as a mouse;
  * - items are Next links with an active state for the current tab.
@@ -25,6 +25,8 @@ export type DockItem = {
   href: string;
   /** Passed to the link so pages can animate in the right direction. */
   transitionTypes?: string[];
+  /** Unread count: shows a small green dot on the icon. */
+  badge?: number;
 };
 
 export const FloatingDock = ({
@@ -72,6 +74,7 @@ function IconContainer({
   href,
   transitionTypes,
   active,
+  badge,
 }: DockItem & { pointerX: MotionValue<number>; active: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -95,7 +98,7 @@ function IconContainer({
     <Link
       href={href}
       transitionTypes={transitionTypes}
-      aria-label={title}
+      aria-label={badge ? `${title} (${badge})` : title}
       aria-current={active ? "page" : undefined}
       onPointerEnter={() => setPressed(true)}
       onPointerLeave={() => setPressed(false)}
@@ -137,6 +140,12 @@ function IconContainer({
           className="relative flex items-center justify-center [&_svg]:size-full"
         >
           {icon}
+          {!!badge && (
+            <span
+              aria-hidden
+              className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-good shadow-[0_0_0_2px_var(--dusk),0_0_8px_1px_var(--good)]"
+            />
+          )}
         </motion.div>
       </motion.div>
     </Link>

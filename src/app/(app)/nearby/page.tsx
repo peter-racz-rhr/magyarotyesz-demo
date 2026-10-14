@@ -5,10 +5,11 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { ActionButton } from "@/components/onboarding/action-button";
 import { PageTransition } from "@/components/page-transition";
-import { HealthDot, ToiletCard } from "@/components/toilet-card";
+import { HealthDot, HoursLine, ToiletCard } from "@/components/toilet-card";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { searchPlaces, type Place } from "@/lib/geocode";
-import { KINDS, distance, formatDistance, useToilets, type Toilet } from "@/lib/toilets";
+import { useT, type Dict } from "@/lib/i18n";
+import { distance, formatDistance, useToilets, type Toilet } from "@/lib/toilets";
 import { useHere } from "@/lib/use-here";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +18,7 @@ const CITY_CENTRE = { latitude: 47.4979, longitude: 19.0544 };
 
 /** Lowercase, without accents, so "kor" finds "Kör". */
 const fold = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
-const matches = (t: Toilet, q: string) => fold(`${t.name} ${KINDS[t.kind]} ${t.note}`).includes(fold(q));
+const matches = (t: Toilet, q: string, d: Dict) => fold(`${t.name} ${d.kinds[t.kind]} ${t.note}`).includes(fold(q));
 
 /**
  * While you type, the dock steps aside and (on Android) the page shrinks
@@ -41,6 +42,7 @@ function useKeyboardMode(active: boolean) {
 }
 
 export default function NearbyPage() {
+  const { t: d } = useT();
   const here = useHere();
   const toilets = useToilets();
   const [open, setOpen] = useState<string | null>(null);
@@ -76,7 +78,7 @@ export default function NearbyPage() {
 
   const from = origin ?? here.coords ?? CITY_CENTRE;
   const sorted = toilets
-    .filter((t) => !q || matches(t, q))
+    .filter((t) => !q || matches(t, q, d))
     .map((t) => ({ toilet: t, metres: distance(from, t) }))
     .sort((a, b) => a.metres - b.metres);
 
@@ -104,16 +106,16 @@ export default function NearbyPage() {
     <PageTransition>
       <main className="mx-auto w-full max-w-md px-6 pt-[max(env(safe-area-inset-top),1rem)] pb-24">
         <header className="pt-8">
-          <h1 className="t-display">Nearby</h1>
+          <h1 className="t-display">{d.nearby.title}</h1>
           {origin ? (
             <p className="mt-2 flex items-center gap-2 text-[1.0625rem] text-haze">
               <span className="min-w-0 truncate">
-                Closest to <span className="text-ink">{origin.label}</span>
+                {d.nearby.closestTo} <span className="text-ink">{origin.label}</span>
               </span>
               <button
                 type="button"
                 onClick={() => setOrigin(null)}
-                aria-label="Back to my location"
+                aria-label={d.nearby.backToMe}
                 className="grid size-8 shrink-0 place-items-center rounded-full bg-dusk text-haze hover:text-ink"
               >
                 <X className="size-4" />
@@ -121,7 +123,7 @@ export default function NearbyPage() {
             </p>
           ) : (
             <p className="mt-2 text-[1.0625rem] text-haze">
-              {here.coords ? "Closest first, from where you are." : "Closest first, from Deák Ferenc tér."}
+              {here.coords ? d.nearby.fromYou : d.nearby.fromCentre}
             </p>
           )}
           {!origin && !here.coords && here.status !== "denied" && here.status !== "checking" && (
@@ -131,17 +133,17 @@ export default function NearbyPage() {
               onClick={here.request}
               disabled={here.status === "locating"}
             >
-              {here.status === "locating" ? "Finding you…" : "Use my location"}
+              {here.status === "locating" ? d.nearby.finding : d.nearby.useLocation}
             </ActionButton>
           )}
         </header>
 
         {toilets.length === 0 ? (
           <p className="mt-10 max-w-[32ch] text-haze">
-            No codes yet. Add the first one from the map: tap where the toilet is.
+            {d.nearby.empty}
           </p>
         ) : sorted.length === 0 ? (
-          <p className="mt-10 max-w-[32ch] text-haze">No toilets match “{q}”.</p>
+          <p className="mt-10 max-w-[32ch] text-haze">{d.nearby.noMatch(q)}</p>
         ) : (
           <ul className="mt-8 divide-y divide-dusk-edge border-y border-dusk-edge">
             {sorted.map(({ toilet, metres }) => {
@@ -157,7 +159,10 @@ export default function NearbyPage() {
                     <HealthDot toilet={toilet} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">{toilet.name}</span>
-                      <span className="block text-sm text-haze">{KINDS[toilet.kind]}</span>
+                      <span className="flex items-center gap-2 text-sm text-haze">
+                        {d.kinds[toilet.kind]}
+                        <HoursLine toilet={toilet} className="text-xs" />
+                      </span>
                     </span>
                     <span className="text-haze tabular-nums">{formatDistance(metres)}</span>
                     <ChevronDown
@@ -240,11 +245,11 @@ export default function NearbyPage() {
                   </button>
                 ))}
                 {q.length >= 3 && searching && shownPlaces.length === 0 && (
-                  <p className="px-3 py-2.5 text-sm text-haze">Looking up addresses…</p>
+                  <p className="px-3 py-2.5 text-sm text-haze">{d.nearby.looking}</p>
                 )}
                 {sorted.length === 0 && shownPlaces.length === 0 && !searching && (
                   <p className="px-3 py-2.5 text-sm text-haze">
-                    {q.length < 3 ? "Keep typing to search addresses too." : "Nothing found."}
+                    {q.length < 3 ? d.nearby.keepTyping : d.nearby.nothing}
                   </p>
                 )}
               </motion.div>
@@ -264,8 +269,8 @@ export default function NearbyPage() {
                 if (e.key === "Enter" && shownPlaces[0]) pickPlace(shownPlaces[0]);
                 if (e.key === "Escape") done();
               }}
-              placeholder="Search toilets or an address"
-              aria-label="Search toilets or an address"
+              placeholder={d.nearby.search}
+              aria-label={d.nearby.search}
               className="h-full min-w-0 flex-1 bg-transparent text-[1rem] outline-none placeholder:text-haze [&::-webkit-search-cancel-button]:hidden"
             />
             {(query || focused) && (
@@ -273,7 +278,7 @@ export default function NearbyPage() {
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => (query ? setQuery("") : done())}
-                aria-label={query ? "Clear" : "Close search"}
+                aria-label={query ? d.nearby.clear : d.nearby.close}
                 className="grid size-11 shrink-0 place-items-center rounded-full text-haze hover:text-ink"
               >
                 <X className="size-5" />

@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActionButton } from "@/components/onboarding/action-button";
 import { FORWARD, PageTransition } from "@/components/page-transition";
 import { Wordmark } from "@/components/wordmark";
+import { useT } from "@/lib/i18n";
 import { requestLocation } from "@/lib/location";
 import { markOnboarded } from "@/lib/onboarding";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,7 @@ type Step = { at: number; run: () => void };
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
 function Keypad({ typed, tone, pressed }: { typed: string; tone: Tone; pressed: { key: string; n: number } | null }) {
+  const { t } = useT();
   const shake = useAnimationControls();
   useEffect(() => {
     if (tone === "wrong") void shake.start({ x: [0, -12, 11, -8, 6, -3, 0], transition: { duration: 0.45 } });
@@ -56,7 +58,7 @@ function Keypad({ typed, tone, pressed }: { typed: string; tone: Tone; pressed: 
         })}
       </motion.div>
       <p className={cn("mt-3 h-5 text-[0.75rem] font-bold tracking-[0.14em] uppercase transition-colors", tone === "wrong" ? "text-bad" : tone === "right" ? "text-good" : "text-transparent")}>
-        {tone === "wrong" ? "Wrong code" : tone === "right" ? "Open" : "·"}
+        {tone === "wrong" ? t.welcome.wrong : tone === "right" ? t.welcome.open : "·"}
       </p>
 
       {/* The keys */}
@@ -91,6 +93,7 @@ function Keypad({ typed, tone, pressed }: { typed: string; tone: Tone; pressed: 
 
 export default function WelcomePage() {
   const router = useRouter();
+  const { t } = useT();
   const reduce = useReducedMotion();
   const [typed, setTyped] = useState("");
   const [tone, setTone] = useState<Tone>("idle");
@@ -182,21 +185,21 @@ export default function WelcomePage() {
                 >
                   {[
                     <h1 key="h" className="text-[3.5rem] leading-[0.94] font-bold tracking-[-0.035em] [font-stretch:90%]">
-                      Never guess
-                      <br />
-                      the code
-                      <br />
-                      again.
+                      {t.welcome.headline.map((line, i) => (
+                        <span key={i} className="block">
+                          {line}
+                        </span>
+                      ))}
                     </h1>,
                     <p key="p" className="mt-5 max-w-[26ch] text-[1.0625rem] leading-snug font-medium text-haze">
-                      Every toilet code in Budapest, shared by the people who got in.
+                      {t.welcome.sub}
                     </p>,
                     <div key="b" className="mt-9 flex flex-col gap-2">
                       <ActionButton onClick={() => enter(true)} disabled={locating}>
-                        {locating ? "Finding you…" : "Find one near me"}
+                        {locating ? t.welcome.finding : t.welcome.find}
                       </ActionButton>
                       <ActionButton variant="quiet" className="h-12" onClick={() => enter(false)}>
-                        Just show me the map
+                        {t.welcome.mapOnly}
                       </ActionButton>
                     </div>,
                   ].map((child) => (
@@ -242,7 +245,7 @@ export default function WelcomePage() {
                 onClick={unlock}
                 className="absolute top-[max(env(safe-area-inset-top),1rem)] right-4 h-11 rounded-full px-4 text-[0.9375rem] font-semibold text-haze hover:text-ink"
               >
-                Skip
+                {t.welcome.skip}
               </button>
             </motion.div>
           )}

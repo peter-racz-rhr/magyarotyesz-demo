@@ -4,16 +4,19 @@ import { List, Map, UserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { BACK, FORWARD } from "@/components/page-transition";
 import { FloatingDock, type DockItem } from "@/components/ui/floating-dock";
+import { useT } from "@/lib/i18n";
+import { useAlerts } from "@/lib/toilets";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
-
-const ITEMS: DockItem[] = [
-  { title: "Map", href: "/map", icon: <Map strokeWidth={1.75} /> },
-  { title: "Nearby", href: "/nearby", icon: <List strokeWidth={1.75} /> },
-  { title: "Profile", href: "/profile", icon: <UserRound strokeWidth={1.75} /> },
-];
 
 export function AppDock() {
   const pathname = usePathname();
+  const { t } = useT();
+  const unread = useAlerts().filter((a) => !a.read).length;
+  const ITEMS: DockItem[] = [
+    { title: t.tabs.map, href: "/map", icon: <Map strokeWidth={1.75} /> },
+    { title: t.tabs.nearby, href: "/nearby", icon: <List strokeWidth={1.75} /> },
+    { title: t.tabs.profile, href: "/profile", icon: <UserRound strokeWidth={1.75} />, badge: unread },
+  ];
   // Tabs to the right slide in from the right, tabs to the left from the left.
   const current = ITEMS.findIndex((item) => item.href === pathname);
   const items = ITEMS.map((item, index) => ({
