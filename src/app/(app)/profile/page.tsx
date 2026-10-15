@@ -10,7 +10,7 @@ import { REMOTE } from "@/lib/api";
 import { useT } from "@/lib/i18n";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
-import { updateSettings, useSettings, type Lang } from "@/lib/settings";
+import { DEFAULT_GLASS_DIM, MAX_GLASS_DIM, updateSettings, useSettings, type Lang } from "@/lib/settings";
 import { dismissNotice, syncNow, usePendingCount, useNotices, useSyncStatus } from "@/lib/sync";
 import {
   addDemoToilets,
@@ -275,6 +275,36 @@ export default function ProfilePage() {
                 on={settings.notify}
                 onChange={toggleNotify}
               />
+            </li>
+            <li className="py-4">
+              <div className="flex items-baseline gap-3">
+                <label htmlFor="glass-dim" className="flex-1">
+                  {t.profile.glass}
+                </label>
+                <span data-testid="glass-dim-value" className="text-lg font-semibold tabular-nums">
+                  {Math.round((settings.glassDim ?? DEFAULT_GLASS_DIM) * 100)}%
+                </span>
+              </div>
+              <p className="mt-0.5 text-sm text-haze">{t.profile.glassSub}</p>
+              <input
+                id="glass-dim"
+                type="range"
+                min={0}
+                max={Math.round(MAX_GLASS_DIM * 100)}
+                step={1}
+                value={Math.round((settings.glassDim ?? DEFAULT_GLASS_DIM) * 100)}
+                onChange={(e) => updateSettings({ glassDim: Number(e.target.value) / 100 })}
+                className="mt-3 h-8 w-full cursor-pointer accent-[var(--good)]"
+              />
+              {Math.round((settings.glassDim ?? DEFAULT_GLASS_DIM) * 100) !== Math.round(DEFAULT_GLASS_DIM * 100) && (
+                <button
+                  type="button"
+                  onClick={() => updateSettings({ glassDim: DEFAULT_GLASS_DIM })}
+                  className="mt-1 text-sm font-semibold text-haze hover:text-ink"
+                >
+                  {t.profile.glassReset}
+                </button>
+              )}
             </li>
             <li>
               <button type="button" onClick={showIntro} className="flex w-full items-center gap-4 py-4 text-left">

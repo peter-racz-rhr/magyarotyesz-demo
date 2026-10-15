@@ -281,7 +281,7 @@ html[data-sheet="open"] .app-dock {
 @layer components {
   .lq-surface[data-liquid-variant="clear"] {
     --lq-blur: 8px;
-    background: linear-gradient(rgb(8 10 14 / 0.2), rgb(8 10 14 / 0.2)), var(--lq-fill);
+    background: linear-gradient(rgb(8 10 14 / var(--glass-dim, 0.2)), rgb(8 10 14 / var(--glass-dim, 0.2))), var(--lq-fill);
   }
 }
 
