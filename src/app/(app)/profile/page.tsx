@@ -123,7 +123,8 @@ export default function ProfilePage() {
   const [confirmClear, setConfirmClear] = useState(false);
   const [notifyBlocked, setNotifyBlocked] = useState(false);
   const mine = toilets.filter((x) => x.mine);
-  const checks = toilets.reduce((n, x) => n + (x.myVote ? 1 : 0), 0);
+  // People who got in with the codes you shared: every "yes" except your own.
+  const gotIn = mine.reduce((n, x) => n + Math.max(0, x.confirms - (x.myVote === "works" ? 1 : 0)), 0);
 
   // Seeing your alerts here counts as reading them.
   const unread = alerts.some((a) => !a.read);
@@ -194,8 +195,8 @@ export default function ProfilePage() {
               <dt className="mt-1 text-[0.8125rem] text-haze">{t.profile.statShared}</dt>
             </div>
             <div className={cn(CARD, "px-4 py-3")}>
-              <dd className="text-[1.75rem] leading-none font-bold tabular-nums">{checks}</dd>
-              <dt className="mt-1 text-[0.8125rem] text-haze">{t.profile.statChecks}</dt>
+              <dd className="text-[1.75rem] leading-none font-bold tabular-nums">{gotIn}</dd>
+              <dt className="mt-1 text-[0.8125rem] text-haze">{t.profile.statGotIn}</dt>
             </div>
           </dl>
           {REMOTE && (pending > 0 || sync.online === false) && !sync.syncing && (

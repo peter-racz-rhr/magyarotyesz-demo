@@ -190,7 +190,7 @@ const en = {
   profile: {
     title: "You",
     statShared: "Codes shared",
-    statChecks: "Checks on this phone",
+    statGotIn: "Got in with your codes",
     about: "About",
     summary: (shared: number, checks: number) =>
       `${shared} ${shared === 1 ? "code" : "codes"} shared · ${checks} ${checks === 1 ? "check" : "checks"} on this phone`,
@@ -411,7 +411,7 @@ const hu: Dict = {
   profile: {
     title: "Te",
     statShared: "Megosztott kód",
-    statChecks: "Ellenőrzés ezen a telefonon",
+    statGotIn: "Bejutott a kódjaiddal",
     about: "Névjegy",
     summary: (shared: number, checks: number) => `${shared} megosztott kód · ${checks} ellenőrzés ezen a telefonon`,
     alerts: "Értesítések",
