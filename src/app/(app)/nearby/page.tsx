@@ -237,7 +237,7 @@ export default function NearbyPage() {
       {focused && <div aria-hidden onClick={done} className="fixed inset-0 z-40 bg-black/50 animate-in fade-in" />}
       <div
         className={cn(
-          "pointer-events-none fixed inset-x-0 z-50 flex justify-center transition-[bottom,translate,opacity] duration-300 ease-out",
+          "nearby-search pointer-events-none fixed inset-x-0 z-50 flex justify-center transition-[bottom,translate,opacity] duration-300 ease-out",
           focused
             ? "bottom-[max(env(safe-area-inset-bottom),0.75rem)]"
             : "bottom-[calc(max(env(safe-area-inset-bottom),0.75rem)+5.25rem)]",
@@ -301,7 +301,7 @@ export default function NearbyPage() {
             )}
           </AnimatePresence>
 
-          <LiquidSurface radius={999} veil={0.55} className="flex h-14 items-center gap-2 pr-1.5 pl-4">
+          <LiquidSurface radius={999} veil={0.55} className="search-glass flex h-14 items-center gap-2 pr-1.5 pl-4">
             <Search className="size-5 shrink-0 text-haze" aria-hidden />
             <input
               ref={input}

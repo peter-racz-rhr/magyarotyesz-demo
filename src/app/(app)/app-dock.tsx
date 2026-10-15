@@ -32,7 +32,7 @@ export function AppDock() {
       className="app-dock pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center pb-[max(env(safe-area-inset-bottom),0.75rem)] transition-[translate,opacity,visibility] duration-300 ease-out"
     >
       {/* Scales with the screen, with room on each side, up to a comfortable maximum */}
-      <div className="relative w-[min(calc(100vw-5rem),22rem)]">
+      <div className="dock-shield relative w-[min(calc(100vw-5rem),22rem)]">
         {/* Pages can put a control here (the map's center-on-me button):
             it sits just above the dock, lined up with its right edge. */}
         <div id="dock-accessory" className="pointer-events-auto absolute right-0 bottom-full mb-3" />

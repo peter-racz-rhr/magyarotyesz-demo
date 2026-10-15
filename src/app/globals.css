@@ -286,20 +286,52 @@ html[data-sheet="open"] .app-dock {
 }
 
 /*
-  While a page slides in, it gets its own layer that paints above the rest of
-  the screen, so its text used to show straight through the nav bar (the glass
-  can't blur a layer that sits above it). Cut those layers off where the dock
-  starts: the dock keeps its usual dim and frost, over an empty strip for the
-  length of the slide. The old page sits shifted up by how far it was scrolled
-  (--vt-scroll, set in ViewTransitionDock).
+  While a page slides in, the browser puts it on a layer above everything else,
+  and glass can't blur a layer sitting above it, so the page's text used to
+  show through the nav bar and the search bar (see ViewTransitionDock).
+  - The dock gets a layer of its own, above the page, with a solid pill behind
+    it for those moments.
+  - The search bar travels with the page, so it gets a denser backing instead.
+  Afterwards both go back to being ordinary frosted glass.
 */
-::view-transition-old(*) {
-  clip-path: inset(0 0 calc(100% - 100lvh + 5.75rem + env(safe-area-inset-bottom, 0px) - var(--vt-scroll, 0px)) 0);
+html[data-vt-new] .app-dock {
+  view-transition-name: dock;
 }
-::view-transition-new(*) {
-  clip-path: inset(0 0 calc(100% - 100lvh + 5.75rem + env(safe-area-inset-bottom, 0px)) 0);
+html[data-vt-new] .dock-shield::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 4.5rem;
+  border-radius: 999px;
+  background: #07080a;
+  z-index: -1;
 }
-::view-transition-old(root),
-::view-transition-new(root) {
-  clip-path: none;
+/* Named here (not left to the automatic name) so both bars can be stacked above the page. */
+.nearby-search {
+  view-transition-name: nearby-search !important;
+}
+::view-transition-group(dock) {
+  animation: none;
+  z-index: 10;
+}
+::view-transition-group(nearby-search) {
+  z-index: 9;
+}
+/* No fade: a half-transparent search bar lets the list underneath show through. */
+::view-transition-new(nearby-search) {
+  animation: none !important;
+}
+::view-transition-old(nearby-search) {
+  display: none;
+}
+::view-transition-old(dock) {
+  display: none;
+}
+::view-transition-new(dock) {
+  animation: none;
+}
+@layer components {
+  html[data-vt] .lq-surface.search-glass {
+    background: linear-gradient(rgb(8 10 14 / 0.9), rgb(8 10 14 / 0.9)), var(--lq-fill);
+  }
 }
