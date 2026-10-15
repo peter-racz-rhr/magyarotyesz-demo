@@ -370,12 +370,13 @@ export default function MapPage() {
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!draft) return;
+    // "Paid" with no price typed is simply free.
+    const paidFor = access === "paid" && Number(price) > 0;
     const cleanName = tidy(name, LIMITS.name);
     const cleanedCode = cleanCode(code);
     if (!cleanName || !validName(cleanName)) return setError(t.add.errName);
     if (!code.trim()) return setError(t.add.errCode);
     if (!validCode(cleanedCode)) return setError(t.add.errCodeChars);
-    if (access === "paid" && !(Number(price) > 0)) return setError(t.add.errPrice);
     if (access === "paid" && Number(price) > LIMITS.price) return setError(t.add.errPriceMax(LIMITS.price));
     if (!inBudapest(draft)) return setError(t.add.errCity);
     if (addedToday() >= DAILY_LIMIT) return setError(t.add.errLimit);
@@ -391,8 +392,8 @@ export default function MapPage() {
       name: cleanName,
       code: cleanedCode,
       kind,
-      access,
-      price: access === "paid" ? Number(price) : undefined,
+      access: paidFor ? "paid" : access === "paid" ? "free" : access,
+      price: paidFor ? Number(price) : undefined,
       hours,
       wheelchair: wheelchair || undefined,
       babyChanging: baby || undefined,
@@ -630,7 +631,7 @@ export default function MapPage() {
                       setPrice(e.target.value.replace(/\D/g, "").replace(/^0+/, ""));
                       setError(null);
                     }}
-                    placeholder="300"
+                    placeholder={t.add.priceFree}
                     aria-invalid={Number(price) > LIMITS.price}
                     className={cn(field, "h-10 w-24", Number(price) > LIMITS.price && "border-bad focus:border-bad")}
                   />

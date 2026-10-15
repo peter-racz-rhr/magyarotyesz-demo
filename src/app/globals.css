@@ -273,3 +273,14 @@ html[data-sheet="open"] .app-dock {
 .maplibregl-marker.sun-light {
   pointer-events: none;
 }
+
+/*
+  Dimmer, lightly frosted glass: text scrolling underneath (the list behind
+  the dock and the search bar) no longer shows through and fights the labels.
+*/
+@layer components {
+  .lq-surface[data-liquid-variant="clear"] {
+    --lq-blur: 8px;
+    background: linear-gradient(rgb(8 10 14 / 0.32), rgb(8 10 14 / 0.32)), var(--lq-fill);
+  }
+}

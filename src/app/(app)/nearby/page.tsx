@@ -91,11 +91,20 @@ export default function NearbyPage() {
     };
   }, [q]);
 
-  const from = origin ?? here.coords ?? CITY_CENTRE;
-  const sorted = toilets
-    .filter((t) => !q || matches(t, q, d))
-    .map((t) => ({ toilet: t, metres: distance(from, t) }))
-    .sort((a, b) => a.metres - b.metres);
+  const shownPlaces = q.length >= 3 ? places : [];
+  const nameMatches = q ? toilets.filter((t) => matches(t, q, d)) : toilets;
+
+  // Typing an address (nothing is called that) already shows what's closest to
+  // the first match; tapping a suggestion or pressing search makes it stick.
+  const preview = !origin && nameMatches.length === 0 ? (shownPlaces[0] ?? null) : null;
+  const anchor = origin ?? preview;
+  const mine = here.coords ?? CITY_CENTRE;
+  const byDistance = (list: Toilet[], from: { latitude: number; longitude: number }) =>
+    list.map((t) => ({ toilet: t, metres: distance(from, t) })).sort((a, b) => a.metres - b.metres);
+  // Names you typed, nearest to you (or the address you picked); the list is
+  // everything, nearest to the address, when you're searching for a place.
+  const named = byDistance(nameMatches, origin ?? mine);
+  const sorted = anchor ? byDistance(toilets, anchor) : named;
 
   const done = () => {
     input.current?.blur();
@@ -115,26 +124,45 @@ export default function NearbyPage() {
   };
 
   const showPanel = focused && q.length > 0;
-  const shownPlaces = q.length >= 3 ? places : [];
+
+  /** The search key: go to the address if there is one, otherwise to the best-named toilet. */
+  const submitSearch = async () => {
+    if (q.length < 2) return;
+    let place: Place | undefined = shownPlaces[0];
+    if (!place && q.length >= 3) {
+      setSearching(true);
+      try {
+        place = (await searchPlaces(q))[0];
+      } catch {
+        // No connection: fall back to the toilets you can already see.
+      } finally {
+        setSearching(false);
+      }
+    }
+    if (place) return pickPlace(place);
+    if (named[0]) pickToilet(named[0].toilet.id);
+  };
 
   return (
     <PageTransition>
       <main className="mx-auto w-full max-w-md px-6 pt-[max(env(safe-area-inset-top),1rem)] pb-24">
         <header className="pt-8">
           <h1 className="t-display">{d.nearby.title}</h1>
-          {origin ? (
+          {anchor ? (
             <p className="mt-2 flex items-center gap-2 text-[1.0625rem] text-haze">
               <span className="min-w-0 truncate">
-                {d.nearby.closestTo} <span className="text-ink">{origin.label}</span>
+                {d.nearby.closestTo} <span className="text-ink">{anchor.label}</span>
               </span>
-              <button
-                type="button"
-                onClick={() => setOrigin(null)}
-                aria-label={d.nearby.backToMe}
-                className="grid size-8 shrink-0 place-items-center rounded-full bg-dusk text-haze hover:text-ink"
-              >
-                <X className="size-4" />
-              </button>
+              {origin && (
+                <button
+                  type="button"
+                  onClick={() => setOrigin(null)}
+                  aria-label={d.nearby.backToMe}
+                  className="grid size-8 shrink-0 place-items-center rounded-full bg-dusk text-haze hover:text-ink"
+                >
+                  <X className="size-4" />
+                </button>
+              )}
             </p>
           ) : (
             <p className="mt-2 text-[1.0625rem] text-haze">
@@ -234,7 +262,7 @@ export default function NearbyPage() {
                 onMouseDown={(e) => e.preventDefault()}
                 className="mb-2 max-h-[45dvh] overflow-y-auto rounded-[1.5rem] border border-dusk-edge bg-dusk p-2"
               >
-                {sorted.slice(0, 3).map(({ toilet, metres }) => (
+                {named.slice(0, 3).map(({ toilet, metres }) => (
                   <button
                     key={toilet.id}
                     type="button"
@@ -246,7 +274,7 @@ export default function NearbyPage() {
                     <span className="text-sm text-haze tabular-nums">{formatDistance(metres)}</span>
                   </button>
                 ))}
-                {sorted.length > 0 && shownPlaces.length > 0 && <div className="mx-3 my-1 h-px bg-dusk-edge" />}
+                {named.length > 0 && shownPlaces.length > 0 && <div className="mx-3 my-1 h-px bg-dusk-edge" />}
                 {shownPlaces.map((place) => (
                   <button
                     key={place.id}
@@ -264,7 +292,7 @@ export default function NearbyPage() {
                 {q.length >= 3 && searching && shownPlaces.length === 0 && (
                   <p className="px-3 py-2.5 text-sm text-haze">{d.nearby.looking}</p>
                 )}
-                {sorted.length === 0 && shownPlaces.length === 0 && !searching && (
+                {named.length === 0 && shownPlaces.length === 0 && !searching && (
                   <p className="px-3 py-2.5 text-sm text-haze">
                     {q.length < 3 ? d.nearby.keepTyping : d.nearby.nothing}
                   </p>
@@ -283,7 +311,10 @@ export default function NearbyPage() {
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setFocused(true)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && shownPlaces[0]) pickPlace(shownPlaces[0]);
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void submitSearch();
+                }
                 if (e.key === "Escape") done();
               }}
               placeholder={d.nearby.search}
