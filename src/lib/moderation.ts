@@ -13,7 +13,7 @@
 
 // Lowercase, ASCII, one letter per run of the same letter ("fuuuck" -> "fuck").
 const squash = (s: string) => s.replace(/(.)\1+/g, '$1');
-const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const fold = (s: string) => s.replace(/ñ/gi, 'ny').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 const LEET: Record<string, string> = { '@': 'a', '4': 'a', '3': 'e', '1': 'i', '!': 'i', '0': 'o', '$': 's', '5': 's', '7': 't', '+': 't', '8': 'b' };
 
@@ -22,28 +22,29 @@ const WORDS = [
   // Hungarian
   'kurva', 'kurvak', 'kurvara', 'kurvanyad', 'geci', 'gecis', 'gecilada', 'fasz', 'faszt', 'faszom', 'faszfej', 'faszkalap', 'faszszopo',
   'picsa', 'picsaba', 'szar', 'szaros', 'szarhazi', 'bazdmeg', 'bazmeg', 'baszd', 'baszod', 'baszik', 'baszki', 'kibaszott', 'megbaszott',
-  'seggfej', 'rohadek', 'mocskos', 'buzi', 'buzik', 'buzeran', 'csicska', 'szopd', 'szopjal', 'anyadat', 'fostalicska', 'ocsmany',
+  'seggfej', 'rohadek', 'rohadt', 'mocskos', 'pina', 'pinaba', 'pocs', 'pocsfej', 'lofasz', 'lofaszt', 'agyfasz', 'fasznak', 'faszba', 'faszra', 'faszom', 'szopo', 'szopos', 'kocsog', 'kurafi', 'kurvanyja', 'picsafej', 'retkes', 'tetves', 'nyomorek', 'szemetlada', 'seggnyalo', 'segg', 'lofaszt', 'pofozz', 'bunkocigany', 'bunko', 'faszkivan', 'szaromat', 'szarok', 'szarjal', 'szarba', 'buzeransok', 'neger', 'negerek', 'niger', 'nigger', 'buzi', 'buzik', 'buzeran', 'csicska', 'szopd', 'szopjal', 'anyadat', 'fostalicska', 'ocsmany',
   // English
   'fuck', 'fucks', 'fucker', 'fucking', 'fuckin', 'motherfucker', 'shit', 'shitty', 'bullshit', 'bitch', 'bitches', 'cunt', 'asshole', 'arsehole',
   'bastard', 'whore', 'slut', 'nigger', 'niggers', 'nigga', 'niggas', 'faggot', 'faggots', 'fag', 'fags', 'retard', 'retarded', 'tranny',
-  'kike', 'chink', 'spic', 'spick', 'wetback', 'gook', 'coon', 'paki', 'towelhead', 'raghead', 'beaner', 'sandnigger', 'hitler', '1488',
+  'dick', 'dickhead', 'cock', 'cocksucker', 'pussy', 'twat', 'wanker', 'prick', 'douchebag', 'nazi', 'nazis', 'jew', 'jews', 'gypsy', 'gypsies', 'gyppo', 'negro', 'kike', 'chink', 'spic', 'spick', 'wetback', 'gook', 'coon', 'paki', 'towelhead', 'raghead', 'beaner', 'sandnigger', 'hitler', '1488',
 ];
 
 // Long, unambiguous words that are also caught inside bigger words ("kurvanyad", "motherfucker").
-const INSIDE = ['kurva', 'bazdmeg', 'bazmeg', 'nigger', 'faggot', 'fuck', 'faszfej', 'faszkalap', 'faszom', 'kibaszott', 'megbaszott', 'szarhazi'];
+const INSIDE = ['cigany', 'zsido', 'ciganyoz', 'zsidoz', 'lofasz', 'kurafi', 'gypsy', 'nigga', 'kocsog', 'seggnyalo', 'kurva', 'bazdmeg', 'bazmeg', 'nigger', 'faggot', 'fuck', 'faszfej', 'faszkalap', 'faszom', 'kibaszott', 'megbaszott', 'szarhazi'];
 
 // Short phrases, matched as whole words in a row.
 const PHRASES = ['heil hitler', 'sieg heil', 'white power', 'gas the jews', 'kill all', 'kill yourself', 'mocskos cigany', 'mocskos zsido', 'piszkos zsido', 'dogoljon meg'];
 
-// "cigany" (Roma) and "zsido" (Jewish) are ordinary words and part of real place names (Zsidonegyed, a
-// Zsido Muzeum), so on their own they pass; they are only turned away with an insult next to them, or
-// in the verb/noun forms that are only ever used as abuse. Plain mentions still land in the admin's
-// "flagged" list through watch().
+// "cigany" (Roma) and "zsido" (Jewish) are used as slurs so often in Hungarian that, in a name or a note
+// for a toilet, they are turned away on their own, in every form and inside compounds. The only things
+// let through are a few established Budapest names (ALLOWED below). Anything not blocked that still
+// mentions them lands in the admin's "flagged" list through watch().
 const ETHNIC = ['cigany', 'ciganyok', 'ciganyt', 'ciganyokat', 'ciganynak', 'ciganyoknak', 'ciganyul', 'zsido', 'zsidok', 'zsidot', 'zsidokat', 'zsidonak', 'zsidoknak', 'zsidoja', 'zsidojai'];
 const ABUSIVE_FORMS = ['zsidozik', 'zsidozas', 'zsidozni', 'zsidozo', 'zsidozd', 'ciganyozik', 'ciganyozas', 'ciganyozni', 'ciganyozo', 'ciganyozd', 'zsidobuzi', 'ciganybuzi', 'ciganypecsenye', 'ciganykurva', 'zsidokurva', 'zsidopenz'];
 const INSULTS = ['mocskos', 'piszkos', 'koszos', 'buzos', 'buzhodt', 'rohadt', 'rohadek', 'szar', 'szaros', 'szemet', 'patkany', 'parazita', 'tolvaj', 'lopo', 'gazember', 'piszok', 'dog', 'dogoljon', 'dogoljatok', 'pusztuljon', 'pusztuljatok', 'kifele', 'irtsd', 'irtsuk', 'agyonutni', 'gyilkos', 'hazug', 'ronda', 'undorito', 'allat', 'disznok', 'hullak', 'gazok', 'gaz', 'kurva', 'buzi'];
 const ethnic = new Set(ETHNIC.map(squash)), abusive = new Set(ABUSIVE_FORMS.map(squash)), insults = new Set(INSULTS.map(w => squash(fold(w))));
 
+const ALLOWED = /zsido\s*(negyed|muzeum|temeto|hitkozseg|kozosseg)\w*/g;
 const blocked = new Set(WORDS.map(w => squash(w)));
 const inside = INSIDE.map(w => squash(w));
 const phrases = PHRASES.map(p => p.split(' ').map(squash).join(' '));
@@ -67,7 +68,8 @@ function joinSingles(list: string[]) {
 export type Verdict = { ok: true } | { ok: false; term: string };
 
 export function check(text: string): Verdict {
-  const plain = fold(text);
+  // Established place names are taken out first; whatever is left is judged.
+  const plain = fold(text).replace(ALLOWED, ' ');
   const leet = plain.replace(/[@4310!$578+]/g, c => LEET[c] ?? c);
   // A third view closes up asterisk/underscore masking inside a word ("fu*ck"); other punctuation stays a separator.
   const views = [plain, leet, plain.replace(/[*_]/g, '')];
@@ -84,7 +86,8 @@ export function check(text: string): Verdict {
       if (letters || view === leet) for (const part of inside) if (word.includes(part)) return { ok: false, term: part };
     }
     if (squashed.some(w => abusive.has(w))) return { ok: false, term: squashed.find(w => abusive.has(w))! };
-    if (squashed.some(w => ethnic.has(w))) { const bad = squashed.find(w => insults.has(w)); if (bad) return { ok: false, term: bad }; }
+    const ethnicWord = squashed.find(w => ethnic.has(w));
+    if (ethnicWord) return { ok: false, term: ethnicWord };
     const joined = ' ' + squashed.join(' ') + ' ';
     for (const phrase of phrases) if (joined.includes(' ' + phrase + ' ')) return { ok: false, term: phrase };
   }
@@ -103,8 +106,9 @@ export function checkFields(fields: { name?: string; note?: string }): Verdict {
 
 /** Words that are fine on their own but worth a look: what the admin's "flagged" list adds to the hard filter. */
 export function watch(text: string): string | null {
+  // Looks at the unfiltered text, so the allowed place names show up for a moderator too.
   const words = tokens(fold(text)).map(squash);
-  return words.find(w => ethnic.has(w) || abusive.has(w)) ?? null;
+  return words.find(w => ethnic.has(w) || abusive.has(w) || w.startsWith('zsido')) ?? null;
 }
 
 /** The hard filter, then the watch list: why a text deserves a moderator's eye. */

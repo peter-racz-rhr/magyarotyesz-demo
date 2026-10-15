@@ -13,7 +13,7 @@ import { useT } from "@/lib/i18n";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
 import { updateSettings, useSettings, type Lang } from "@/lib/settings";
-import { dismissNotice, syncNow, usePendingCount, useNotices, useSyncStatus } from "@/lib/sync";
+import { dismissNotice, syncNow, useGotInTotal, usePendingCount, useNotices, useSyncStatus } from "@/lib/sync";
 import {
   addDemoToilets,
   ago,
@@ -123,8 +123,10 @@ export default function ProfilePage() {
   const [confirmClear, setConfirmClear] = useState(false);
   const [notifyBlocked, setNotifyBlocked] = useState(false);
   const mine = toilets.filter((x) => x.mine);
-  // People who got in with the codes you shared: every "yes" except your own.
-  const gotIn = mine.reduce((n, x) => n + Math.max(0, x.confirms - (x.myVote === "works" ? 1 : 0)), 0);
+  // People who got in with the codes you shared. The server keeps a running total (a new code resets the
+  // votes, not this); without a server it is every "yes" on your codes except your own.
+  const serverGotIn = useGotInTotal();
+  const gotIn = REMOTE ? serverGotIn : mine.reduce((n, x) => n + Math.max(0, x.confirms - (x.myVote === "works" ? 1 : 0)), 0);
 
   // Seeing your alerts here counts as reading them.
   const unread = alerts.some((a) => !a.read);
