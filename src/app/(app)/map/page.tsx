@@ -4,6 +4,7 @@ import "@/lib/maplibre-worker";
 import { Accessibility, Baby, ChevronUp, LocateFixed, Zap, X } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { AddedBurst, AddedCheck, DropIn } from "@/components/added-burst";
 import { LegalLinks } from "@/components/legal-page";
 import { PageTransition } from "@/components/page-transition";
 import { HealthDot, ToiletCard } from "@/components/toilet-card";
@@ -405,6 +406,12 @@ export default function MapPage() {
     }, spot.location);
     closeSheet();
     setJustAdded({ id: toilet.id, name: toilet.name });
+    // A tiny tap on phones that allow it (not iPhones).
+    try {
+      navigator.vibrate?.(18);
+    } catch {
+      // No haptics: the animation is enough.
+    }
     window.setTimeout(() => setJustAdded(null), 2600);
   };
 
@@ -433,16 +440,11 @@ export default function MapPage() {
                   onClick={() => openCard(toilet)}
                   className="relative grid size-8 place-items-center"
                 >
-                  {justAdded?.id === toilet.id && (
-                    <span aria-hidden className="absolute size-2.5 animate-ping rounded-full bg-good/70" />
-                  )}
-                  <HealthDot
-                    toilet={toilet}
-                    className={cn(
-                      justAdded?.id === toilet.id && "animate-in zoom-in-0 duration-500 ease-out",
-                      isOpen(toilet) === false && "opacity-45",
-                    )}
-                  />
+                  {justAdded?.id === toilet.id && <AddedBurst />}
+                  {(() => {
+                    const dot = <HealthDot toilet={toilet} className={cn(isOpen(toilet) === false && "opacity-45")} />;
+                    return justAdded?.id === toilet.id ? <DropIn>{dot}</DropIn> : dot;
+                  })()}
                 </span>
               </MarkerContent>
             </MapMarker>
@@ -546,7 +548,12 @@ export default function MapPage() {
             >
               {notice ??
                 (justAdded
-                  ? t.map.added(justAdded.name)
+                  ? (
+                      <span className="inline-flex items-center gap-2">
+                        <AddedCheck />
+                        {t.map.added(justAdded.name)}
+                      </span>
+                    )
                   : filtering && visible.length === 0 && toilets.length > 0
                     ? t.map.noMatch
                     : t.map.hint)}
