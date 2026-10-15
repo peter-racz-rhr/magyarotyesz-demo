@@ -275,25 +275,16 @@ html[data-sheet="open"] .app-dock {
 }
 
 /*
-  Glass looks (Profile > Settings > Glass). All of them keep the library's lens,
-  so the edge still bends what is behind it. They only change what sits inside:
-  - classic:  the library as it ships (thin, see-through)
-  - tinted:   a dark tint as the glass's own fill (strength = the dimming slider)
-  - balanced: the tint plus a light blur, so text behind is hard to make out
-  - frosted:  a stronger blur with only a hint of tint
-  The tint replaces the glass's own fill token rather than laying a separate
-  layer over it, so there is no box inside the glass: it is one material.
+  The glass look, settled after trying a few: the library's own lens (the edge
+  still bends what is behind it) over a dark tint as the glass's own fill, so
+  it is one material and text behind it is dim. Every glass control shares it:
+  the bars, the pills and the round buttons.
 */
-html[data-glass="tinted"] .lq-surface[data-liquid-variant="clear"] {
-  --lq-fill: rgb(10 12 16 / var(--glass-dim, 0.3));
+.lq-surface[data-liquid-variant="clear"] {
+  --lq-fill: rgb(10 12 16 / 0.62);
 }
-html[data-glass="balanced"] .lq-surface[data-liquid-variant="clear"] {
-  --lq-fill: rgb(10 12 16 / var(--glass-dim, 0.3));
-  --lq-blur: 2.5px;
-}
-html[data-glass="frosted"] .lq-surface[data-liquid-variant="clear"] {
-  --lq-fill: rgb(10 12 16 / calc(var(--glass-dim, 0.3) * 0.5));
-  --lq-blur: 6px;
+.lq-icon-button {
+  background: rgb(10 12 16 / 0.62);
 }
 
 /*

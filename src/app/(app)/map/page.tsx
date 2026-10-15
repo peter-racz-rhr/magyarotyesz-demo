@@ -485,7 +485,7 @@ export default function MapPage() {
             the middle when it fits and scrolls sideways when it doesn't. */}
         {!draft && (
           <div className="absolute inset-x-0 top-[max(env(safe-area-inset-top),0.75rem)] z-10 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <LiquidSurface radius={999} veil={0.5} className="mx-auto flex w-max gap-1 p-1">
+            <LiquidSurface radius={999} veil={0.5} className="mx-auto flex w-max gap-0.5 p-1">
               {(Object.keys(t.map.filters) as (keyof Filters)[]).map((key) => (
                 <button
                   key={key}
@@ -493,10 +493,18 @@ export default function MapPage() {
                   aria-pressed={filters[key]}
                   onClick={() => setFilters((f) => ({ ...f, [key]: !f[key] }))}
                   className={cn(
-                    "h-9 shrink-0 rounded-full px-3.5 text-sm font-semibold whitespace-nowrap transition-colors [text-shadow:0_1px_6px_rgb(0_0_0/0.5)]",
-                    filters[key] ? "bg-good/25 text-good" : "text-ink/90",
+                    "inline-flex h-9 shrink-0 items-center rounded-full px-3.5 text-[0.8125rem] font-medium whitespace-nowrap transition-colors duration-200",
+                    filters[key] ? "bg-white/14 text-ink" : "text-ink/60 active:bg-white/8",
                   )}
                 >
+                  {/* A small light when the filter is on: green, like "this one works" */}
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "h-1.5 rounded-full bg-good transition-all duration-200",
+                      filters[key] ? "mr-2 w-1.5 opacity-100 shadow-[0_0_8px_1px_var(--good)]" : "mr-0 w-0 opacity-0",
+                    )}
+                  />
                   {t.map.filters[key]}
                 </button>
               ))}

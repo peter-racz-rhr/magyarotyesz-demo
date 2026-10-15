@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/instrument-sans/wdth.css";
 import "./globals.css";
-import { GLASS_DIM_BOOT, GlassDim } from "@/components/glass-dim";
 import { ServiceWorker } from "@/components/service-worker";
 import { SyncRunner } from "@/components/sync-runner";
 
@@ -32,13 +31,9 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: GLASS_DIM_BOOT }} />
-      </head>
+    <html lang="en" className="h-full antialiased">
       <body className="min-h-full">
         {children}
-        <GlassDim />
         <ServiceWorker />
         <SyncRunner />
       </body>
