@@ -6,6 +6,9 @@ const base = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "") ?? "";
 
 export const REMOTE = base !== "";
 
+/** The server address, for the admin page. */
+export const API_BASE = base;
+
 /** The server said no (4xx/5xx), with its machine-readable code. */
 export class ApiFailure extends Error {
   constructor(

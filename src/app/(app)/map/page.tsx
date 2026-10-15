@@ -4,6 +4,7 @@ import "@/lib/maplibre-worker";
 import { Accessibility, Baby, ChevronUp, LocateFixed, Zap, X } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { LegalLinks } from "@/components/legal-page";
 import { PageTransition } from "@/components/page-transition";
 import { HealthDot, ToiletCard } from "@/components/toilet-card";
 import { btn } from "@/components/ui/buttons";
@@ -13,6 +14,7 @@ import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { Map, MapMarker, MapPopup, MarkerContent, useMap, type MapRef } from "@/components/ui/map";
 import { spotMessage, useT } from "@/lib/i18n";
 import { requestLocation } from "@/lib/location";
+import { checkFields } from "@/lib/moderation";
 import { LIMITS, cleanCode, cleanText, tidy, validCode, validName } from "@/lib/limits";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
 import {
@@ -377,6 +379,7 @@ export default function MapPage() {
     if (!cleanName || !validName(cleanName)) return setError(t.add.errName);
     if (!code.trim()) return setError(t.add.errCode);
     if (!validCode(cleanedCode)) return setError(t.add.errCodeChars);
+    if (!checkFields({ name: cleanName, note: tidy(note, LIMITS.note) }).ok) return setError(t.add.errBad);
     if (access === "paid" && Number(price) > LIMITS.price) return setError(t.add.errPriceMax(LIMITS.price));
     if (!inBudapest(draft)) return setError(t.add.errCity);
     if (addedToday() >= DAILY_LIMIT) return setError(t.add.errLimit);
@@ -619,6 +622,9 @@ export default function MapPage() {
                 autoCapitalize="characters"
                 className={cn(field, "h-14 w-full font-mono text-[1.375rem] tracking-[0.16em] placeholder:font-sans placeholder:text-base placeholder:tracking-normal")}
               />
+              <p className="px-1 text-xs leading-relaxed text-haze">
+                {t.add.agree} <LegalLinks />
+              </p>
               {/* Everything else is optional: pull the sheet up and it opens */}
               <div {...grip} className={cn("-mx-5 flex touch-none items-center justify-center gap-2 px-5 py-1.5 text-sm text-haze transition-opacity", details && "hidden")}>
                 <ChevronUp className="size-4" aria-hidden />

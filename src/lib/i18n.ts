@@ -10,6 +10,15 @@ const en = {
   kinds: { cafe: "Café", restaurant: "Restaurant", bar: "Bar", mall: "Mall", station: "Station", other: "Other" } as Record<Kind, string>,
   access: { free: "Free to use", customers: "Customers only", paid: "Paid" } as Record<Access, string>,
   tabs: { map: "Map", nearby: "Nearby", profile: "Profile" },
+  legal: {
+    back: "Back",
+    missing: "not set yet",
+    more: "More documents",
+    draft: "This text is a plain-language draft for a small community project and is not legal advice.",
+    terms: "Terms",
+    privacy: "Privacy",
+    imprint: "Imprint",
+  },
 
   welcome: {
     wrong: "Wrong code",
@@ -55,6 +64,8 @@ const en = {
     errLimit: "That's 10 codes today. Come back tomorrow.",
     errCity: "magyarotyesz only covers Budapest for now.",
     errCodeChars: "A code can use letters, numbers and # * + - . / only.",
+    errBad: "Please keep names and notes friendly: that wording isn't allowed.",
+    agree: "By adding a toilet you agree to the",
     errPriceMax: (n: number) => `Toilets here cost up to ${n} Ft. Check the price.`,
     priceMax: (n: number) => `Up to ${n} Ft`,
     priceFree: "Free",
@@ -90,6 +101,7 @@ const en = {
         accept_suggestion: "taking the suggestion for",
         dismiss_suggestion: "dismissing the suggestion for",
         delete_toilet: "removing",
+        report_toilet: "your report about",
       };
       const text = `${what[type] ?? "your change to"} ${name ?? "a toilet"} didn't go through`;
       return text[0].toUpperCase() + text.slice(1);
@@ -105,6 +117,7 @@ const en = {
       already_exists: "That toilet is already there.",
       banned: "This phone is blocked.",
       validation: "Something in it wasn't valid.",
+      inappropriate: "Names and notes can't contain offensive language.",
     } as Record<string, string>,
     statusTitle: "Sync",
     server: "Shared with everyone through the magyarotyesz server.",
@@ -145,6 +158,11 @@ const en = {
     closedOpens: (t: string) => `Closed · opens ${t}`,
     wheelchair: "Wheelchair access",
     baby: "Baby changing",
+    report: "Report",
+    reportTitle: "What's wrong with this place?",
+    reportReasons: { offensive: "Offensive or hateful", private: "Private, shouldn't be listed", wrong: "Wrong place or details", closed: "Closed or gone", other: "Something else" } as Record<string, string>,
+    reportSent: "Thanks, we'll look at it.",
+    reportDemo: "Thanks. (In the demo nothing is sent.)",
   },
 
   nearby: {
@@ -211,6 +229,15 @@ const hu: Dict = {
   kinds: { cafe: "Kávézó", restaurant: "Étterem", bar: "Bár", mall: "Bevásárlóközpont", station: "Állomás", other: "Egyéb" },
   access: { free: "Ingyenes", customers: "Csak vendégeknek", paid: "Fizetős" },
   tabs: { map: "Térkép", nearby: "Közelben", profile: "Profil" },
+  legal: {
+    back: "Vissza",
+    missing: "még nincs megadva",
+    more: "További dokumentumok",
+    draft: "Ez a szöveg egy kis közösségi projekthez írt, közérthető tervezet, nem jogi tanács.",
+    terms: "Feltételek",
+    privacy: "Adatkezelés",
+    imprint: "Impresszum",
+  },
 
   welcome: {
     wrong: "Hibás kód",
@@ -256,6 +283,8 @@ const hu: Dict = {
     errLimit: "Ma már 10 kódot hozzáadtál. Holnap folytathatod.",
     errCity: "A magyarotyesz egyelőre csak Budapestet fedi le.",
     errCodeChars: "A kód csak betűt, számot és a # * + - . / jeleket tartalmazhat.",
+    errBad: "Kérjük, maradjon kedves a név és a megjegyzés: ez a megfogalmazás nem engedélyezett.",
+    agree: "Hozzáadással elfogadod a következőket:",
     errPriceMax: (n: number) => `Itt a mosdók ára legfeljebb ${n} Ft. Nézd át az árat.`,
     priceMax: (n: number) => `Legfeljebb ${n} Ft`,
     priceFree: "Ingyenes",
@@ -291,6 +320,7 @@ const hu: Dict = {
         accept_suggestion: "javaslat elfogadása",
         dismiss_suggestion: "javaslat elvetése",
         delete_toilet: "törlés",
+        report_toilet: "jelentés",
       };
       return `${name ?? "Egy mosdó"}: ${what[type] ?? "módosítás"} nem sikerült`;
     },
@@ -305,6 +335,7 @@ const hu: Dict = {
       already_exists: "Ez a mosdó már fent van.",
       banned: "Ez a telefon le van tiltva.",
       validation: "Valami nem volt érvényes benne.",
+      inappropriate: "A név és a megjegyzés nem tartalmazhat sértő szavakat.",
     } as Record<string, string>,
     statusTitle: "Szinkron",
     server: "A magyarotyesz szerveren át mindenkivel megosztva.",
@@ -345,6 +376,11 @@ const hu: Dict = {
     closedOpens: (t: string) => `Zárva · ${t}-kor nyit`,
     wheelchair: "Akadálymentes",
     baby: "Pelenkázó",
+    report: "Jelentés",
+    reportTitle: "Mi a baj ezzel a hellyel?",
+    reportReasons: { offensive: "Sértő vagy gyűlöletkeltő", private: "Magán, nem kellene szerepelnie", wrong: "Rossz hely vagy adatok", closed: "Bezárt vagy megszűnt", other: "Valami más" } as Record<string, string>,
+    reportSent: "Köszönjük, megnézzük.",
+    reportDemo: "Köszönjük. (A demóban nem megy el semmi.)",
   },
 
   nearby: {

@@ -3,6 +3,7 @@
 import { Bell, ChevronRight, MapPinCheck, RotateCcw, Sparkles, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import { LegalLinks } from "@/components/legal-page";
 import { BACK, PageTransition } from "@/components/page-transition";
 import { HealthDot } from "@/components/toilet-card";
 import { btn } from "@/components/ui/buttons";
@@ -351,7 +352,9 @@ export default function ProfilePage() {
           </section>
         )}
 
-        <footer className="mt-10 pb-6 text-[0.8125rem] leading-relaxed text-haze">{REMOTE ? t.sync.footer : t.profile.footer}</footer>
+        <footer className="mt-10 pb-6 text-[0.8125rem] leading-relaxed text-haze">{REMOTE ? t.sync.footer : t.profile.footer}
+          <LegalLinks className="mt-2 block" />
+        </footer>
       </main>
     </PageTransition>
   );

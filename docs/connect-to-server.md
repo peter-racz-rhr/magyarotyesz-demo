@@ -30,3 +30,9 @@ To go back to the demo, remove the variable and redeploy.
 - Deleting a code in Profile removes it **for everyone**. Only the person who shared it can.
 - The server only accepts toilets inside Budapest.
 - If the server's data is wiped, phones notice (their old key is refused), get a new key and carry on; codes they shared before can't be edited any more.
+
+## Legal pages and moderation
+
+- `/terms`, `/privacy` and `/imprint` are part of the app (English and Hungarian). Set `NEXT_PUBLIC_OPERATOR_NAME`, `NEXT_PUBLIC_CONTACT_EMAIL` and `NEXT_PUBLIC_OPERATOR_ADDRESS` in Vercel, then redeploy; until then they show a highlighted placeholder. The texts are plain-language drafts, not legal advice: have a lawyer read them.
+- Every place has a **Report** button. Names and notes are checked for slurs and swearing on the phone and again on the server.
+- `/admin` is a separate page for hiding, restoring and deleting places and banning users. It is not linked from the app. It needs `ADMIN_FROM_BROWSER=true` in the server's `.env` (then `sudo docker compose up -d`), and you sign in with the server's `ADMIN_TOKEN`.

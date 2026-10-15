@@ -192,6 +192,11 @@ export function editToilet(
   });
 }
 
+/** Tell the server a place is offensive, private, wrong or gone. Without a server there is nobody to tell. */
+export function reportToilet(id: string, reason: string) {
+  if (REMOTE) enqueue("report_toilet", { toiletId: id, reason }, { name: nameOf(id) });
+}
+
 /** Anyone else can only suggest a new code. */
 export function suggestCode(id: string, rawCode: string) {
   const code = cleanCode(rawCode);

@@ -1,12 +1,14 @@
 "use client";
 
-import { Accessibility, Baby, Check, Copy, Eye, Navigation, Pencil, ThumbsDown, ThumbsUp } from "lucide-react";
+import { Accessibility, Baby, Check, Copy, Eye, Flag, Navigation, Pencil, ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { LimitedInput } from "@/components/limited-input";
 import { btn } from "@/components/ui/buttons";
 import { spotMessage, useT } from "@/lib/i18n";
 import { LIMITS, cleanCode, cleanText, tidy, validCode, validName } from "@/lib/limits";
+import { REMOTE } from "@/lib/api";
+import { checkFields } from "@/lib/moderation";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
 import {
   ago,
@@ -17,6 +19,7 @@ import {
   editToilet,
   isOpen,
   reportCode,
+  reportToilet,
   suggestCode,
   trust,
   trustColor,
@@ -74,12 +77,15 @@ function EditForm({ toilet, onDone }: { toilet: Toilet; onDone: () => void }) {
   const [name, setName] = useState(toilet.name);
   const [code, setCode] = useState(toilet.code);
   const [note, setNote] = useState(toilet.note);
+  const [error, setError] = useState("");
   const save = (event: FormEvent) => {
     event.preventDefault();
     const cleanName = tidy(name, LIMITS.name);
     const cleanedCode = cleanCode(code);
     if (!validName(cleanName) || !validCode(cleanedCode)) return;
-    editToilet(toilet.id, { name: cleanName, code: cleanedCode, note: tidy(note, LIMITS.note) });
+    const cleanNote = tidy(note, LIMITS.note);
+    if (!checkFields({ name: cleanName, note: cleanNote }).ok) return setError(t.add.errBad);
+    editToilet(toilet.id, { name: cleanName, code: cleanedCode, note: cleanNote });
     onDone();
   };
   return (
@@ -113,6 +119,11 @@ function EditForm({ toilet, onDone }: { toilet: Toilet; onDone: () => void }) {
         rejectedHint={t.add.textHint}
         className={field}
       />
+      {error && (
+        <p role="alert" className="text-sm text-stale">
+          {error}
+        </p>
+      )}
       <div className="mt-1 flex justify-end gap-2">
         <button type="button" onClick={onDone} className={cn(btn.quiet, btn.md)}>
           {t.card.cancel}
@@ -151,6 +162,8 @@ export function ToiletCard({
   const [newCode, setNewCode] = useState("");
   const [checking, setChecking] = useState(false);
   const [blocked, setBlocked] = useState<string | null>(null);
+  // Reporting a place: closed, picking a reason, or done.
+  const [reporting, setReporting] = useState<"closed" | "pick" | "sent">("closed");
   const suggestions = toilet.mine ? (toilet.suggestions ?? []) : [];
   const votes = toilet.confirms + toilet.reports;
 
@@ -388,6 +401,41 @@ export function ToiletCard({
       )}
 
       {toilet.note && <p className="mt-3 text-sm text-haze">{toilet.note}</p>}
+
+      {/* Anything wrong with the place itself (not the code): offensive, private, gone */}
+      {!toilet.mine && (
+        <div className="mt-3">
+          {reporting === "closed" && (
+            <button type="button" onClick={() => setReporting("pick")} className="inline-flex h-8 items-center gap-1.5 rounded-full text-xs text-haze hover:text-ink">
+              <Flag className="size-3.5" aria-hidden /> {t.card.report}
+            </button>
+          )}
+          {reporting === "pick" && (
+            <div className="rounded-2xl border border-dusk-edge p-3">
+              <p className="text-sm font-semibold">{t.card.reportTitle}</p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {Object.entries(t.card.reportReasons).map(([reason, label]) => (
+                  <button
+                    key={reason}
+                    type="button"
+                    onClick={() => {
+                      reportToilet(toilet.id, reason);
+                      setReporting("sent");
+                    }}
+                    className={cn(btn.secondary, btn.sm, "px-3")}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <button type="button" onClick={() => setReporting("closed")} className={cn(btn.quiet, btn.sm, "mt-1")}>
+                {t.card.cancel}
+              </button>
+            </div>
+          )}
+          {reporting === "sent" && <p className="text-xs text-haze">{REMOTE ? t.card.reportSent : t.card.reportDemo}</p>}
+        </div>
+      )}
     </div>
   );
 }
