@@ -33,7 +33,6 @@ export function AppDock() {
     >
       {/* Scales with the screen, with room on each side, up to a comfortable maximum */}
       <div className="dock-shield relative isolate w-[min(calc(100vw-5rem),22rem)]">
-        <span aria-hidden className="glass-frost" />
         {/* Pages can put a control here (the map's center-on-me button):
             it sits just above the dock, lined up with its right edge. */}
         <div id="dock-accessory" className="pointer-events-auto absolute right-0 bottom-full mb-3" />

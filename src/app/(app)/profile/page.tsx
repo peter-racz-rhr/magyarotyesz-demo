@@ -10,7 +10,15 @@ import { REMOTE } from "@/lib/api";
 import { useT } from "@/lib/i18n";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
-import { DEFAULT_GLASS_DIM, MAX_GLASS_DIM, updateSettings, useSettings, type Lang } from "@/lib/settings";
+import {
+  DEFAULT_GLASS_DIM,
+  DEFAULT_GLASS_STYLE,
+  GLASS_STYLES,
+  MAX_GLASS_DIM,
+  updateSettings,
+  useSettings,
+  type Lang,
+} from "@/lib/settings";
 import { dismissNotice, syncNow, usePendingCount, useNotices, useSyncStatus } from "@/lib/sync";
 import {
   addDemoToilets,
@@ -277,29 +285,54 @@ export default function ProfilePage() {
               />
             </li>
             <li className="py-4">
-              <div className="flex items-baseline gap-3">
-                <label htmlFor="glass-dim" className="flex-1">
-                  {t.profile.glass}
-                </label>
-                <span data-testid="glass-dim-value" className="text-lg font-semibold tabular-nums">
-                  {Math.round((settings.glassDim ?? DEFAULT_GLASS_DIM) * 100)}%
-                </span>
-              </div>
+              <p className="flex-1">{t.profile.glass}</p>
               <p className="mt-0.5 text-sm text-haze">{t.profile.glassSub}</p>
-              <input
-                id="glass-dim"
-                type="range"
-                min={0}
-                max={Math.round(MAX_GLASS_DIM * 100)}
-                step={1}
-                value={Math.round((settings.glassDim ?? DEFAULT_GLASS_DIM) * 100)}
-                onChange={(e) => updateSettings({ glassDim: Number(e.target.value) / 100 })}
-                className="mt-3 h-8 w-full cursor-pointer accent-[var(--good)]"
-              />
-              {Math.round((settings.glassDim ?? DEFAULT_GLASS_DIM) * 100) !== Math.round(DEFAULT_GLASS_DIM * 100) && (
+              <div role="radiogroup" aria-label={t.profile.glass} className="mt-3 grid grid-cols-2 gap-1 rounded-3xl bg-dusk p-1">
+                {GLASS_STYLES.map((key) => {
+                  const on = (settings.glassStyle ?? DEFAULT_GLASS_STYLE) === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      role="radio"
+                      aria-checked={on}
+                      onClick={() => updateSettings({ glassStyle: key })}
+                      className={cn(
+                        "h-10 rounded-full px-3 text-sm font-semibold transition-colors",
+                        on ? "bg-ink text-night" : "text-haze",
+                      )}
+                    >
+                      {t.profile.glassStyles[key]}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className={cn("mt-4 transition-opacity", (settings.glassStyle ?? DEFAULT_GLASS_STYLE) === "classic" && "opacity-40")}>
+                <div className="flex items-baseline gap-3">
+                  <label htmlFor="glass-dim" className="flex-1 text-sm text-haze">
+                    {t.profile.glassDim}
+                  </label>
+                  <span data-testid="glass-dim-value" className="text-lg font-semibold tabular-nums">
+                    {Math.round((settings.glassDim ?? DEFAULT_GLASS_DIM) * 100)}%
+                  </span>
+                </div>
+                <input
+                  id="glass-dim"
+                  type="range"
+                  min={0}
+                  max={Math.round(MAX_GLASS_DIM * 100)}
+                  step={1}
+                  disabled={(settings.glassStyle ?? DEFAULT_GLASS_STYLE) === "classic"}
+                  value={Math.round((settings.glassDim ?? DEFAULT_GLASS_DIM) * 100)}
+                  onChange={(e) => updateSettings({ glassDim: Number(e.target.value) / 100 })}
+                  className="mt-2 h-8 w-full cursor-pointer accent-[var(--good)]"
+                />
+              </div>
+              {((settings.glassStyle ?? DEFAULT_GLASS_STYLE) !== DEFAULT_GLASS_STYLE ||
+                Math.round((settings.glassDim ?? DEFAULT_GLASS_DIM) * 100) !== Math.round(DEFAULT_GLASS_DIM * 100)) && (
                 <button
                   type="button"
-                  onClick={() => updateSettings({ glassDim: DEFAULT_GLASS_DIM })}
+                  onClick={() => updateSettings({ glassStyle: DEFAULT_GLASS_STYLE, glassDim: DEFAULT_GLASS_DIM })}
                   className="mt-1 text-sm font-semibold text-haze hover:text-ink"
                 >
                   {t.profile.glassReset}

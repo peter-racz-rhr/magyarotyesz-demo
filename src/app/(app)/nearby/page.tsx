@@ -50,7 +50,9 @@ export default function NearbyPage() {
   const [focused, setFocused] = useState(false);
   const [origin, setOrigin] = useState<Place | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
-  const [searching, setSearching] = useState(false);
+  // idle | loading | done | failed: what the address lookup is doing, so the panel can say so.
+  const [lookup, setLookup] = useState<"idle" | "loading" | "done" | "failed">("idle");
+  const [retry, setRetry] = useState(0);
   const input = useRef<HTMLInputElement>(null);
   useKeyboardMode(focused);
 
@@ -75,23 +77,26 @@ export default function NearbyPage() {
     if (q.length < 3) return;
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
-      setSearching(true);
+      setLookup("loading");
       searchPlaces(q, controller.signal)
-        .then(setPlaces)
-        .catch(() => {
-          if (!controller.signal.aborted) setPlaces([]);
+        .then((found) => {
+          setPlaces(found);
+          setLookup("done");
         })
-        .finally(() => {
-          if (!controller.signal.aborted) setSearching(false);
+        .catch(() => {
+          if (controller.signal.aborted) return;
+          setPlaces([]);
+          setLookup("failed");
         });
-    }, 350);
+    }, 300);
     return () => {
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [q]);
+  }, [q, retry]);
 
   const shownPlaces = q.length >= 3 ? places : [];
+  const looking = q.length >= 3 && lookup === "loading";
   const nameMatches = q ? toilets.filter((t) => matches(t, q, d)) : toilets;
 
   // Typing an address (nothing is called that) already shows what's closest to
@@ -130,18 +135,22 @@ export default function NearbyPage() {
     if (q.length < 2) return;
     let place: Place | undefined = shownPlaces[0];
     if (!place && q.length >= 3) {
-      setSearching(true);
+      setLookup("loading");
       try {
         place = (await searchPlaces(q))[0];
+        setLookup("done");
       } catch {
         // No connection: fall back to the toilets you can already see.
-      } finally {
-        setSearching(false);
+        setLookup("failed");
       }
     }
     if (place) return pickPlace(place);
     if (named[0]) pickToilet(named[0].toilet.id);
   };
+
+  /** How far the closest toilet is from an address, to show next to it. */
+  const nearestTo = (place: Place) =>
+    toilets.reduce((best, t) => Math.min(best, distance(place, t)), Infinity);
 
   return (
     <PageTransition>
@@ -275,34 +284,49 @@ export default function NearbyPage() {
                   </button>
                 ))}
                 {named.length > 0 && shownPlaces.length > 0 && <div className="mx-3 my-1 h-px bg-dusk-edge" />}
-                {shownPlaces.map((place) => (
-                  <button
-                    key={place.id}
-                    type="button"
-                    onClick={() => pickPlace(place)}
-                    className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left hover:bg-night/60"
-                  >
-                    <MapPin className="size-4 shrink-0 text-haze" aria-hidden />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate">{place.label}</span>
-                      <span className="block truncate text-sm text-haze">{place.detail}</span>
-                    </span>
-                  </button>
-                ))}
-                {q.length >= 3 && searching && shownPlaces.length === 0 && (
+                {shownPlaces.map((place) => {
+                  const metres = nearestTo(place);
+                  return (
+                    <button
+                      key={place.id}
+                      type="button"
+                      onClick={() => pickPlace(place)}
+                      className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left hover:bg-night/60"
+                    >
+                      <MapPin className="size-4 shrink-0 text-haze" aria-hidden />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate">{place.label}</span>
+                        <span className="block truncate text-sm text-haze">{place.detail}</span>
+                      </span>
+                      {Number.isFinite(metres) && (
+                        <span className="shrink-0 text-right text-xs text-haze">
+                          {d.nearby.nearestToilet}
+                          <span className="block text-sm text-ink tabular-nums">{formatDistance(metres)}</span>
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+                {q.length >= 3 && looking && shownPlaces.length === 0 && (
                   <p className="px-3 py-2.5 text-sm text-haze">{d.nearby.looking}</p>
                 )}
-                {named.length === 0 && shownPlaces.length === 0 && !searching && (
-                  <p className="px-3 py-2.5 text-sm text-haze">
-                    {q.length < 3 ? d.nearby.keepTyping : d.nearby.nothing}
-                  </p>
+                {q.length >= 3 && lookup === "failed" && shownPlaces.length === 0 && (
+                  <div className="px-3 py-2.5 text-sm text-haze">
+                    <p>{d.nearby.lookupFailed}</p>
+                    <button type="button" onClick={() => setRetry((n) => n + 1)} className="mt-1 font-semibold text-ink">
+                      {d.nearby.retry}
+                    </button>
+                  </div>
                 )}
+                {q.length >= 3 && lookup === "done" && !looking && named.length === 0 && shownPlaces.length === 0 && (
+                  <p className="px-3 py-2.5 text-sm text-haze">{d.nearby.noAddress}</p>
+                )}
+                {q.length < 3 && named.length === 0 && <p className="px-3 py-2.5 text-sm text-haze">{d.nearby.keepTyping}</p>}
               </motion.div>
             )}
           </AnimatePresence>
 
           <div className="relative isolate">
-            <span aria-hidden className="glass-frost" />
             <LiquidSurface radius={999} veil={0.55} className="search-glass flex h-14 items-center gap-2 pr-1.5 pl-4">
               <Search className="size-5 shrink-0 text-haze" aria-hidden />
               <input

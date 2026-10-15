@@ -275,33 +275,25 @@ html[data-sheet="open"] .app-dock {
 }
 
 /*
-  Dimmer glass that is still liquid. The glass itself stays crisp, so its lens
-  can bend whatever is behind it at the rim, where the curving shows. What
-  reads through the middle is hidden by a separate frosted layer (.glass-frost)
-  that sits under the glass and fades out toward the rim, plus a dark veil whose
-  strength is the Profile "Glass dimming" setting.
+  Glass looks (Profile > Settings > Glass). All of them keep the library's lens,
+  so the edge still bends what is behind it. They only change what sits inside:
+  - classic:  the library as it ships (thin, see-through)
+  - tinted:   a dark tint as the glass's own fill (strength = the dimming slider)
+  - balanced: the tint plus a light blur, so text behind is hard to make out
+  - frosted:  a stronger blur with only a hint of tint
+  The tint replaces the glass's own fill token rather than laying a separate
+  layer over it, so there is no box inside the glass: it is one material.
 */
-@layer components {
-  .lq-surface[data-liquid-variant="clear"] {
-    --lq-blur: 0px;
-    background: linear-gradient(rgb(8 10 14 / var(--glass-dim, 0.2)), rgb(8 10 14 / var(--glass-dim, 0.2))), var(--lq-fill);
-  }
+html[data-glass="tinted"] .lq-surface[data-liquid-variant="clear"] {
+  --lq-fill: rgb(10 12 16 / var(--glass-dim, 0.3));
 }
-.glass-frost {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: 999px;
-  pointer-events: none;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  /* Fade the frost out toward the edge (about the width of the lens's bend). */
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 1.25rem, #000 calc(100% - 1.25rem), transparent),
-    linear-gradient(to bottom, transparent, #000 0.9rem, #000 calc(100% - 0.9rem), transparent);
-  mask-image: linear-gradient(to right, transparent, #000 1.25rem, #000 calc(100% - 1.25rem), transparent),
-    linear-gradient(to bottom, transparent, #000 0.9rem, #000 calc(100% - 0.9rem), transparent);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+html[data-glass="balanced"] .lq-surface[data-liquid-variant="clear"] {
+  --lq-fill: rgb(10 12 16 / var(--glass-dim, 0.3));
+  --lq-blur: 2.5px;
+}
+html[data-glass="frosted"] .lq-surface[data-liquid-variant="clear"] {
+  --lq-fill: rgb(10 12 16 / calc(var(--glass-dim, 0.3) * 0.5));
+  --lq-blur: 6px;
 }
 
 /*
