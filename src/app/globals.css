@@ -281,6 +281,25 @@ html[data-sheet="open"] .app-dock {
 @layer components {
   .lq-surface[data-liquid-variant="clear"] {
     --lq-blur: 8px;
-    background: linear-gradient(rgb(8 10 14 / 0.32), rgb(8 10 14 / 0.32)), var(--lq-fill);
+    background: linear-gradient(rgb(8 10 14 / 0.2), rgb(8 10 14 / 0.2)), var(--lq-fill);
   }
+}
+
+/*
+  While a page slides in, it gets its own layer that paints above the rest of
+  the screen, so its text used to show straight through the nav bar (the glass
+  can't blur a layer that sits above it). Cut those layers off where the dock
+  starts: the dock keeps its usual dim and frost, over an empty strip for the
+  length of the slide. The old page sits shifted up by how far it was scrolled
+  (--vt-scroll, set in ViewTransitionDock).
+*/
+::view-transition-old(*) {
+  clip-path: inset(0 0 calc(100% - 100lvh + 5.75rem + env(safe-area-inset-bottom, 0px) - var(--vt-scroll, 0px)) 0);
+}
+::view-transition-new(*) {
+  clip-path: inset(0 0 calc(100% - 100lvh + 5.75rem + env(safe-area-inset-bottom, 0px)) 0);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  clip-path: none;
 }
