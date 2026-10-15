@@ -35,6 +35,15 @@ const INSIDE = ['kurva', 'bazdmeg', 'bazmeg', 'nigger', 'faggot', 'fuck', 'faszf
 // Short phrases, matched as whole words in a row.
 const PHRASES = ['heil hitler', 'sieg heil', 'white power', 'gas the jews', 'kill all', 'kill yourself', 'mocskos cigany', 'mocskos zsido', 'piszkos zsido', 'dogoljon meg'];
 
+// "cigany" (Roma) and "zsido" (Jewish) are ordinary words and part of real place names (Zsidonegyed, a
+// Zsido Muzeum), so on their own they pass; they are only turned away with an insult next to them, or
+// in the verb/noun forms that are only ever used as abuse. Plain mentions still land in the admin's
+// "flagged" list through watch().
+const ETHNIC = ['cigany', 'ciganyok', 'ciganyt', 'ciganyokat', 'ciganynak', 'ciganyoknak', 'ciganyul', 'zsido', 'zsidok', 'zsidot', 'zsidokat', 'zsidonak', 'zsidoknak', 'zsidoja', 'zsidojai'];
+const ABUSIVE_FORMS = ['zsidozik', 'zsidozas', 'zsidozni', 'zsidozo', 'zsidozd', 'ciganyozik', 'ciganyozas', 'ciganyozni', 'ciganyozo', 'ciganyozd', 'zsidobuzi', 'ciganybuzi', 'ciganypecsenye', 'ciganykurva', 'zsidokurva', 'zsidopenz'];
+const INSULTS = ['mocskos', 'piszkos', 'koszos', 'buzos', 'buzhodt', 'rohadt', 'rohadek', 'szar', 'szaros', 'szemet', 'patkany', 'parazita', 'tolvaj', 'lopo', 'gazember', 'piszok', 'dog', 'dogoljon', 'dogoljatok', 'pusztuljon', 'pusztuljatok', 'kifele', 'irtsd', 'irtsuk', 'agyonutni', 'gyilkos', 'hazug', 'ronda', 'undorito', 'allat', 'disznok', 'hullak', 'gazok', 'gaz', 'kurva', 'buzi'];
+const ethnic = new Set(ETHNIC.map(squash)), abusive = new Set(ABUSIVE_FORMS.map(squash)), insults = new Set(INSULTS.map(w => squash(fold(w))));
+
 const blocked = new Set(WORDS.map(w => squash(w)));
 const inside = INSIDE.map(w => squash(w));
 const phrases = PHRASES.map(p => p.split(' ').map(squash).join(' '));
@@ -74,6 +83,8 @@ export function check(text: string): Verdict {
       if (blocked.has(word)) return { ok: false, term: word };
       if (letters || view === leet) for (const part of inside) if (word.includes(part)) return { ok: false, term: part };
     }
+    if (squashed.some(w => abusive.has(w))) return { ok: false, term: squashed.find(w => abusive.has(w))! };
+    if (squashed.some(w => ethnic.has(w))) { const bad = squashed.find(w => insults.has(w)); if (bad) return { ok: false, term: bad }; }
     const joined = ' ' + squashed.join(' ') + ' ';
     for (const phrase of phrases) if (joined.includes(' ' + phrase + ' ')) return { ok: false, term: phrase };
   }
@@ -88,4 +99,16 @@ export function checkFields(fields: { name?: string; note?: string }): Verdict {
     if (!verdict.ok) return verdict;
   }
   return { ok: true };
+}
+
+/** Words that are fine on their own but worth a look: what the admin's "flagged" list adds to the hard filter. */
+export function watch(text: string): string | null {
+  const words = tokens(fold(text)).map(squash);
+  return words.find(w => ethnic.has(w) || abusive.has(w)) ?? null;
+}
+
+/** The hard filter, then the watch list: why a text deserves a moderator's eye. */
+export function flag(text: string): string | null {
+  const v = check(text);
+  return v.ok ? watch(text) : v.term;
 }
