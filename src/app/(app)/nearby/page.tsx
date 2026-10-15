@@ -301,38 +301,41 @@ export default function NearbyPage() {
             )}
           </AnimatePresence>
 
-          <LiquidSurface radius={999} veil={0.55} className="search-glass flex h-14 items-center gap-2 pr-1.5 pl-4">
-            <Search className="size-5 shrink-0 text-haze" aria-hidden />
-            <input
-              ref={input}
-              type="search"
-              enterKeyHint="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={() => setFocused(true)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  void submitSearch();
-                }
-                if (e.key === "Escape") done();
-              }}
-              placeholder={d.nearby.search}
-              aria-label={d.nearby.search}
-              className="h-full min-w-0 flex-1 bg-transparent text-[1rem] outline-none placeholder:text-haze [&::-webkit-search-cancel-button]:hidden"
-            />
-            {(query || focused) && (
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => (query ? setQuery("") : done())}
-                aria-label={query ? d.nearby.clear : d.nearby.close}
-                className="grid size-11 shrink-0 place-items-center rounded-full text-haze hover:text-ink"
-              >
-                <X className="size-5" />
-              </button>
-            )}
-          </LiquidSurface>
+          <div className="relative isolate">
+            <span aria-hidden className="glass-frost" />
+            <LiquidSurface radius={999} veil={0.55} className="search-glass flex h-14 items-center gap-2 pr-1.5 pl-4">
+              <Search className="size-5 shrink-0 text-haze" aria-hidden />
+              <input
+                ref={input}
+                type="search"
+                enterKeyHint="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => setFocused(true)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    void submitSearch();
+                  }
+                  if (e.key === "Escape") done();
+                }}
+                placeholder={d.nearby.search}
+                aria-label={d.nearby.search}
+                className="h-full min-w-0 flex-1 bg-transparent text-[1rem] outline-none placeholder:text-haze [&::-webkit-search-cancel-button]:hidden"
+              />
+              {(query || focused) && (
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => (query ? setQuery("") : done())}
+                  aria-label={query ? d.nearby.clear : d.nearby.close}
+                  className="grid size-11 shrink-0 place-items-center rounded-full text-haze hover:text-ink"
+                >
+                  <X className="size-5" />
+                </button>
+              )}
+            </LiquidSurface>
+          </div>
         </div>
       </div>
     </PageTransition>

@@ -275,14 +275,33 @@ html[data-sheet="open"] .app-dock {
 }
 
 /*
-  Dimmer, lightly frosted glass: text scrolling underneath (the list behind
-  the dock and the search bar) no longer shows through and fights the labels.
+  Dimmer glass that is still liquid. The glass itself stays crisp, so its lens
+  can bend whatever is behind it at the rim, where the curving shows. What
+  reads through the middle is hidden by a separate frosted layer (.glass-frost)
+  that sits under the glass and fades out toward the rim, plus a dark veil whose
+  strength is the Profile "Glass dimming" setting.
 */
 @layer components {
   .lq-surface[data-liquid-variant="clear"] {
-    --lq-blur: 8px;
+    --lq-blur: 0px;
     background: linear-gradient(rgb(8 10 14 / var(--glass-dim, 0.2)), rgb(8 10 14 / var(--glass-dim, 0.2))), var(--lq-fill);
   }
+}
+.glass-frost {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 999px;
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  /* Fade the frost out toward the edge (about the width of the lens's bend). */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 1.25rem, #000 calc(100% - 1.25rem), transparent),
+    linear-gradient(to bottom, transparent, #000 0.9rem, #000 calc(100% - 0.9rem), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 1.25rem, #000 calc(100% - 1.25rem), transparent),
+    linear-gradient(to bottom, transparent, #000 0.9rem, #000 calc(100% - 0.9rem), transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
 }
 
 /*
@@ -306,8 +325,10 @@ html[data-vt-new] .dock-shield::before {
   background: #07080a;
   z-index: -1;
 }
-/* Named here (not left to the automatic name) so both bars can be stacked above the page. */
-.nearby-search {
+/* Named here (not left to the automatic name) so both bars can be stacked above the page.
+   Only while a transition runs: an element with a transition name is a backdrop root, and
+   the glass inside it would see nothing behind it (no frost, no lens). */
+html[data-vt] .nearby-search {
   view-transition-name: nearby-search !important;
 }
 ::view-transition-group(dock) {

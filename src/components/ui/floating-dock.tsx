@@ -122,7 +122,7 @@ export const FloatingDock = ({
         e.stopPropagation();
       }}
       className={cn(
-        "mx-auto flex h-[4.5rem] touch-none items-center justify-around gap-4 rounded-full border border-dusk-edge bg-dusk/85 px-5 backdrop-blur-xl",
+        "mx-auto flex h-[4.5rem] touch-none items-stretch gap-0.5 rounded-full border border-dusk-edge bg-dusk/85 p-1.5 backdrop-blur-xl",
         className,
       )}
     >
@@ -162,15 +162,12 @@ function IconContainer({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
+  // Distance from the finger to the middle of this tab's cell.
   const distance = useTransform(pointerX, (val) => {
     const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
     return val - bounds.x - bounds.width / 2;
   });
 
-  const size = useSpring(
-    useTransform(distance, [-110, 0, 110], [48, 66, 48]),
-    spring,
-  );
   const iconSize = useSpring(
     useTransform(distance, [-110, 0, 110], [22, 30, 22]),
     spring,
@@ -188,27 +185,23 @@ function IconContainer({
       onPointerEnter={() => setPressed(true)}
       onPointerLeave={() => setPressed(false)}
       onPointerUp={() => setPressed(false)}
-      className="rounded-full outline-offset-4 focus-visible:outline-2"
+      className="min-w-0 flex-1 rounded-full outline-offset-[-3px] focus-visible:outline-2"
     >
-      <motion.div
+      <div
         ref={ref}
-        style={{ width: size, height: size }}
         className={cn(
-          "relative flex aspect-square items-center justify-center rounded-full transition-colors",
-          // Outline icons straight on the glass; the current tab gets a soft lit disc.
+          "relative flex h-full w-full items-center justify-center rounded-full transition-colors",
+          // Outline icons straight on the glass; the current tab gets a soft lit oval.
           lit ? "text-ink" : "text-ink/65",
         )}
       >
-        {/* One shared disc that glides to whichever tab is current. */}
+        {/* One shared oval that glides to whichever tab is current. It fills the
+            tab's whole cell, edge to edge, so no empty strip is left around it. */}
         {lit && (
           <motion.span
             layoutId="dock-active-disc"
             aria-hidden
-            // Its own fixed size, centred on the tab: it never grows past the bar.
-            className={cn(
-              "absolute top-1/2 left-1/2 size-[3.75rem] -translate-x-1/2 -translate-y-1/2 rounded-full transition-colors",
-              sliding ? "bg-white/22" : "bg-white/14",
-            )}
+            className={cn("absolute inset-0 rounded-full transition-colors", sliding ? "bg-white/22" : "bg-white/14")}
             transition={{ type: "spring", duration: 0.55, bounce: 0.12 }}
           />
         )}
@@ -236,7 +229,7 @@ function IconContainer({
             />
           )}
         </motion.div>
-      </motion.div>
+      </div>
     </Link>
   );
 }
