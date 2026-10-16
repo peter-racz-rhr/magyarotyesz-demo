@@ -10,6 +10,7 @@ import { LIMITS, cleanCode, cleanText, tidy, validCode, validName } from "@/lib/
 import { REMOTE } from "@/lib/api";
 import { checkFields } from "@/lib/moderation";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
+import { useSettings } from "@/lib/settings";
 import {
   ago,
   acceptSuggestion,
@@ -154,7 +155,8 @@ export function ToiletCard({
   inList?: boolean;
 }) {
   const { t, lang } = useT();
-  const [shown, setShown] = useState(false);
+  const { showCodes } = useSettings();
+  const [shown, setShown] = useState(showCodes);
   const [copied, setCopied] = useState(false);
   const [editing, setEditing] = useState(false);
   // After a vote: thanks, or (after "no") asking for the new code.

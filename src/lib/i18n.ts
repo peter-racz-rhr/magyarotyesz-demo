@@ -11,6 +11,23 @@ const en = {
   access: { free: "Free to use", customers: "Customers only", paid: "Paid" } as Record<Access, string>,
   tabs: { map: "Map", nearby: "Nearby", profile: "Profile" },
   refresh: { refreshing: "Refreshing…" },
+  settings: {
+    title: "Settings",
+    back: "Profile",
+    general: "General",
+    mapGroup: "Map and location",
+    codesGroup: "Codes",
+    dataGroup: "Your data",
+    showCodes: "Show codes right away",
+    showCodesSub: "Off: a code stays hidden until you tap it, so people nearby can't read it.",
+    haptics: "Vibration",
+    hapticsSub: "A tiny buzz on taps and when you add a toilet (Android phones).",
+    animations: "Celebration animation",
+    animationsSub: "The little burst when your toilet lands on the map.",
+    export: "Download my data",
+    exportSub: "A file with your name, settings and the places you shared.",
+    exported: "Saved to your downloads.",
+  },
   legal: {
     back: "Back",
     missing: "not set yet",
@@ -38,7 +55,7 @@ const en = {
     locate: "Show where I am",
     nearest: "Nearest",
     nearestNone: "No open toilet that usually works nearby yet.",
-    locationOff: "Location is off. Turn it on in Profile.",
+    locationOff: "Location is off. Turn it on in Settings.",
     noMatch: "No toilets match these filters.",
     filters: { open: "Open now", free: "Free", works: "Usually works" },
   },
@@ -82,7 +99,7 @@ const en = {
     location: "Turn on location: codes can only be added or checked on the spot.",
     vague: (m: number) => `Your location is too vague right now (about ${m} m). Step outside or wait a moment, then try again.`,
     checking: "Checking you're there…",
-    off: "Location is off. Turn it on in Profile: codes can only be added or checked on the spot.",
+    off: "Location is off. Turn it on in Settings: codes can only be added or checked on the spot.",
   },
 
   sync: {
@@ -96,6 +113,7 @@ const en = {
     noticesTitle: "Couldn't be sent",
     dismiss: "Dismiss",
     notice: (type: string, name?: string) => {
+      if (type === "set_profile") return "Saving your name didn't go through";
       const what: Record<string, string> = {
         add_toilet: "adding",
         vote: "your check of",
@@ -192,6 +210,14 @@ const en = {
 
   profile: {
     title: "You",
+    editProfile: "Edit profile",
+    nameLabel: "Your name",
+    namePlaceholder: "What should we call you?",
+    colourLabel: "Colour",
+    idLabel: "Profile ID",
+    idHint: "Your profile belongs to this phone: there is no password. Only you (and the admin) see the name.",
+    noName: "Add your name",
+    settingsAria: "Settings",
     statShared: "Codes shared",
     statGotIn: "Got in with your codes",
     about: "About",
@@ -241,6 +267,23 @@ const hu: Dict = {
   access: { free: "Ingyenes", customers: "Csak vendégeknek", paid: "Fizetős" },
   tabs: { map: "Térkép", nearby: "Közelben", profile: "Profil" },
   refresh: { refreshing: "Frissítés…" },
+  settings: {
+    title: "Beállítások",
+    back: "Profil",
+    general: "Általános",
+    mapGroup: "Térkép és hely",
+    codesGroup: "Kódok",
+    dataGroup: "Az adataid",
+    showCodes: "Kódok azonnali mutatása",
+    showCodesSub: "Kikapcsolva a kód rejtve marad, amíg rá nem koppintasz, így a közelben lévők nem látják.",
+    haptics: "Rezgés",
+    hapticsSub: "Apró rezgés koppintáskor és hely hozzáadásakor (Android telefonokon).",
+    animations: "Ünneplő animáció",
+    animationsSub: "A kis robbanás, amikor a mosdód felkerül a térképre.",
+    export: "Adataim letöltése",
+    exportSub: "Egy fájl a nevedről, a beállításaidról és a megosztott helyeidről.",
+    exported: "Elmentve a letöltések közé.",
+  },
   legal: {
     back: "Vissza",
     missing: "még nincs megadva",
@@ -268,7 +311,7 @@ const hu: Dict = {
     locate: "Mutasd, hol vagyok",
     nearest: "Legközelebbi",
     nearestNone: "A közelben még nincs nyitva lévő, megbízható WC.",
-    locationOff: "A helymeghatározás ki van kapcsolva. Kapcsold be a Profilban.",
+    locationOff: "A helymeghatározás ki van kapcsolva. Kapcsold be a Beállításokban.",
     noMatch: "Egy WC sem felel meg a szűrőknek.",
     filters: { open: "Most nyitva", free: "Ingyenes", works: "Megbízható" },
   },
@@ -312,7 +355,7 @@ const hu: Dict = {
     vague: (m: number) => `A helyzeted most túl pontatlan (kb. ${m} m). Menj ki, vagy várj egy kicsit, aztán próbáld újra.`,
     location: "Kapcsold be a helymeghatározást: kódot csak a helyszínen lehet hozzáadni vagy ellenőrizni.",
     checking: "Ellenőrizzük, hogy ott vagy…",
-    off: "A helymeghatározás ki van kapcsolva. Kapcsold be a Profilban: kódot csak a helyszínen lehet hozzáadni vagy ellenőrizni.",
+    off: "A helymeghatározás ki van kapcsolva. Kapcsold be a Beállításokban: kódot csak a helyszínen lehet hozzáadni vagy ellenőrizni.",
   },
 
   sync: {
@@ -326,6 +369,7 @@ const hu: Dict = {
     noticesTitle: "Nem sikerült elküldeni",
     dismiss: "Értem",
     notice: (type: string, name?: string) => {
+      if (type === "set_profile") return "A név mentése nem sikerült";
       const what: Record<string, string> = {
         add_toilet: "hozzáadás",
         vote: "ellenőrzés",
@@ -421,6 +465,14 @@ const hu: Dict = {
 
   profile: {
     title: "Te",
+    editProfile: "Profil szerkesztése",
+    nameLabel: "A neved",
+    namePlaceholder: "Hogy hívjunk?",
+    colourLabel: "Szín",
+    idLabel: "Profilazonosító",
+    idHint: "A profilod ehhez a telefonhoz tartozik: nincs jelszó. A nevet csak te és az admin látja.",
+    noName: "Add meg a neved",
+    settingsAria: "Beállítások",
     statShared: "Megosztott kód",
     statGotIn: "Bejutott a kódjaiddal",
     about: "Névjegy",

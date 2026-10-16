@@ -41,8 +41,7 @@ const PHRASES = ['heil hitler', 'sieg heil', 'white power', 'gas the jews', 'kil
 // mentions them lands in the admin's "flagged" list through watch().
 const ETHNIC = ['cigany', 'ciganyok', 'ciganyt', 'ciganyokat', 'ciganynak', 'ciganyoknak', 'ciganyul', 'zsido', 'zsidok', 'zsidot', 'zsidokat', 'zsidonak', 'zsidoknak', 'zsidoja', 'zsidojai'];
 const ABUSIVE_FORMS = ['zsidozik', 'zsidozas', 'zsidozni', 'zsidozo', 'zsidozd', 'ciganyozik', 'ciganyozas', 'ciganyozni', 'ciganyozo', 'ciganyozd', 'zsidobuzi', 'ciganybuzi', 'ciganypecsenye', 'ciganykurva', 'zsidokurva', 'zsidopenz'];
-const INSULTS = ['mocskos', 'piszkos', 'koszos', 'buzos', 'buzhodt', 'rohadt', 'rohadek', 'szar', 'szaros', 'szemet', 'patkany', 'parazita', 'tolvaj', 'lopo', 'gazember', 'piszok', 'dog', 'dogoljon', 'dogoljatok', 'pusztuljon', 'pusztuljatok', 'kifele', 'irtsd', 'irtsuk', 'agyonutni', 'gyilkos', 'hazug', 'ronda', 'undorito', 'allat', 'disznok', 'hullak', 'gazok', 'gaz', 'kurva', 'buzi'];
-const ethnic = new Set(ETHNIC.map(squash)), abusive = new Set(ABUSIVE_FORMS.map(squash)), insults = new Set(INSULTS.map(w => squash(fold(w))));
+const ethnic = new Set(ETHNIC.map(squash)), abusive = new Set(ABUSIVE_FORMS.map(squash));
 
 const ALLOWED = /zsido\s*(negyed|muzeum|temeto|hitkozseg|kozosseg)\w*/g;
 const blocked = new Set(WORDS.map(w => squash(w)));

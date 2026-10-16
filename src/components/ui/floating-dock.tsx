@@ -7,6 +7,7 @@
  * Original: https://ui.aceternity.com/components/floating-dock
  **/
 
+import { getSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 import {
   AnimatePresence,
@@ -107,7 +108,7 @@ export const FloatingDock = ({
         const index = nearest(e.clientX);
         if (index !== slidingNow.current) {
           slideTo(index);
-          navigator.vibrate?.(8);
+          if (getSettings().haptics) navigator.vibrate?.(8);
         }
       }}
       onPointerUp={() => finish(true)}

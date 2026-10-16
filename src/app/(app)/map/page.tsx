@@ -17,7 +17,7 @@ import { spotMessage, useT } from "@/lib/i18n";
 import { requestLocation } from "@/lib/location";
 import { Buildings3D } from "@/components/buildings-3d";
 import { checkFields } from "@/lib/moderation";
-import { useSettings } from "@/lib/settings";
+import { getSettings, useSettings } from "@/lib/settings";
 import { LIMITS, cleanCode, cleanText, tidy, validCode, validName } from "@/lib/limits";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
 import {
@@ -412,7 +412,7 @@ export default function MapPage() {
     setJustAdded({ id: toilet.id, name: toilet.name });
     // A tiny tap on phones that allow it (not iPhones).
     try {
-      navigator.vibrate?.(18);
+      if (getSettings().haptics) navigator.vibrate?.(18);
     } catch {
       // No haptics: the animation is enough.
     }

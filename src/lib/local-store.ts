@@ -15,7 +15,12 @@ export function createLocalStore<T>(key: string, initial: T) {
     if (cache !== null) return cache;
     try {
       const raw = window.localStorage.getItem(key);
-      cache = raw ? (JSON.parse(raw) as T) : initial;
+      const parsed = raw ? (JSON.parse(raw) as T) : initial;
+      // Settings added in a newer version start with their default instead of being missing.
+      cache =
+        parsed && initial && typeof parsed === "object" && typeof initial === "object" && !Array.isArray(initial)
+          ? ({ ...initial, ...parsed } as T)
+          : parsed;
     } catch {
       cache = initial;
     }

@@ -156,6 +156,8 @@ export default function WelcomePage() {
         // No location: the map starts on Budapest instead.
       }
     }
+    // "Just show me the map" is also a no to location; it can be switched on later in Settings.
+    if (!askLocation) updateSettings({ location: false });
     markOnboarded();
     router.replace("/map", { transitionTypes: FORWARD });
   };

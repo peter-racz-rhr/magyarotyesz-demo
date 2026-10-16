@@ -64,6 +64,7 @@ const en: Record<DocKey, Doc> = {
         h: "What we process",
         p: [
           "Anonymous ID: when you first use the shared map your phone gets a random ID and a secret token. The server keeps only a hash of the token, plus the list of places you added and when. There is no name, email or phone number.",
+          "Profile name: optional. If you choose a name, it is saved with your anonymous ID on the server. Only you and the administrator can see it; it is not shown on any place.",
           "Your contributions: places you add (name, code, kind, opening hours, note, position), your votes, code suggestions and reports.",
           "Location: your phone's position is read on the device to show you where you are and to find nearby places. When you add a place or vote, your position is sent with the request so the server can check you are within about 150 m of the toilet; the server does not store it.",
           "Technical data: your IP address is processed to deliver the service and to limit abuse. It appears in short-lived server logs and is not linked to your ID by us.",
@@ -165,6 +166,7 @@ const hu: Record<DocKey, Doc> = {
         h: "Milyen adatokat kezelünk",
         p: [
           "Névtelen azonosító: amikor először használod a közös térképet, a telefonod kap egy véletlenszerű azonosítót és egy titkos tokent. A szerver a tokennek csak a hash-ét tárolja, valamint azt, hogy mely helyeket és mikor adtál hozzá. Nincs név, e-mail-cím vagy telefonszám.",
+          "Profilnév: nem kötelező. Ha megadsz egy nevet, az a névtelen azonosítódhoz kötve tárolódik a szerveren. Csak te és az adminisztrátor látja, egyetlen helynél sem jelenik meg.",
           "Hozzájárulásaid: a hozzáadott helyek (név, kód, fajta, nyitva tartás, megjegyzés, helyzet), szavazataid, kódjavaslataid és jelentéseid.",
           "Helyadat: a telefonod pozícióját az eszközön olvassuk, hogy megmutassuk, hol vagy, és a közeli helyeket. Hely hozzáadásakor és szavazáskor a pozíciód elküldjük a kéréssel, hogy a szerver ellenőrizze, hogy kb. 150 méteren belül vagy; a szerver nem tárolja.",
           "Technikai adat: az IP-címedet a szolgáltatás nyújtásához és a visszaélések korlátozásához kezeljük. Rövid életű szerver naplókban jelenik meg, és mi nem kapcsoljuk az azonosítódhoz.",

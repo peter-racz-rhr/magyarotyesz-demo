@@ -1,6 +1,14 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+import { useSettings } from "@/lib/settings";
+
+/** Reduced motion from the phone, or "Celebration animation" switched off in Settings. */
+function useQuiet() {
+  const reduced = useReducedMotion();
+  const { animations } = useSettings();
+  return Boolean(reduced) || !animations;
+}
 
 /*
   The little reward for sharing a code. It plays on the new dot: two rings
@@ -13,7 +21,9 @@ const SPARKS = 10;
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function AddedBurst() {
-  const reduced = useReducedMotion();
+  const reduced = useQuiet();
+  const { animations } = useSettings();
+  if (!animations) return null;
   if (reduced) {
     return <motion.span aria-hidden className="absolute size-9 rounded-full bg-good/30" initial={{ opacity: 0.8 }} animate={{ opacity: 0 }} transition={{ duration: 0.8 }} />;
   }
@@ -48,7 +58,7 @@ export function AddedBurst() {
 
 /** The dot falls in from above and settles with a small squash, like a pin pressed into the map. */
 export function DropIn({ children }: { children: React.ReactNode }) {
-  const reduced = useReducedMotion();
+  const reduced = useQuiet();
   if (reduced) return <>{children}</>;
   return (
     <motion.span
@@ -64,7 +74,7 @@ export function DropIn({ children }: { children: React.ReactNode }) {
 
 /** A green tick that draws itself in the "Added" message. */
 export function AddedCheck() {
-  const reduced = useReducedMotion();
+  const reduced = useQuiet();
   return (
     <svg aria-hidden viewBox="0 0 24 24" className="size-5 shrink-0 text-good" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round">
       <motion.circle cx="12" cy="12" r="9.5" initial={{ pathLength: reduced ? 1 : 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.45 }} />

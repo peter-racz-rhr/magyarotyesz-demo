@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { api, ApiFailure, Offline, REMOTE } from "./api";
 import { createLocalStore } from "./local-store";
+import { getSettings, updateSettings } from "./settings";
 import type { Alert, Toilet } from "./toilets";
 
 /*
@@ -44,6 +45,7 @@ type Me = {
   addsLeftToday: number;
   /** Running total of people who got in with this phone's codes; kept by the server across code changes. */
   gotIn?: number;
+  displayName?: string;
 };
 export type Location = { latitude: number; longitude: number; accuracy: number };
 export type OutAction = {
@@ -61,6 +63,7 @@ export type Notice = { id: string; type: string; code: string; message: string; 
 const cache = createLocalStore<Cache>("magyarotyesz:server", { seq: null, toilets: [] });
 const identity = createLocalStore<{ userId: string; token: string } | null>("magyarotyesz:identity", null);
 const meStore = createLocalStore<Me>("magyarotyesz:me", { owns: [], votes: {}, suggestions: {}, alerts: [], addsLeftToday: 10, gotIn: 0 });
+export const useUserId = () => identity.useValue()?.userId ?? null;
 export const useGotInTotal = () => meStore.useValue().gotIn ?? 0;
 const outbox = createLocalStore<OutAction[]>("magyarotyesz:outbox", []);
 const noticeStore = createLocalStore<Notice[]>("magyarotyesz:notices", []);
@@ -407,7 +410,9 @@ async function refreshMe() {
     throw e;
   }
   if (res.notModified) return;
-  const { owns, votes, suggestions, alerts: list, addsLeftToday, gotIn } = res.data;
+  const { owns, votes, suggestions, alerts: list, addsLeftToday, gotIn, displayName } = res.data;
+  // A name chosen on another visit (same id) shows up here too; one typed on this phone wins.
+  if (displayName && !getSettings().name) updateSettings({ name: displayName });
   meStore.set({ owns, votes, suggestions, alerts: list, addsLeftToday, gotIn: gotIn ?? 0 });
 
   // Phone notifications for alerts we haven't shown yet (never for the very first fetch).
