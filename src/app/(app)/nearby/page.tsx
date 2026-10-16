@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { ChevronDown, MapPin, Search, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { LegalLinks } from "@/components/legal-page";
 import { ActionButton } from "@/components/onboarding/action-button";
 import { PageTransition } from "@/components/page-transition";
 import { HealthDot, HoursLine, ToiletCard } from "@/components/toilet-card";
@@ -190,6 +192,16 @@ export default function NearbyPage() {
               {here.coords ? d.nearby.fromYou : d.nearby.fromCentre}
             </p>
           )}
+          {!origin && !here.coords && (here.status === "off" || here.status === "denied") && (
+            <div role="note" className="mt-4 rounded-[18px] bg-white/[0.055] px-4 py-3 text-[0.875rem] leading-relaxed text-haze">
+              {here.status === "denied" ? d.nearby.blockedHint : d.nearby.fromCentreHint}
+              {here.status === "off" && (
+                <Link href="/settings" className="mt-1 block font-semibold text-good">
+                  {d.nearby.turnOnLocation}
+                </Link>
+              )}
+            </div>
+          )}
           {!origin && !here.coords && here.status !== "denied" && here.status !== "checking" && here.status !== "off" && (
             <ActionButton
               variant="secondary"
@@ -271,6 +283,9 @@ export default function NearbyPage() {
           </ul>
           </>
         )}
+        <footer className="mt-10 text-center text-xs text-haze">
+          <LegalLinks />
+        </footer>
       </main>
 
       {/* Search: a glass bar above the dock; while typing it sits on the keyboard */}

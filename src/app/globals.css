@@ -5,12 +5,12 @@
 @import "shadcn/tailwind.css";
 
 /*
-  Tokens. True black, quiet type, and colour only where it means something:
+  Tokens. Very dark grey, quiet type, and colour only where it means something:
   a code that works is green, one nobody checked lately is amber, one that
   was reported broken is red.
 */
 :root {
-  --night: #000000;
+  --night: #121212; /* very dark grey, not pure black: easier on the eyes */
   --ink: #f4efe9; /* text, primary button */
   --haze: #9a938c; /* secondary text */
   --dusk: #1c1a19; /* fields, secondary surfaces */

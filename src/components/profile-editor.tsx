@@ -207,7 +207,7 @@ export function ProfileEditor({ onClose }: { onClose: () => void }) {
           <form onSubmit={save} className="mt-6 flex flex-1 flex-col items-center">
             <button type="button" onClick={() => input.current?.click()} aria-label={photo ? t.profile.changePhoto : t.profile.addPhoto} className="group relative rounded-full">
               <Avatar name={name} hue={hue} photo={photo} size={132} />
-              <span className="absolute right-0 bottom-0 grid size-10 place-items-center rounded-full bg-ink text-night shadow-[0_2px_10px_rgb(0_0_0/0.5)] ring-4 ring-black">
+              <span className="absolute right-0 bottom-0 grid size-10 place-items-center rounded-full bg-ink text-night shadow-[0_2px_10px_rgb(0_0_0/0.5)] ring-4 ring-night">
                 <Camera className="size-[1.125rem]" strokeWidth={2} aria-hidden />
               </span>
             </button>

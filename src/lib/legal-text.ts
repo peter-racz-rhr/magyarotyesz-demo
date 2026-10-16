@@ -10,7 +10,7 @@ import type { DocKey } from "./legal";
 export type Section = { h: string; p: string[] };
 export type Doc = { title: string; updated: string; intro?: string; sections: Section[] };
 
-const UPDATED = { en: "Last updated: 15 October 2026", hu: "Utolsó frissítés: 2026. október 15." };
+const UPDATED = { en: "Last updated: 16 October 2026", hu: "Utolsó frissítés: 2026. október 16." };
 
 const en: Record<DocKey, Doc> = {
   terms: {
@@ -26,7 +26,7 @@ const en: Record<DocKey, Doc> = {
       },
       {
         h: "Who can use it",
-        p: ["You must be at least 16, or have a parent or guardian who agrees to this on your behalf. The app has no account: your phone gets a random anonymous ID."],
+        p: ["You must be at least 16 years old to use magyarotyesz. The app has no account: your phone gets a random anonymous ID."],
       },
       {
         h: "What you may add",
@@ -39,8 +39,10 @@ const en: Record<DocKey, Doc> = {
       {
         h: "Reporting and removal",
         p: [
-          "Every place has a Report button. Enough reports hide a place until someone checks it. We remove content that breaks these terms or the law, and we may block a phone that keeps doing so.",
-          "If you run a place and do not want its code listed (for example it is meant for customers only), write to {email} with the name and address of the place and we will remove it. The same address takes notices about illegal content.",
+          "Every place has a Report button. One report that a place is not a toilet hides it straight away; several reports of offensive or private content hide it too. Hidden places stay hidden until someone has checked them. We remove content that breaks these terms or the law, and we may block a phone that keeps doing so.",
+          "When we hide or remove a place you shared, we tell you why in the app (Profile, Alerts).",
+          "If you run a place and do not want its code listed (for example it is meant for customers only), write to {email} with the name and address of the place and we will remove it within 48 hours. The same address takes notices about illegal content.",
+          "Contact point under the EU Digital Services Act, for users and for authorities: {email}. We answer in Hungarian and English.",
         ],
       },
       {
@@ -66,8 +68,8 @@ const en: Record<DocKey, Doc> = {
           "Anonymous ID: when you first use the shared map your phone gets a random ID and a secret token. The server keeps only a hash of the token, plus the list of places you added and when. There is no name, email or phone number.",
           "Profile name: optional. If you choose a name, it is saved with your anonymous ID on the server. Only you and the administrator can see it; it is not shown on any place.",
           "Your contributions: places you add (name, code, kind, opening hours, note, position), your votes, code suggestions and reports.",
-          "Location: your phone's position is read on the device to show you where you are and to find nearby places. When you add a place or vote, your position is sent with the request so the server can check you are within about 150 m of the toilet; the server does not store it.",
-          "Technical data: your IP address is processed to deliver the service and to limit abuse. It appears in short-lived server logs and is not linked to your ID by us.",
+          "Location: your phone's position is read on the device to show you where you are and to find nearby places. When you add a place or vote, your position is sent with the request so the server can check you are within about 150 m of the toilet; the server does not store it. You can withdraw your consent at any time: switch off \"Use my location\" in Settings, or turn location off for the app in your phone or browser settings.",
+          "Technical data: your IP address is processed to deliver the service and to limit abuse. Our server writes no access log: the address is held in memory for about an hour to limit abuse and is then forgotten. The providers named below keep their own technical logs.",
           "On your phone: settings, a copy of the places and a queue of actions waiting to be sent are stored in your browser's local storage. This is strictly necessary for the app to work, so there is no cookie banner. We do not use analytics or advertising trackers.",
         ],
       },
@@ -80,16 +82,18 @@ const en: Record<DocKey, Doc> = {
       {
         h: "Who else sees data",
         p: [
-          "Server: hosted at Oracle Cloud Infrastructure in Frankfurt, Germany.",
-          "App hosting: Vercel Inc. delivers the web app and sees your IP address when it loads.",
-          "Map and search: map tiles come from OpenFreeMap (OpenStreetMap data) and, in the satellite view, a satellite picture from EOX (tiles.maps.eox.at, Austria). If you search for an address, the text you type and the area are sent to Photon (komoot.io) or OpenStreetMap Nominatim. These services see your IP address and request.",
-          "Some of these providers are outside the EU and rely on the safeguards described in their own policies. We do not sell data.",
+          "Server: Oracle Cloud Infrastructure, Frankfurt, Germany (EU). Oracle is a US company; where data could be reached from outside the EU, the transfer relies on the EU–US Data Privacy Framework and/or standard contractual clauses, as set out in Oracle's data processing terms.",
+          "App hosting: Vercel Inc., USA. It delivers the web app and sees your IP address when it loads. The transfer relies on the EU–US Data Privacy Framework and/or standard contractual clauses in Vercel's data processing terms.",
+          "Map tiles: OpenFreeMap (openfreemap.org) with OpenStreetMap data. It receives your IP address and the map area you look at. We have no contract with it; it is a free public service.",
+          "Satellite view: EOX IT Services GmbH, Austria (EU), tiles.maps.eox.at. It receives your IP address and the map area.",
+          "Address search: Photon, run by Komoot, Germany (EU), and OpenStreetMap Nominatim, run by the OpenStreetMap Foundation, United Kingdom. They receive what you type, the area, and your IP address.",
+          "We do not sell data. Where a provider is outside the EU, the basis for the transfer is the one named above or the country's adequacy decision.",
         ],
       },
       {
         h: "How long",
         p: [
-          "Places and votes stay until they are deleted. You can delete the places you added in the Profile tab; an administrator can delete or hide places and block IDs that break the terms. Server logs are kept only briefly. Clear your browser data to remove everything stored on your phone.",
+          "Places, votes, suggestions and reports stay until they are deleted. If a place is deleted, its votes, suggestions and reports are deleted with it. You can delete the places you added in the Profile tab; an administrator can delete or hide places and block IDs that break the terms. Your anonymous ID and optional name stay until you ask us to delete them. Our server keeps no access logs. Clear your browser data to remove everything stored on your phone, including your profile photo, which never leaves it.",
         ],
       },
       {
@@ -101,7 +105,7 @@ const en: Record<DocKey, Doc> = {
       },
       {
         h: "Children",
-        p: ["The app is meant for people aged 16 and over. If you are younger, use it only with a parent or guardian."],
+        p: ["The app is only for people aged 16 and over."],
       },
     ],
   },
@@ -130,7 +134,7 @@ const hu: Record<DocKey, Doc> = {
       },
       {
         h: "Ki használhatja",
-        p: ["Legalább 16 évesnek kell lenned, vagy a szülőd/gondviselőd hozzájárulása kell. Az appban nincs fiók: a telefonod véletlenszerű, névtelen azonosítót kap."],
+        p: ["A magyarotyesz használatához legalább 16 évesnek kell lenned. Az appban nincs fiók: a telefonod véletlenszerű, névtelen azonosítót kap."],
       },
       {
         h: "Mit adhatsz hozzá",
@@ -143,8 +147,10 @@ const hu: Record<DocKey, Doc> = {
       {
         h: "Jelentés és eltávolítás",
         p: [
-          "Minden helyen van Jelentés gomb. Elég számú jelentés elrejti a helyet, amíg valaki meg nem nézi. Eltávolítjuk a feltételeket vagy a jogszabályt sértő tartalmat, és letilthatjuk azt a telefont, amely ezt ismételten teszi.",
-          "Ha egy hely üzemeltetője vagy, és nem szeretnéd, hogy a kódjuk szerepeljen (például csak vendégeknek szól), írj a {email} címre a hely nevével és címével, és eltávolítjuk. Ugyanide küldhetők a jogellenes tartalomról szóló bejelentések.",
+          "Minden helyen van Jelentés gomb. Ha egyetlen jelentés szerint a hely nem mosdó, azonnal elrejtjük; ha többen jelentik sértőnek vagy magánjellegűnek, az is elrejti. A rejtett hely addig rejtett marad, amíg valaki meg nem nézte. Eltávolítjuk a feltételeket vagy a jogszabályt sértő tartalmat, és letilthatjuk azt a telefont, amely ezt ismételten teszi.",
+          "Ha elrejtünk vagy eltávolítunk egy általad megosztott helyet, az appban (Profil, Értesítések) megmondjuk, miért.",
+          "Ha egy hely üzemeltetője vagy, és nem szeretnéd, hogy a kódjuk szerepeljen (például csak vendégeknek szól), írj a {email} címre a hely nevével és címével, és 48 órán belül eltávolítjuk. Ugyanide küldhetők a jogellenes tartalomról szóló bejelentések.",
+          "Az EU digitális szolgáltatásokról szóló rendelete (DSA) szerinti kapcsolattartó pont felhasználóknak és hatóságoknak: {email}. Magyarul és angolul válaszolunk.",
         ],
       },
       {
@@ -168,8 +174,8 @@ const hu: Record<DocKey, Doc> = {
           "Névtelen azonosító: amikor először használod a közös térképet, a telefonod kap egy véletlenszerű azonosítót és egy titkos tokent. A szerver a tokennek csak a hash-ét tárolja, valamint azt, hogy mely helyeket és mikor adtál hozzá. Nincs név, e-mail-cím vagy telefonszám.",
           "Profilnév: nem kötelező. Ha megadsz egy nevet, az a névtelen azonosítódhoz kötve tárolódik a szerveren. Csak te és az adminisztrátor látja, egyetlen helynél sem jelenik meg.",
           "Hozzájárulásaid: a hozzáadott helyek (név, kód, fajta, nyitva tartás, megjegyzés, helyzet), szavazataid, kódjavaslataid és jelentéseid.",
-          "Helyadat: a telefonod pozícióját az eszközön olvassuk, hogy megmutassuk, hol vagy, és a közeli helyeket. Hely hozzáadásakor és szavazáskor a pozíciód elküldjük a kéréssel, hogy a szerver ellenőrizze, hogy kb. 150 méteren belül vagy; a szerver nem tárolja.",
-          "Technikai adat: az IP-címedet a szolgáltatás nyújtásához és a visszaélések korlátozásához kezeljük. Rövid életű szerver naplókban jelenik meg, és mi nem kapcsoljuk az azonosítódhoz.",
+          "Helyadat: a telefonod pozícióját az eszközön olvassuk, hogy megmutassuk, hol vagy, és a közeli helyeket. Hely hozzáadásakor és szavazáskor a pozíciód elküldjük a kéréssel, hogy a szerver ellenőrizze, hogy kb. 150 méteren belül vagy; a szerver nem tárolja. A hozzájárulásodat bármikor visszavonhatod: kapcsold ki a Beállításokban a „Helyem használata” kapcsolót, vagy a telefon / böngésző helybeállításaiban az appot.",
+          "Technikai adat: az IP-címedet a szolgáltatás nyújtásához és a visszaélések korlátozásához kezeljük. A szerverünk nem ír hozzáférési naplót: a címet kb. egy órán át a memóriában tartja a visszaélések korlátozásához, aztán elfelejti. Az alább megnevezett szolgáltatók saját technikai naplót vezetnek.",
           "A telefonodon: a beállítások, a helyek másolata és az elküldésre váró műveletek a böngésző helyi tárolójában vannak. Ez az app működéséhez feltétlenül szükséges, ezért nincs sütibanner. Nem használunk analitikát vagy hirdetési követőket.",
         ],
       },
@@ -180,15 +186,17 @@ const hu: Record<DocKey, Doc> = {
       {
         h: "Ki látja még",
         p: [
-          "Szerver: Oracle Cloud Infrastructure, Frankfurt, Németország.",
-          "Az app kiszolgálása: a Vercel Inc. szolgálja ki a webappot, betöltéskor látja az IP-címedet.",
-          "Térkép és keresés: a térképcsempéket az OpenFreeMap adja (OpenStreetMap adatok), a műholdas nézetben pedig az EOX műholdképe (tiles.maps.eox.at, Ausztria). Címkereséskor a beírt szöveg és a terület a Photon (komoot.io) vagy az OpenStreetMap Nominatim felé megy. Ezek látják az IP-címedet és a kérést.",
-          "Néhány szolgáltató az EU-n kívül működik, és a saját szabályzatukban leírt garanciákra támaszkodnak. Adatot nem adunk el.",
+          "Szerver: Oracle Cloud Infrastructure, Frankfurt, Németország (EU). Az Oracle amerikai cég; ha az adatokhoz az EU-n kívülről is hozzá lehet férni, az átadás az EU–USA adatvédelmi keretrendszerre (Data Privacy Framework) és/vagy általános szerződési feltételekre (SCC) támaszkodik, az Oracle adatfeldolgozási feltételei szerint.",
+          "Az app kiszolgálása: Vercel Inc., USA. Szolgálja ki a webappot, betöltéskor látja az IP-címedet. Az átadás az EU–USA adatvédelmi keretrendszerre és/vagy általános szerződési feltételekre támaszkodik, a Vercel adatfeldolgozási feltételei szerint.",
+          "Térképcsempék: OpenFreeMap (openfreemap.org), OpenStreetMap adatokkal. Látja az IP-címedet és a megnézett térképterületet. Nincs vele szerződésünk, ingyenes nyilvános szolgáltatás.",
+          "Műholdas nézet: EOX IT Services GmbH, Ausztria (EU), tiles.maps.eox.at. Látja az IP-címedet és a térképterületet.",
+          "Címkeresés: Photon (Komoot, Németország, EU) és OpenStreetMap Nominatim (OpenStreetMap Foundation, Egyesült Királyság). Látják, amit beírsz, a területet és az IP-címedet.",
+          "Adatot nem adunk el. Ahol a szolgáltató az EU-n kívül van, az átadás jogalapja a fent megnevezett, vagy az adott ország megfelelőségi határozata.",
         ],
       },
       {
         h: "Meddig",
-        p: ["A helyek és szavazatok a törlésükig megmaradnak. A hozzáadott helyeidet a Profil fülön törölheted; adminisztrátor törölhet vagy elrejthet helyeket és letilthat a feltételeket sértő azonosítókat. A szerver naplókat csak rövid ideig őrizzük. A telefonodon tárolt adatokat a böngészőadatok törlésével távolíthatod el."],
+        p: ["A helyek, szavazatok, javaslatok és jelentések a törlésükig megmaradnak. Ha egy helyet törölnek, a szavazatai, javaslatai és jelentései is törlődnek vele. A hozzáadott helyeidet a Profil fülön törölheted; adminisztrátor törölhet vagy elrejthet helyeket és letilthat a feltételeket sértő azonosítókat. A névtelen azonosítód és az opcionális neved addig marad, amíg nem kéred a törlésüket. A szerverünk nem tart hozzáférési naplót. A telefonodon tárolt adatokat (a profilfotóddal együtt, ami sosem hagyja el a telefont) a böngészőadatok törlésével távolíthatod el."],
       },
       {
         h: "Jogaid",
@@ -199,7 +207,7 @@ const hu: Record<DocKey, Doc> = {
       },
       {
         h: "Gyermekek",
-        p: ["Az app 16 éves és idősebb felhasználóknak szól. Fiatalabbként csak szülő vagy gondviselő mellett használd."],
+        p: ["Az app csak 16 éves és idősebb felhasználóknak szól."],
       },
     ],
   },

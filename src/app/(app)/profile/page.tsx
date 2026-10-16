@@ -90,7 +90,7 @@ export default function ProfilePage() {
         <header className="flex flex-col items-center pt-2">
           <button type="button" onClick={() => setEditing(true)} aria-label={t.profile.editProfile} className="relative rounded-full active:opacity-80">
             <Avatar name={settings.name} hue={settings.avatar} photo={settings.photo} size={120} />
-            <span className="absolute right-0.5 bottom-0.5 grid size-9 place-items-center rounded-full bg-ink text-night ring-[3px] ring-black">
+            <span className="absolute right-0.5 bottom-0.5 grid size-9 place-items-center rounded-full bg-ink text-night ring-[3px] ring-night">
               <Camera className="size-4" strokeWidth={2} aria-hidden />
             </span>
           </button>

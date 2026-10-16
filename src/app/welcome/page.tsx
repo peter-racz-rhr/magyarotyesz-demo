@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { LegalLinks } from "@/components/legal-page";
 import { ActionButton } from "@/components/onboarding/action-button";
 import { FORWARD, PageTransition } from "@/components/page-transition";
 import { Wordmark } from "@/components/wordmark";
@@ -206,6 +207,7 @@ export default function WelcomePage() {
                       <ActionButton variant="quiet" className="h-12" onClick={() => enter(false)}>
                         {t.welcome.mapOnly}
                       </ActionButton>
+                      <LegalLinks className="mt-4 block text-center text-xs text-haze" />
                     </div>,
                   ].map((child) => (
                     <motion.div

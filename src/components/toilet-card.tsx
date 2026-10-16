@@ -42,8 +42,8 @@ export function HealthDot({ toilet, className }: { toilet: Toilet; className?: s
       className={cn("block size-2.5 shrink-0 rounded-full", className)}
       style={
         doubtful
-          ? { background: "#000", boxShadow: `inset 0 0 0 2.5px ${color}, 0 0 0 1.5px #000, 0 0 8px 1px color-mix(in srgb, ${color} 45%, transparent)` }
-          : { background: color, boxShadow: `0 0 0 2px #000, 0 0 10px 2px color-mix(in srgb, ${color} 55%, transparent)` }
+          ? { background: "var(--night)", boxShadow: `inset 0 0 0 2.5px ${color}, 0 0 0 1.5px var(--night), 0 0 8px 1px color-mix(in srgb, ${color} 45%, transparent)` }
+          : { background: color, boxShadow: `0 0 0 2px var(--night), 0 0 10px 2px color-mix(in srgb, ${color} 55%, transparent)` }
       }
     />
   );
