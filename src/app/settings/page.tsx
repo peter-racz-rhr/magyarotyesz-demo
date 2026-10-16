@@ -100,7 +100,7 @@ export default function SettingsPage() {
         <h1 className="mt-1 px-1 text-[2rem] leading-tight font-bold tracking-tight">{t.settings.title}</h1>
 
         <Group id="general-heading" title={t.settings.general}>
-          <li className="flex min-h-12 items-center gap-3 px-4 py-2 text-[0.9375rem]">
+          <li className="flex min-h-[3.25rem] items-center gap-3.5 px-4 py-2 text-[1rem]">
             <Tile hue={212}>
               <Globe />
             </Tile>
@@ -123,7 +123,7 @@ export default function SettingsPage() {
           <SwitchRow icon={<Bell />} hue={6} title={t.profile.notify} on={settings.notify} onChange={toggleNotify} />
           <LinkRow icon={<RotateCcw />} hue={268} title={t.profile.intro} onClick={showIntro} />
         </Group>
-        {notifyBlocked && <p className="mt-1.5 px-4 text-[0.75rem] text-stale">{t.profile.notifyBlocked}</p>}
+        {notifyBlocked && <p className="mt-2 px-5 text-[0.8125rem] text-stale">{t.profile.notifyBlocked}</p>}
 
         <Group id="map-heading" title={t.settings.mapGroup} footer={locationBlocked ? t.profile.locationBlocked : t.settings.footerMap} tone={locationBlocked ? "warn" : undefined}>
           <SwitchRow icon={<LocateFixed />} hue={212} title={t.profile.location} on={settings.location} onChange={toggleLocation} />
@@ -154,7 +154,7 @@ export default function SettingsPage() {
         {!REMOTE && (
           <Group id="danger" plain>
             {confirmClear ? (
-              <li className="flex min-h-12 items-center gap-3 px-4 py-2">
+              <li className="flex min-h-[3.25rem] items-center gap-3 px-4 py-2">
                 <span className="flex-1 text-sm">{t.profile.deleteConfirm}</span>
                 <button type="button" onClick={() => setConfirmClear(false)} className={cn(btn.quiet, btn.sm)}>
                   {t.profile.keep}
@@ -177,7 +177,7 @@ export default function SettingsPage() {
           </Group>
         )}
 
-        <footer className="mt-8 px-4 text-[0.75rem] leading-relaxed text-haze">{REMOTE ? t.sync.footer : t.profile.footer}</footer>
+        <footer className="mt-8 px-5 text-[0.8125rem] leading-relaxed text-haze">{REMOTE ? t.sync.footer : t.profile.footer}</footer>
       </main>
     </PageTransition>
   );

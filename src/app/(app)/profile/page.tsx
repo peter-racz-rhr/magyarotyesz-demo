@@ -206,7 +206,7 @@ export default function ProfilePage() {
           )}
         </Group>
 
-        <p className="mt-6 px-4 text-[0.75rem] leading-relaxed text-haze">{t.profile.idHint}</p>
+        <p className="mt-8 px-5 text-[0.8125rem] leading-relaxed text-haze">{t.profile.idHint}</p>
       </main>
       {editing && <ProfileEditor onClose={() => setEditing(false)} />}
     </PageTransition>
