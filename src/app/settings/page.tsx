@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BACK, PageTransition } from "@/components/page-transition";
+import { MapStylePicker } from "@/components/map-style-picker";
 import { Group, LinkRow, SwitchRow, Tile } from "@/components/settings-ui";
 import { btn } from "@/components/ui/buttons";
 import { REMOTE } from "@/lib/api";
@@ -124,6 +125,14 @@ export default function SettingsPage() {
           <LinkRow icon={<RotateCcw />} hue={268} title={t.profile.intro} onClick={showIntro} />
         </Group>
         {notifyBlocked && <p className="mt-2 px-5 text-[0.8125rem] text-stale">{t.profile.notifyBlocked}</p>}
+
+        <section className="mt-8" aria-labelledby="mapstyle-heading">
+          <h2 id="mapstyle-heading" className="mb-2 px-5 text-[0.9375rem] font-semibold text-ink/65">
+            {t.settings.mapStyles}
+          </h2>
+          <MapStylePicker />
+          <p className="mt-2 px-5 text-[0.8125rem] leading-relaxed text-haze">{t.settings.mapStyleHint}</p>
+        </section>
 
         <Group id="map-heading" title={t.settings.mapGroup} footer={locationBlocked ? t.profile.locationBlocked : t.settings.footerMap} tone={locationBlocked ? "warn" : undefined}>
           <SwitchRow icon={<LocateFixed />} hue={212} title={t.profile.location} on={settings.location} onChange={toggleLocation} />

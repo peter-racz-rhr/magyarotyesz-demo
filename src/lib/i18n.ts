@@ -16,6 +16,9 @@ const en = {
     back: "Profile",
     general: "General",
     mapGroup: "Map and location",
+    mapStyles: "Map styles",
+    mapStyleNames: { dark: "Dark", light: "Light", satellite: "Satellite" } as Record<string, string>,
+    mapStyleHint: "Pick how the map looks. Satellite needs a good connection.",
     codesGroup: "Codes",
     dataGroup: "Your data",
     footerMap: "Location is needed to add codes and say if they work. 3D tilts the map and raises the buildings; turn it off if the map feels slow.",
@@ -146,7 +149,7 @@ const en = {
     statusTitle: "Sync",
     server: "Shared with everyone through the magyarotyesz server.",
     removeNote: "Removes it for everyone.",
-    footer: "Codes are shared through the server and saved on this phone, so they work offline. Map © CARTO, © OpenStreetMap contributors.",
+    footer: "Codes are shared through the server and saved on this phone, so they work offline. Map © OpenFreeMap, © OpenMapTiles, data © OpenStreetMap contributors. Imagery © Esri.",
   },
 
   card: {
@@ -273,7 +276,7 @@ const en = {
     deleteConfirm: "Delete every code on this phone?",
     keep: "Keep",
     delete: "Delete",
-    footer: "Demo: codes are saved on this phone and work offline. Map © CARTO, © OpenStreetMap contributors.",
+    footer: "Demo: codes are saved on this phone and work offline. Map © OpenFreeMap, © OpenMapTiles, data © OpenStreetMap contributors. Imagery © Esri.",
   },
 };
 
@@ -289,6 +292,9 @@ const hu: Dict = {
     back: "Profil",
     general: "Általános",
     mapGroup: "Térkép és hely",
+    mapStyles: "Térkép stílusok",
+    mapStyleNames: { dark: "Sötét", light: "Világos", satellite: "Műholdas" } as Record<string, string>,
+    mapStyleHint: "Válaszd ki, hogyan nézzen ki a térkép. A műholdképhez jó net kell.",
     codesGroup: "Kódok",
     dataGroup: "Az adataid",
     footerMap: "A helyhez kell, hogy kódot adhass hozzá vagy ellenőrizhess. A 3D megdönti a térképet és felhúzza az épületeket; kapcsold ki, ha lassúnak érzed.",
@@ -418,7 +424,7 @@ const hu: Dict = {
     statusTitle: "Szinkron",
     server: "A magyarotyesz szerveren át mindenkivel megosztva.",
     removeNote: "Mindenki számára törli.",
-    footer: "A kódok a szerveren át megosztottak, és ezen a telefonon is el vannak mentve, így net nélkül is működnek. Térkép © CARTO, © OpenStreetMap közreműködők.",
+    footer: "A kódok a szerveren át megosztottak, és ezen a telefonon is el vannak mentve, így net nélkül is működnek. Térkép © OpenFreeMap, © OpenMapTiles, adatok © OpenStreetMap közreműködők. Műholdkép © Esri.",
   },
 
   card: {
@@ -544,7 +550,7 @@ const hu: Dict = {
     deleteConfirm: "Törlöd az összes kódot erről a telefonról?",
     keep: "Megtartom",
     delete: "Törlés",
-    footer: "Demó: a kódok ezen a telefonon vannak elmentve, és internet nélkül is elérhetők. Térkép © CARTO, © OpenStreetMap közreműködők.",
+    footer: "Demó: a kódok ezen a telefonon vannak elmentve, és internet nélkül is elérhetők. Térkép © OpenFreeMap, © OpenMapTiles, adatok © OpenStreetMap közreműködők. Műholdkép © Esri.",
   },
 };
 

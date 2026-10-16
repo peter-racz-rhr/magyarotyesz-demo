@@ -36,6 +36,7 @@ import {
   type Kind,
   type Toilet,
 } from "@/lib/toilets";
+import { useMapStyle } from "@/lib/map-style";
 import { useHere } from "@/lib/use-here";
 import { cn } from "@/lib/utils";
 
@@ -228,6 +229,7 @@ export default function MapPage() {
   const mapRef = useRef<MapRef>(null);
   const here = useHere();
   const { buildings3d } = useSettings();
+  const base = useMapStyle();
   const toilets = useToilets();
 
   const dockSlot = useSyncExternalStore(
@@ -427,7 +429,8 @@ export default function MapPage() {
       <main className="fixed inset-x-0 top-0 h-lvh bg-night">
         <Map
           ref={mapRef}
-          theme="dark"
+          theme={base.theme}
+          styles={base.styles}
           center={here.coords ? [here.coords.longitude, here.coords.latitude] : BUDAPEST}
           zoom={here.coords ? 15 : 12}
           className="h-full w-full"

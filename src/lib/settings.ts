@@ -14,6 +14,8 @@ export type Settings = {
   location: boolean;
   /** Draw the buildings on the map as 3D blocks and tilt the map. */
   buildings3d: boolean;
+  /** Which base map: night, day or satellite. */
+  mapStyle: "dark" | "light" | "satellite";
   /** Show a place's code as soon as its card opens, without tapping. */
   showCodes: boolean;
   /** A short vibration on taps and when a toilet is added (Android). */
@@ -35,6 +37,7 @@ const store = createLocalStore<Settings>("magyarotyesz:settings", {
   notify: false,
   location: true,
   buildings3d: true,
+  mapStyle: "dark",
   showCodes: false,
   haptics: true,
   animations: true,
