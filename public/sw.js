@@ -3,9 +3,21 @@
   from the network when there is one, so updates arrive straight away, and
   from the saved copy when there isn't. Built files are saved forever (their
   names change with every build). The codes themselves already live on the
-  phone. Map tiles and address search still need the internet.
+  phone. Map pieces you have already seen are kept too (MAP_CACHE); new areas and address search need the internet.
 */
-const CACHE = "magyarotyesz-v1";
+const CACHE = "magyarotyesz-v2";
+// Map pieces from other servers (vector tiles, fonts, satellite). Seen once, they stay on the phone, so
+// the places you have looked at still show up with no signal. Capped so it never fills the storage.
+const MAP_CACHE = "magyarotyesz-map-v1";
+const MAP_HOSTS = ["tiles.openfreemap.org", "tiles.maps.eox.at", "basemaps.cartocdn.com"];
+const MAP_LIMIT = 4000;
+
+const trimMap = async () => {
+  const cache = await caches.open(MAP_CACHE);
+  const keys = await cache.keys();
+  await Promise.all(keys.slice(0, Math.max(0, keys.length - MAP_LIMIT)).map((key) => cache.delete(key)));
+};
+
 const PAGES = ["/", "/welcome", "/map", "/nearby", "/profile", "/manifest.webmanifest", "/icons/icon-192.png"];
 
 self.addEventListener("install", (event) => {
@@ -19,7 +31,7 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE && key !== MAP_CACHE).map((key) => caches.delete(key))))
       .then(() => self.clients.claim()),
   );
 });
@@ -28,6 +40,30 @@ self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
   const url = new URL(request.url);
+
+  if (MAP_HOSTS.includes(url.hostname)) {
+    // The tile list ("/planet") names the current tile version, so it goes to the network first.
+    const fresh = url.pathname === "/planet" || url.pathname.endsWith("style.json");
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(MAP_CACHE);
+        const hit = await cache.match(request);
+        if (hit && !fresh) return hit;
+        try {
+          const response = await fetch(request);
+          if (response.ok) {
+            cache.put(request, response.clone()).then(() => (Math.random() < 0.02 ? trimMap() : undefined));
+          }
+          return response;
+        } catch (error) {
+          if (hit) return hit;
+          throw error;
+        }
+      })(),
+    );
+    return;
+  }
+
   if (url.origin !== self.location.origin) return;
 
   // Built files: saved once, served from the phone.
