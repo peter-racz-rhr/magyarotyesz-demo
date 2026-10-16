@@ -142,6 +142,16 @@ function Toggle({ on, onChange, icon, children }: { on: boolean; onChange: (on: 
   );
 }
 
+/** The satellite picture has nothing sharper to show past this zoom, so the map stops here instead of stretching it. */
+function ZoomCap({ max }: { max: number }) {
+  const { map } = useMap();
+  useEffect(() => {
+    if (!map) return;
+    map.setMaxZoom(max);
+  }, [map, max]);
+  return null;
+}
+
 export default function MapPage() {
   const { t } = useT();
   const mapRef = useRef<MapRef>(null);
@@ -377,7 +387,8 @@ export default function MapPage() {
           className="h-full w-full"
         >
           <TapToAdd onTap={startDraft} onDismiss={() => setFocus(null)} />
-          <Buildings3D enabled={buildings3d} variant={base.key === "light" ? "light" : "dark"} />
+          <ZoomCap max={base.key === "satellite" ? 15.5 : 22} />
+          <Buildings3D enabled={buildings3d && base.key !== "satellite"} variant={base.key === "light" ? "light" : "dark"} />
 
           {visible.map((toilet) => (
             <MapMarker key={toilet.id} latitude={toilet.latitude} longitude={toilet.longitude}>

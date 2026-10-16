@@ -117,17 +117,6 @@ const labels = labelIds.map((id) => {
   l.paint = { ...l.paint, "text-color": "#ffffff", "text-halo-color": "rgba(0,0,0,0.75)", "text-halo-width": 1.4 };
   return l;
 });
-// The picture is only 10 m per pixel, so close up it turns to mush. From zoom 14 it fades back and the
-// night map's roads and buildings fade in over it, so the streets stay readable at street level.
-const fade = (a, b, from, to) => ["interpolate", ["linear"], ["zoom"], a, from, b, to];
-const detail = night.layers
-  .filter((l) => l.id === "building" || /^(highway_(path|minor|major_inner|major_subtle|motorway_inner|motorway_subtle)|railway)$/.test(l.id))
-  .map((l) => {
-    const c = structuredClone(l);
-    if (c.type === "line") c.paint = { ...c.paint, "line-color": "#ffffff", "line-opacity": fade(14, 16.5, 0, 0.55) };
-    else c.paint = { ...c.paint, "fill-color": "#ffffff", "fill-outline-color": "#ffffff", "fill-opacity": fade(14.5, 17, 0, 0.18) };
-    return c;
-  });
 const satellite = {
   version: 8,
   name: "Satellite",
@@ -146,8 +135,7 @@ const satellite = {
   },
   layers: [
     { id: "background", type: "background", paint: { "background-color": "#0a0f1a" } },
-    { id: "imagery", type: "raster", source: "imagery", paint: { "raster-fade-duration": 200, "raster-opacity": fade(13.5, 17, 1, 0.45) } },
-    ...detail,
+    { id: "imagery", type: "raster", source: "imagery", paint: { "raster-fade-duration": 200 } },
     ...labels,
   ],
 };
