@@ -10,6 +10,7 @@ const en = {
   kinds: { cafe: "Café", restaurant: "Restaurant", bar: "Bar", mall: "Mall", station: "Station", other: "Other" } as Record<Kind, string>,
   access: { free: "Free to use", customers: "Customers only", paid: "Paid" } as Record<Access, string>,
   tabs: { map: "Map", nearby: "Nearby", profile: "Profile" },
+  refresh: { refreshing: "Refreshing…" },
   legal: {
     back: "Back",
     missing: "not set yet",
@@ -239,6 +240,7 @@ const hu: Dict = {
   kinds: { cafe: "Kávézó", restaurant: "Étterem", bar: "Bár", mall: "Bevásárlóközpont", station: "Állomás", other: "Egyéb" },
   access: { free: "Ingyenes", customers: "Csak vendégeknek", paid: "Fizetős" },
   tabs: { map: "Térkép", nearby: "Közelben", profile: "Profil" },
+  refresh: { refreshing: "Frissítés…" },
   legal: {
     back: "Vissza",
     missing: "még nincs megadva",

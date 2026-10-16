@@ -1,4 +1,5 @@
 import { LiquefyProvider } from "@/lib/provider";
+import { PullToRefresh } from "@/components/pull-to-refresh";
 import { ViewTransitionDock } from "@/components/view-transition-dock";
 import { AppDock } from "./app-dock";
 
@@ -8,6 +9,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     // Liquid glass for the controls that float over the map.
     <LiquefyProvider theme="dark" tint="#4fe08a" intensity={1}>
       <div className="pb-28">{children}</div>
+      <PullToRefresh />
       <AppDock />
       <ViewTransitionDock />
     </LiquefyProvider>

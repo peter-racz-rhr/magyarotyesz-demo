@@ -494,7 +494,7 @@ export default function MapPage() {
         {/* Filters: one glass bar, the same material as the dock. It sits in
             the middle when it fits and scrolls sideways when it doesn't. */}
         {!draft && (
-          <div className="absolute inset-x-0 top-[max(env(safe-area-inset-top),0.75rem)] z-10 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div data-pull-zone className="absolute inset-x-0 top-[max(env(safe-area-inset-top),0.75rem)] z-10 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <LiquidSurface radius={999} veil={0.5} className="mx-auto flex w-max gap-0.5 p-1">
               {(Object.keys(t.map.filters) as (keyof Filters)[]).map((key) => (
                 <button

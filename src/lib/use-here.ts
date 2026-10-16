@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { locationPermission, requestLocation, type Coordinates } from "./location";
 import { getSettings, useSettings } from "./settings";
+import { REFRESH_EVENT } from "@/components/pull-to-refresh";
 
 type Status = "checking" | "prompt" | "locating" | "ready" | "denied" | "off";
 
@@ -43,6 +44,15 @@ export function useHere() {
       else setStatus(state === "denied" ? "denied" : "prompt");
     });
   }, [request, allowed]);
+
+  // Pull to refresh also asks where you are now.
+  useEffect(() => {
+    const refresh = () => {
+      if (getSettings().location) void request();
+    };
+    window.addEventListener(REFRESH_EVENT, refresh);
+    return () => window.removeEventListener(REFRESH_EVENT, refresh);
+  }, [request]);
 
   return { coords, status, request };
 }
