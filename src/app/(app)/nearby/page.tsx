@@ -193,7 +193,7 @@ export default function NearbyPage() {
             </p>
           )}
           {!origin && !here.coords && (here.status === "off" || here.status === "denied") && (
-            <div role="note" className="mt-4 rounded-[18px] bg-white/[0.055] px-4 py-3 text-[0.875rem] leading-relaxed text-haze">
+            <div role="note" className="mt-4 rounded-[18px] bg-fg/[0.055] px-4 py-3 text-[0.875rem] leading-relaxed text-haze">
               {here.status === "denied" ? d.nearby.blockedHint : d.nearby.fromCentreHint}
               {here.status === "off" && (
                 <Link href="/settings" className="mt-1 block font-semibold text-good">

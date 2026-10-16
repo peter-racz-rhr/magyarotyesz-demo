@@ -185,7 +185,7 @@ export function ProfileEditor({ onClose }: { onClose: () => void }) {
     <div role="dialog" aria-modal="true" aria-label={t.profile.profileTitle} className="fixed inset-0 z-[80] overflow-y-auto bg-night pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto flex min-h-full w-full max-w-md flex-col px-5 pt-3 pb-8">
         <div className="flex h-11 items-center">
-          <button type="button" onClick={onClose} aria-label={t.card.cancel} className="-ml-2.5 grid size-11 place-items-center rounded-full text-ink/80 active:bg-white/10">
+          <button type="button" onClick={onClose} aria-label={t.card.cancel} className="-ml-2.5 grid size-11 place-items-center rounded-full text-ink/80 active:bg-fg/10">
             <X className="size-[1.375rem]" strokeWidth={1.75} aria-hidden />
           </button>
           <h2 className="flex-1 text-center text-[1.0625rem] font-semibold">{t.profile.profileTitle}</h2>
@@ -236,7 +236,7 @@ export function ProfileEditor({ onClose }: { onClose: () => void }) {
                 placeholder={t.profile.namePlaceholder}
                 autoComplete="nickname"
                 enterKeyHint="done"
-                className="h-[3.25rem] w-full rounded-[22px] bg-white/[0.055] px-4 text-[1.0625rem] outline-none placeholder:text-haze/60 focus:bg-white/[0.08]"
+                className="h-[3.25rem] w-full rounded-[22px] bg-fg/[0.055] px-4 text-[1.0625rem] outline-none placeholder:text-haze/60 focus:bg-fg/[0.08]"
               />
             </label>
 

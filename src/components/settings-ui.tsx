@@ -13,11 +13,11 @@ import { cn } from "@/lib/utils";
   quiet footnote under the group instead of inside the rows.
 */
 
-export const CARD = "overflow-hidden rounded-[22px] bg-white/[0.055]";
+export const CARD = "overflow-hidden rounded-[22px] bg-fg/[0.055]";
 /** Every row is the same height, so a list reads as a list. */
-export const ROW = "flex min-h-[3.25rem] w-full items-center gap-3.5 px-4 py-2.5 text-left text-[1rem] transition-colors duration-200 active:bg-white/[0.09] active:duration-0";
+export const ROW = "flex min-h-[3.25rem] w-full items-center gap-3.5 px-4 py-2.5 text-left text-[1rem] transition-colors duration-200 active:bg-fg/[0.09] active:duration-0";
 /** The divider starts under the text, not under the icon. */
-const DIVIDE = "[&>li+li]:relative [&>li+li]:before:absolute [&>li+li]:before:top-0 [&>li+li]:before:right-0 [&>li+li]:before:left-[3.875rem] [&>li+li]:before:h-px [&>li+li]:before:bg-white/[0.07]";
+const DIVIDE = "[&>li+li]:relative [&>li+li]:before:absolute [&>li+li]:before:top-0 [&>li+li]:before:right-0 [&>li+li]:before:left-[3.875rem] [&>li+li]:before:h-px [&>li+li]:before:bg-fg/[0.07]";
 
 /** A group: a small heading, the block of rows, and an optional footnote. */
 export function Group({
@@ -52,7 +52,7 @@ export function Group({
           {action}
         </div>
       )}
-      <ul className={cn(CARD, plain ? "[&>li+li]:border-t [&>li+li]:border-white/[0.07]" : DIVIDE)}>{children}</ul>
+      <ul className={cn(CARD, plain ? "[&>li+li]:border-t [&>li+li]:border-fg/[0.07]" : DIVIDE)}>{children}</ul>
       {footer && <p className={cn("mt-2 px-5 text-[0.8125rem] leading-relaxed", tone === "warn" ? "text-stale" : "text-haze")}>{footer}</p>}
     </section>
   );
@@ -89,7 +89,7 @@ export function SwitchRow({ icon, hue, title, on, onChange }: { icon: ReactNode;
       <button type="button" role="switch" aria-checked={on} onClick={() => onChange(!on)} className={ROW}>
         <Tile hue={hue}>{icon}</Tile>
         <span className="min-w-0 flex-1 truncate">{title}</span>
-        <span className={cn("relative h-[1.75rem] w-[3rem] shrink-0 rounded-full transition-colors duration-200", on ? "bg-good" : "bg-white/[0.16]")}>
+        <span className={cn("relative h-[1.75rem] w-[3rem] shrink-0 rounded-full transition-colors duration-200", on ? "bg-good" : "bg-fg/[0.16]")}>
           <span className={cn("absolute top-[0.125rem] left-[0.125rem] size-[1.5rem] rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.4)] transition-transform duration-200", on && "translate-x-[1.25rem]")} />
         </span>
       </button>
@@ -126,7 +126,7 @@ export function LinkRow({
       </Tile>
       <span className={cn("min-w-0 flex-1 truncate", danger && "text-bad")}>{title}</span>
       {value && <span className="max-w-[40%] truncate text-[0.9375rem] text-haze">{value}</span>}
-      {chevron && <ChevronRight className="-mr-1 size-[1.125rem] shrink-0 text-white/25" aria-hidden />}
+      {chevron && <ChevronRight className="-mr-1 size-[1.125rem] shrink-0 text-fg/25" aria-hidden />}
     </>
   );
   return (

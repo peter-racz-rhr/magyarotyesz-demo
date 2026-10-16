@@ -9,7 +9,13 @@
   a code that works is green, one nobody checked lately is amber, one that
   was reported broken is red.
 */
-:root {
+:root,
+:root[data-theme="dark"],
+[data-theme="dark"] {
+  --fg: #ffffff; /* the colour that tints surfaces: white on dark, black on light */
+  --well: rgb(0 0 0 / 0.4); /* a sunken box (code, small switches) */
+  --glass-fill: rgb(10 12 16 / 0.62);
+  --glass-solid: #07080a;
   --night: #121212; /* very dark grey, not pure black: easier on the eyes */
   --ink: #f4efe9; /* text, primary button */
   --haze: #9a938c; /* secondary text */
@@ -23,7 +29,33 @@
   --stale: #ffc247; /* not checked lately */
   --bad: #ff5f57; /* reported not working */
   --error: #ff8a7a;
+  color-scheme: dark;
+}
 
+/* The light theme: warm paper, dark ink, greens and ambers darkened so they read on white. */
+:root[data-theme="light"],
+[data-theme="light"] {
+  --fg: #000000;
+  --well: rgb(0 0 0 / 0.06);
+  --glass-fill: rgb(255 255 255 / 0.72);
+  --glass-solid: #f6f3ee;
+  --night: #f6f3ee;
+  --ink: #1b1917;
+  --haze: #6b645d;
+  --dusk: #ffffff;
+  --dusk-edge: #ddd6cc;
+  --ember: #d9531a;
+  --gold: #b7791f;
+  --rose: #c02e63;
+  --ok: #1d7a47;
+  --good: #12994a;
+  --stale: #a86a00;
+  --bad: #d12e26;
+  --error: #c0392b;
+  color-scheme: light;
+}
+
+:root {
   --background: var(--night);
   --foreground: var(--ink);
   --muted-foreground: var(--haze);
@@ -48,6 +80,8 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-accent: var(--accent);
   --color-muted: var(--muted);
+  --color-fg: var(--fg);
+  --color-well: var(--well);
   --color-night: var(--night);
   --color-ink: var(--ink);
   --color-haze: var(--haze);
@@ -75,7 +109,6 @@
   html {
     @apply font-sans;
     background: var(--night);
-    color-scheme: dark;
     -webkit-tap-highlight-color: transparent;
   }
   body {
@@ -102,6 +135,9 @@
     /* MapLibre draws a dark "i"; flip it to light for our dark map. */
     filter: invert(1);
     opacity: 0.55;
+  }
+  :root[data-theme="light"] .maplibregl-ctrl-attrib-button {
+    filter: none;
   }
   .maplibregl-ctrl-attrib.maplibregl-compact {
     @apply bg-night/60! border-dusk-edge! shadow-none!;
@@ -224,9 +260,9 @@
 */
 .glass {
   background: color-mix(in oklab, var(--dusk) 55%, transparent);
-  border: 1px solid color-mix(in oklab, white 14%, transparent);
+  border: 1px solid color-mix(in oklab, var(--fg) 14%, transparent);
   box-shadow:
-    inset 0 1px 0 color-mix(in oklab, white 18%, transparent),
+    inset 0 1px 0 color-mix(in oklab, var(--fg) 18%, transparent),
     0 10px 30px -10px rgb(0 0 0 / 0.6);
   backdrop-filter: blur(18px) saturate(1.6);
   -webkit-backdrop-filter: blur(18px) saturate(1.6);
@@ -281,10 +317,10 @@ html[data-sheet="open"] .app-dock {
   the bars, the pills and the round buttons.
 */
 .lq-surface[data-liquid-variant="clear"] {
-  --lq-fill: rgb(10 12 16 / 0.62);
+  --lq-fill: var(--glass-fill);
 }
 .lq-icon-button {
-  background: rgb(10 12 16 / 0.62);
+  background: var(--glass-fill);
 }
 
 /*
@@ -305,7 +341,7 @@ html[data-vt-new] .dock-shield::before {
   inset: auto 0 0 0;
   height: 4.5rem;
   border-radius: 999px;
-  background: #07080a;
+  background: var(--glass-solid);
   z-index: -1;
 }
 /* Named here (not left to the automatic name) so both bars can be stacked above the page.
@@ -336,6 +372,11 @@ html[data-vt] .nearby-search {
 }
 @layer components {
   html[data-vt] .lq-surface.search-glass {
-    background: linear-gradient(rgb(8 10 14 / 0.9), rgb(8 10 14 / 0.9)), var(--lq-fill);
+    background: linear-gradient(color-mix(in oklab, var(--glass-solid) 90%, transparent), color-mix(in oklab, var(--glass-solid) 90%, transparent)), var(--lq-fill);
   }
+}
+
+/* Liquefy colours its wrapper's text navy in the light theme; the app's own ink is warmer. */
+html .lq-provider[data-liquid-theme] {
+  color: var(--ink);
 }

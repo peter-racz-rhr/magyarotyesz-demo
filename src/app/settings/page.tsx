@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -109,7 +109,7 @@ export default function SettingsPage() {
               <Globe />
             </Tile>
             <span className="flex-1">{t.profile.language}</span>
-            <div role="radiogroup" aria-label={t.profile.language} className="flex rounded-full bg-black/40 p-0.5">
+            <div role="radiogroup" aria-label={t.profile.language} className="flex rounded-full bg-well p-0.5">
               {(["en", "hu"] as Lang[]).map((key) => (
                 <button
                   key={key}
@@ -117,9 +117,29 @@ export default function SettingsPage() {
                   role="radio"
                   aria-checked={settings.lang === key}
                   onClick={() => updateSettings({ lang: key })}
-                  className={cn("h-7 min-w-11 rounded-full px-3 text-[0.8125rem] font-semibold transition-colors", settings.lang === key ? "bg-white/[0.92] text-night" : "text-haze")}
+                  className={cn("h-7 min-w-11 rounded-full px-3 text-[0.8125rem] font-semibold transition-colors", settings.lang === key ? "bg-ink text-night" : "text-haze")}
                 >
                   {key === "en" ? "EN" : "HU"}
+                </button>
+              ))}
+            </div>
+          </li>
+          <li className="flex min-h-[3.25rem] items-center gap-3.5 px-4 py-2 text-[1rem]">
+            <Tile hue={42}>
+              <SunMoon />
+            </Tile>
+            <span className="flex-1">{t.settings.theme}</span>
+            <div role="radiogroup" aria-label={t.settings.theme} className="flex rounded-full bg-well p-0.5">
+              {(["system", "dark", "light"] as const).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  role="radio"
+                  aria-checked={settings.theme === key}
+                  onClick={() => updateSettings({ theme: key })}
+                  className={cn("h-7 min-w-11 rounded-full px-3 text-[0.8125rem] font-semibold transition-colors", settings.theme === key ? "bg-ink text-night" : "text-haze")}
+                >
+                  {t.settings.themeNames[key]}
                 </button>
               ))}
             </div>

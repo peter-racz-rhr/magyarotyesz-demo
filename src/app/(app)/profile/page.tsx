@@ -80,7 +80,7 @@ export default function ProfilePage() {
           <Link
             href="/settings"
             aria-label={t.profile.settingsAria}
-            className="-mr-2.5 grid size-11 place-items-center rounded-full text-ink/80 transition-colors active:bg-white/10"
+            className="-mr-2.5 grid size-11 place-items-center rounded-full text-ink/80 transition-colors active:bg-fg/10"
           >
             <Settings className="size-[1.375rem]" strokeWidth={1.7} aria-hidden />
           </Link>
@@ -105,13 +105,13 @@ export default function ProfilePage() {
               {copied ? <Check className="size-3.5 text-good" aria-hidden /> : <Copy className="size-3.5" aria-hidden />}
             </button>
           )}
-          <button type="button" onClick={() => setEditing(true)} className="mt-4 h-9 rounded-full bg-white/[0.08] px-5 text-[0.875rem] font-semibold active:bg-white/[0.14]">
+          <button type="button" onClick={() => setEditing(true)} className="mt-4 h-9 rounded-full bg-fg/[0.08] px-5 text-[0.875rem] font-semibold active:bg-fg/[0.14]">
             {t.profile.editProfile}
           </button>
         </header>
 
         {/* The two numbers that matter, in one block */}
-        <dl className={cn(CARD, "mt-7 grid grid-cols-2 divide-x divide-white/[0.07]")}>
+        <dl className={cn(CARD, "mt-7 grid grid-cols-2 divide-x divide-fg/[0.07]")}>
           <div className="px-4 py-3.5 text-center">
             <dd className="text-[1.625rem] leading-none font-bold tabular-nums">{mine.length}</dd>
             <dt className="mt-1.5 text-[0.75rem] text-haze">{t.profile.statShared}</dt>
@@ -166,7 +166,7 @@ export default function ProfilePage() {
           ) : (
             alerts.map((alert) => (
               <li key={alert.id} className="flex items-start gap-3 px-4 py-3">
-                <span aria-hidden className={cn("mt-2 size-2 shrink-0 rounded-full", alert.read ? "bg-white/20" : "bg-good shadow-[0_0_8px_1px_var(--good)]")} />
+                <span aria-hidden className={cn("mt-2 size-2 shrink-0 rounded-full", alert.read ? "bg-fg/20" : "bg-good shadow-[0_0_8px_1px_var(--good)]")} />
                 <span className="min-w-0 flex-1">
                   <span className="block text-[0.9375rem] leading-snug">
                     {alertLine(t, alert)}
@@ -192,7 +192,7 @@ export default function ProfilePage() {
                     {t.kinds[toilet.kind]} · {t.profile.added(ago(toilet.addedAt, lang))}
                   </span>
                 </span>
-                <span className="rounded-md bg-black/45 px-2 py-1 font-mono text-[0.8125rem] tracking-[0.1em] text-ink/85">{toilet.code}</span>
+                <span className="rounded-md bg-well px-2 py-1 font-mono text-[0.8125rem] tracking-[0.1em] text-ink/85">{toilet.code}</span>
                 <button
                   type="button"
                   onClick={() => removeToilet(toilet.id)}

@@ -92,7 +92,7 @@ export default function BackupPage() {
                       {/* eslint-disable-next-line @next/next/no-img-element -- a QR code made on this phone */}
                       {qr && <img src={qr} alt="" width={180} height={180} className="rounded-2xl" />}
                       <p className="text-center text-[0.8125rem] text-haze">{t.backup.qrNote}</p>
-                      <p className="w-full rounded-xl bg-black/40 p-3 font-mono text-[0.75rem] leading-relaxed break-all select-all">{code}</p>
+                      <p className="w-full rounded-xl bg-well p-3 font-mono text-[0.75rem] leading-relaxed break-all select-all">{code}</p>
                       <button type="button" onClick={copy} className={cn(btn.secondary, btn.sm, "gap-2 px-4")}>
                         {copied ? <Check className="size-4 text-good" aria-hidden /> : <Copy className="size-4" aria-hidden />}
                         {copied ? t.backup.copied : t.backup.copy}
@@ -119,7 +119,7 @@ export default function BackupPage() {
                 autoComplete="off"
                 autoCapitalize="off"
                 spellCheck={false}
-                className="mt-3 h-12 w-full rounded-full bg-black/40 px-4 font-mono text-[0.8125rem] outline-none placeholder:font-sans placeholder:text-haze/60 focus:bg-black/60"
+                className="mt-3 h-12 w-full rounded-full bg-well px-4 font-mono text-[0.8125rem] outline-none placeholder:font-sans placeholder:text-haze/60 focus:bg-black/60"
               />
               {step === "confirm" ? (
                 <div className="mt-4 flex items-center gap-3">

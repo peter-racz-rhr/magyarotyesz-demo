@@ -459,7 +459,7 @@ export default function MapPage() {
                   onClick={() => setFilters((f) => ({ ...f, [key]: !f[key] }))}
                   className={cn(
                     "inline-flex h-9 shrink-0 items-center rounded-full px-3.5 text-[0.8125rem] font-medium whitespace-nowrap transition-colors duration-200",
-                    filters[key] ? "bg-white/14 text-ink" : "text-ink/60 active:bg-white/8",
+                    filters[key] ? "bg-fg/14 text-ink" : "text-ink/60 active:bg-fg/8",
                   )}
                 >
                   {/* A small light when the filter is on: green, like "this one works" */}

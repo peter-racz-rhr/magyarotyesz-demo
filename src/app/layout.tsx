@@ -3,6 +3,7 @@ import "@fontsource-variable/instrument-sans/wdth.css";
 import "./globals.css";
 import { ServiceWorker } from "@/components/service-worker";
 import { SyncRunner } from "@/components/sync-runner";
+import { THEME_BOOT, ThemeRunner } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: "magyarotyesz",
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#121212",
-  colorScheme: "dark",
+  colorScheme: "dark light",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -31,8 +32,12 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className="h-full antialiased" data-theme="dark" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
+      </head>
       <body className="min-h-full">
+        <ThemeRunner />
         {children}
         <ServiceWorker />
         <SyncRunner />

@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { useSettings } from "./settings";
 
+import { useLook } from "./theme";
+
 export type MapStyleKey = "dark" | "light" | "satellite";
+export type MapStyleChoice = MapStyleKey | "auto";
 
 /* Our own styles (public/map-styles, built by scripts/map-styles/build.mjs) on OpenFreeMap tiles. */
 const OWN: Record<MapStyleKey, string> = {
@@ -47,9 +50,11 @@ function useBasemapDown() {
 }
 
 /** The `theme` and `styles` the Map component needs for a chosen look (default: the saved setting). */
-export function useMapStyle(override?: MapStyleKey) {
+export function useMapStyle(override?: MapStyleChoice) {
   const { mapStyle } = useSettings();
-  const key = override ?? mapStyle ?? "dark";
+  const look = useLook();
+  const choice = override ?? mapStyle ?? "auto";
+  const key: MapStyleKey = choice === "auto" ? look : choice;
   const down = useBasemapDown();
   const night = down ? CARTO.dark : OWN.dark;
   const day = down ? CARTO.light : OWN.light;

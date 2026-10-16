@@ -167,7 +167,7 @@ export default function WelcomePage() {
 
   return (
     <PageTransition>
-      <main className="relative mx-auto min-h-dvh w-full max-w-md overflow-hidden bg-night">
+      <main data-theme="dark" className="relative mx-auto min-h-dvh w-full max-w-md overflow-hidden bg-night text-ink">
         {/* Behind the door: the light, and the promise */}
         <div className="absolute inset-0">
           <motion.div

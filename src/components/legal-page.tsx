@@ -54,7 +54,7 @@ export function LegalPage({ doc }: { doc: DocKey }) {
           ))}
         </nav>
         {OPERATOR.email && (
-          <section className="mt-10 rounded-[22px] bg-white/[0.055] p-5">
+          <section className="mt-10 rounded-[22px] bg-fg/[0.055] p-5">
             <h2 className="text-[1.0625rem] font-semibold">{t.legal.contact}</h2>
             <p className="mt-1 text-[0.9375rem] leading-relaxed text-haze">{t.legal.contactBody}</p>
             <a href={`mailto:${OPERATOR.email}`} className="mt-4 inline-flex h-11 items-center rounded-full bg-ink px-5 text-[0.9375rem] font-semibold text-night active:opacity-80">
