@@ -110,7 +110,7 @@ const en: Record<DocKey, Doc> = {
     updated: UPDATED.en,
     sections: [
       { h: "Service provider", p: ["{operator}", "{address}"] },
-      { h: "Contact", p: ["{email}", "Use this address for questions, privacy requests, takedown requests and notices about illegal content. We aim to reply within a few working days."] },
+      { h: "Contact", p: ["{email}", "{phone}", "Use this address for questions, privacy requests, takedown requests and notices about illegal content. We aim to reply within a few working days."] },
       { h: "Service", p: ["magyarotyesz, a free community map of toilet door codes in Budapest. Not a commercial service; no fee is charged."] },
       { h: "Hosting", p: ["Web app: Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA.", "Server: Oracle Cloud Infrastructure, Frankfurt, Germany."] },
       { h: "Map data", p: ["Map © OpenFreeMap, © OpenMapTiles, data © OpenStreetMap contributors. Style based on the CartoDB basemaps (CC BY 3.0).", "Satellite: Sentinel-2 cloudless – https://s2maps.eu by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2016 & 2017), CC BY 4.0."] },
@@ -208,7 +208,7 @@ const hu: Record<DocKey, Doc> = {
     updated: UPDATED.hu,
     sections: [
       { h: "Szolgáltató", p: ["{operator}", "{address}"] },
-      { h: "Kapcsolat", p: ["{email}", "Kérdésekkel, adatkezelési kérésekkel, eltávolítási kérésekkel és jogellenes tartalomról szóló bejelentésekkel erre a címre írj. Néhány munkanapon belül igyekszünk válaszolni."] },
+      { h: "Kapcsolat", p: ["{email}", "{phone}", "Kérdésekkel, adatkezelési kérésekkel, eltávolítási kérésekkel és jogellenes tartalomról szóló bejelentésekkel erre a címre írj. Néhány munkanapon belül igyekszünk válaszolni."] },
       { h: "Szolgáltatás", p: ["magyarotyesz, ingyenes közösségi térkép budapesti mosdók ajtókódjairól. Nem üzleti szolgáltatás, díjat nem számítunk fel."] },
       { h: "Tárhely", p: ["Webapp: Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA.", "Szerver: Oracle Cloud Infrastructure, Frankfurt, Németország."] },
       { h: "Térképadatok", p: ["Térkép © OpenFreeMap, © OpenMapTiles, adatok © OpenStreetMap közreműködők. A stílus a CartoDB alaptérképeken alapul (CC BY 3.0).", "Műholdkép: Sentinel-2 cloudless – https://s2maps.eu, EOX IT Services GmbH (módosított Copernicus Sentinel-adatokat tartalmaz, 2016 és 2017), CC BY 4.0."] },

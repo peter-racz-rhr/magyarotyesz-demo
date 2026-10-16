@@ -4,18 +4,18 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { BACK, PageTransition } from "@/components/page-transition";
 import { useT } from "@/lib/i18n";
-import { OPERATOR, type DocKey } from "@/lib/legal";
+import { LEGAL_REVIEWED, OPERATOR, type DocKey } from "@/lib/legal";
 import { LEGAL } from "@/lib/legal-text";
 import { useSettings } from "@/lib/settings";
 
 const LINKS: DocKey[] = ["terms", "privacy", "imprint"];
 
-/** Fills {operator}, {email} and {address}; anything unset shows as a visible placeholder. */
+/** Fills {operator}, {email}, {address} and {phone}; anything unset (but the optional phone) shows as a visible placeholder. */
 function fill(text: string, missing: string) {
-  const values = { operator: OPERATOR.name, email: OPERATOR.email, address: OPERATOR.address };
-  const parts = text.split(/(\{operator\}|\{email\}|\{address\})/);
+  const values = { operator: OPERATOR.name, email: OPERATOR.email, address: OPERATOR.address, phone: OPERATOR.phone };
+  const parts = text.split(/(\{operator\}|\{email\}|\{address\}|\{phone\})/);
   return parts.map((part, i) => {
-    const key = part.match(/^\{(operator|email|address)\}$/)?.[1] as keyof typeof values | undefined;
+    const key = part.match(/^\{(operator|email|address|phone)\}$/)?.[1] as keyof typeof values | undefined;
     if (!key) return part;
     const value = values[key];
     if (value) return key === "email" ? <a key={i} href={`mailto:${value}`} className="text-good underline">{value}</a> : value;
@@ -39,7 +39,7 @@ export function LegalPage({ doc }: { doc: DocKey }) {
         {d.sections.map((s) => (
           <section key={s.h} className="mt-7">
             <h2 className="t-section">{s.h}</h2>
-            {s.p.map((p) => (
+            {s.p.filter((p) => p !== "{phone}" || OPERATOR.phone).map((p) => (
               <p key={p} className="mt-2 leading-relaxed text-ink/85">
                 {fill(p, t.legal.missing)}
               </p>
@@ -53,7 +53,16 @@ export function LegalPage({ doc }: { doc: DocKey }) {
             </Link>
           ))}
         </nav>
-        <p className="mt-6 text-xs leading-relaxed text-haze">{t.legal.draft}</p>
+        {OPERATOR.email && (
+          <section className="mt-10 rounded-[22px] bg-white/[0.055] p-5">
+            <h2 className="text-[1.0625rem] font-semibold">{t.legal.contact}</h2>
+            <p className="mt-1 text-[0.9375rem] leading-relaxed text-haze">{t.legal.contactBody}</p>
+            <a href={`mailto:${OPERATOR.email}`} className="mt-4 inline-flex h-11 items-center rounded-full bg-ink px-5 text-[0.9375rem] font-semibold text-night active:opacity-80">
+              {OPERATOR.email}
+            </a>
+          </section>
+        )}
+        {!LEGAL_REVIEWED && <p className="mt-6 text-xs leading-relaxed text-haze">{t.legal.draft}</p>}
       </main>
     </PageTransition>
   );
