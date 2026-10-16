@@ -178,7 +178,7 @@ export default function NearbyPage() {
               {here.coords ? d.nearby.fromYou : d.nearby.fromCentre}
             </p>
           )}
-          {!origin && !here.coords && here.status !== "denied" && here.status !== "checking" && (
+          {!origin && !here.coords && here.status !== "denied" && here.status !== "checking" && here.status !== "off" && (
             <ActionButton
               variant="secondary"
               className="mt-5 h-12"

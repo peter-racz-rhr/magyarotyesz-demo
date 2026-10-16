@@ -30,6 +30,7 @@ export const MAX_ACCURACY = 100;
 export type SpotCheck =
   | { ok: true; location?: Location }
   | { ok: false; reason: "location" }
+  | { ok: false; reason: "off" }
   | { ok: false; reason: "vague"; metres: number }
   | { ok: false; reason: "far"; metres: number };
 
@@ -39,6 +40,7 @@ export type SpotCheck =
  */
 export async function checkOnTheSpot(place: { latitude: number; longitude: number }): Promise<SpotCheck> {
   if (!REMOTE && !getSettings().nearbyCheck) return { ok: true };
+  if (!getSettings().location) return { ok: false, reason: "off" };
   try {
     const location = await whereAmI();
     if (location.accuracy > MAX_ACCURACY) return { ok: false, reason: "vague", metres: Math.round(location.accuracy) };

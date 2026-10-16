@@ -1,3 +1,5 @@
+import { getSettings } from "./settings";
+
 export type Coordinates = { latitude: number; longitude: number };
 
 /** Whether the browser already has an answer, so we don't ask twice. */
@@ -13,6 +15,11 @@ export async function locationPermission(): Promise<PermissionState | "unknown">
 
 export function requestLocation(): Promise<Coordinates> {
   return new Promise((resolve, reject) => {
+    // Switched off in Profile: the phone's position is never read.
+    if (!getSettings().location) {
+      reject(new Error("off"));
+      return;
+    }
     if (!("geolocation" in navigator)) {
       reject(new Error("unsupported"));
       return;

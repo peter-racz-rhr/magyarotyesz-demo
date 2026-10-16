@@ -8,6 +8,7 @@ import { FORWARD, PageTransition } from "@/components/page-transition";
 import { Wordmark } from "@/components/wordmark";
 import { useT } from "@/lib/i18n";
 import { requestLocation } from "@/lib/location";
+import { updateSettings } from "@/lib/settings";
 import { markOnboarded } from "@/lib/onboarding";
 import { cn } from "@/lib/utils";
 
@@ -147,6 +148,8 @@ export default function WelcomePage() {
   const enter = async (askLocation: boolean) => {
     if (askLocation) {
       setLocating(true);
+      // Asking for the nearest toilet is asking for location: switch it on.
+      updateSettings({ location: true });
       try {
         await requestLocation();
       } catch {

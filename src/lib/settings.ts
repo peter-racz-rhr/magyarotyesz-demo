@@ -10,6 +10,10 @@ export type Settings = {
   nearbyCheck: boolean;
   /** Show alerts as phone notifications too. */
   notify: boolean;
+  /** Let the app read this phone's position (your dot, nearest toilets, adding and checking codes). */
+  location: boolean;
+  /** Draw the buildings on the map as 3D blocks and tilt the map. */
+  buildings3d: boolean;
 };
 
 
@@ -17,6 +21,8 @@ const store = createLocalStore<Settings>("magyarotyesz:settings", {
   lang: "en",
   nearbyCheck: true,
   notify: false,
+  location: true,
+  buildings3d: true,
 });
 
 export const useSettings = store.useValue;

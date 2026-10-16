@@ -37,6 +37,7 @@ const en = {
     locate: "Show where I am",
     nearest: "Nearest",
     nearestNone: "No open toilet that usually works nearby yet.",
+    locationOff: "Location is off. Turn it on in Profile.",
     noMatch: "No toilets match these filters.",
     filters: { open: "Open now", free: "Free", works: "Usually works" },
   },
@@ -80,6 +81,7 @@ const en = {
     location: "Turn on location: codes can only be added or checked on the spot.",
     vague: (m: number) => `Your location is too vague right now (about ${m} m). Step outside or wait a moment, then try again.`,
     checking: "Checking you're there…",
+    off: "Location is off. Turn it on in Profile: codes can only be added or checked on the spot.",
   },
 
   sync: {
@@ -212,6 +214,11 @@ const en = {
     notify: "Phone notifications",
     notifySub: "When someone reports one of your codes or suggests a new one.",
     notifyBlocked: "Notifications are blocked in your phone's settings.",
+    location: "Use my location",
+    locationSub: "Shows where you are and the toilets nearest you. Needed to add codes and say if they work.",
+    locationBlocked: "Location is blocked in your browser or phone settings. Allow it there, then switch this on.",
+    buildings3d: "3D buildings",
+    buildings3dSub: "Tilts the map and raises the buildings. Turn off if the map feels slow.",
     intro: "Show the intro again",
     introSub: "Your codes stay.",
     demoOthers: "Add codes from other people",
@@ -259,6 +266,7 @@ const hu: Dict = {
     locate: "Mutasd, hol vagyok",
     nearest: "Legközelebbi",
     nearestNone: "A közelben még nincs nyitva lévő, megbízható WC.",
+    locationOff: "A helymeghatározás ki van kapcsolva. Kapcsold be a Profilban.",
     noMatch: "Egy WC sem felel meg a szűrőknek.",
     filters: { open: "Most nyitva", free: "Ingyenes", works: "Megbízható" },
   },
@@ -302,6 +310,7 @@ const hu: Dict = {
     vague: (m: number) => `A helyzeted most túl pontatlan (kb. ${m} m). Menj ki, vagy várj egy kicsit, aztán próbáld újra.`,
     location: "Kapcsold be a helymeghatározást: kódot csak a helyszínen lehet hozzáadni vagy ellenőrizni.",
     checking: "Ellenőrizzük, hogy ott vagy…",
+    off: "A helymeghatározás ki van kapcsolva. Kapcsold be a Profilban: kódot csak a helyszínen lehet hozzáadni vagy ellenőrizni.",
   },
 
   sync: {
@@ -432,6 +441,11 @@ const hu: Dict = {
     notify: "Értesítések a telefonon",
     notifySub: "Ha valaki jelzi, hogy egy kódod nem működik, vagy újat javasol.",
     notifyBlocked: "Az értesítések le vannak tiltva a telefon beállításaiban.",
+    location: "Helyem használata",
+    locationSub: "Megmutatja, hol vagy, és a legközelebbi mosdókat. Kell hozzá, hogy kódot add hozzá vagy ellenőrizz.",
+    locationBlocked: "A helymeghatározás le van tiltva a böngésző vagy a telefon beállításaiban. Engedélyezd ott, aztán kapcsold be ezt.",
+    buildings3d: "3D épületek",
+    buildings3dSub: "Megdönti a térképet és felhúzza az épületeket. Kapcsold ki, ha lassúnak érzed a térképet.",
     intro: "Bemutató újra",
     introSub: "A kódjaid megmaradnak.",
     demoOthers: "Mások kódjainak hozzáadása",
@@ -450,6 +464,7 @@ const hu: Dict = {
 export function spotMessage(t: Dict, spot: SpotCheck & { ok: false }) {
   if (spot.reason === "far") return t.spot.far(spot.metres);
   if (spot.reason === "vague") return t.spot.vague(spot.metres);
+  if (spot.reason === "off") return t.spot.off;
   return t.spot.location;
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, ChevronRight, FileText, Globe, Landmark, MapPinCheck, RotateCcw, ShieldCheck, Sparkles, Trash2, Users } from "lucide-react";
+import { Bell, Box, ChevronRight, FileText, Globe, Landmark, LocateFixed, MapPinCheck, RotateCcw, ShieldCheck, Sparkles, Trash2, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
@@ -10,6 +10,7 @@ import { btn } from "@/components/ui/buttons";
 import { REMOTE } from "@/lib/api";
 import { LEGAL } from "@/lib/legal-text";
 import { useT } from "@/lib/i18n";
+import { requestLocation } from "@/lib/location";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
 import { updateSettings, useSettings, type Lang } from "@/lib/settings";
@@ -122,6 +123,7 @@ export default function ProfilePage() {
   const sync = useSyncStatus();
   const [confirmClear, setConfirmClear] = useState(false);
   const [notifyBlocked, setNotifyBlocked] = useState(false);
+  const [locationBlocked, setLocationBlocked] = useState(false);
   const mine = toilets.filter((x) => x.mine);
   // People who got in with the codes you shared. The server keeps a running total (a new code resets the
   // votes, not this); without a server it is every "yes" on your codes except your own.
@@ -147,6 +149,19 @@ export default function ProfilePage() {
     const allowed = await askForNotifications();
     updateSettings({ notify: allowed });
     setNotifyBlocked(!allowed);
+  };
+
+  const toggleLocation = async (on: boolean) => {
+    setLocationBlocked(false);
+    if (!on) return updateSettings({ location: false });
+    // Switching on is what makes the browser ask, so a refusal shows right here.
+    updateSettings({ location: true });
+    try {
+      await requestLocation();
+    } catch {
+      updateSettings({ location: false });
+      setLocationBlocked(true);
+    }
   };
 
   const simulate = () => {
@@ -328,6 +343,24 @@ export default function ProfilePage() {
                   </button>
                 ))}
               </div>
+            </li>
+            <li>
+              <SwitchRow
+                icon={<LocateFixed className="size-5" />}
+                title={t.profile.location}
+                sub={locationBlocked ? t.profile.locationBlocked : t.profile.locationSub}
+                on={settings.location}
+                onChange={toggleLocation}
+              />
+            </li>
+            <li>
+              <SwitchRow
+                icon={<Box className="size-5" />}
+                title={t.profile.buildings3d}
+                sub={t.profile.buildings3dSub}
+                on={settings.buildings3d}
+                onChange={(on) => updateSettings({ buildings3d: on })}
+              />
             </li>
             {!REMOTE && (
               <li>

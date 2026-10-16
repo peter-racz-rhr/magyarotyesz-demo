@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { locationPermission, requestLocation, type Coordinates } from "./location";
+import { getSettings, useSettings } from "./settings";
 
-type Status = "checking" | "prompt" | "locating" | "ready" | "denied";
+type Status = "checking" | "prompt" | "locating" | "ready" | "denied" | "off";
 
 /**
  * Where the viewer is. Reads the location silently when permission was
@@ -12,23 +13,36 @@ type Status = "checking" | "prompt" | "locating" | "ready" | "denied";
 export function useHere() {
   const [coords, setCoords] = useState<Coordinates | null>(null);
   const [status, setStatus] = useState<Status>("checking");
+  const { location: allowed } = useSettings();
 
   const request = useCallback(async () => {
     setStatus("locating");
     try {
-      setCoords(await requestLocation());
+      const here = await requestLocation();
+      // Switched off while we waited: forget the answer.
+      if (!getSettings().location) return;
+      setCoords(here);
       setStatus("ready");
     } catch {
-      setStatus("denied");
+      if (getSettings().location) setStatus("denied");
     }
   }, []);
 
   useEffect(() => {
+    // Off in Profile: forget the position and don't even ask the browser.
+    if (!allowed) {
+      queueMicrotask(() => {
+        setCoords(null);
+        setStatus("off");
+      });
+      return;
+    }
     void locationPermission().then((state) => {
+      if (!getSettings().location) return;
       if (state === "granted") void request();
       else setStatus(state === "denied" ? "denied" : "prompt");
     });
-  }, [request]);
+  }, [request, allowed]);
 
   return { coords, status, request };
 }

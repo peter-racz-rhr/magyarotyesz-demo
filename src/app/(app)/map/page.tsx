@@ -15,7 +15,9 @@ import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { Map, MapMarker, MapPopup, MarkerContent, useMap, type MapRef } from "@/components/ui/map";
 import { spotMessage, useT } from "@/lib/i18n";
 import { requestLocation } from "@/lib/location";
+import { Buildings3D } from "@/components/buildings-3d";
 import { checkFields } from "@/lib/moderation";
+import { useSettings } from "@/lib/settings";
 import { LIMITS, cleanCode, cleanText, tidy, validCode, validName } from "@/lib/limits";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
 import {
@@ -225,6 +227,7 @@ export default function MapPage() {
   const { t } = useT();
   const mapRef = useRef<MapRef>(null);
   const here = useHere();
+  const { buildings3d } = useSettings();
   const toilets = useToilets();
 
   const dockSlot = useSyncExternalStore(
@@ -324,6 +327,7 @@ export default function MapPage() {
   const { box: detailsBox, inner: detailsInner, grip } = useSheetPull({ onOpenChange: setDetails, onClose: closeSheet });
 
   const locate = async () => {
+    if (here.status === "off") return flash(t.map.locationOff);
     if (here.coords) {
       mapRef.current?.flyTo({ center: [here.coords.longitude, here.coords.latitude], zoom: 16, duration: 1200 });
     } else {
@@ -429,6 +433,7 @@ export default function MapPage() {
           className="h-full w-full"
         >
           <TapToAdd onTap={startDraft} onDismiss={() => setFocus(null)} />
+          <Buildings3D enabled={buildings3d} />
 
           {visible.map((toilet) => (
             <MapMarker key={toilet.id} latitude={toilet.latitude} longitude={toilet.longitude}>
