@@ -125,7 +125,7 @@ const satellite = {
   sources: {
     imagery: {
       type: "raster",
-      tiles: [process.env.SATELLITE_TILES ?? "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2016_3857/default/g/{z}/{y}/{x}.jpg"],
+      tiles: [process.env.SATELLITE_TILES ?? "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/GoogleMapsCompatible/{z}/{y}/{x}.jpg"],
       tileSize: 256,
       // Sharper than this does not exist in the data; the map stretches the last level.
       maxzoom: Number(process.env.SATELLITE_MAXZOOM ?? 13),
