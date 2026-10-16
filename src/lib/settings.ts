@@ -24,6 +24,8 @@ export type Settings = {
   name: string;
   /** Which colour your profile circle has (0-7). */
   avatar: number;
+  /** Your profile photo as a small picture (a data address); stays on this phone. Empty: none. */
+  photo: string;
 };
 
 
@@ -38,6 +40,7 @@ const store = createLocalStore<Settings>("magyarotyesz:settings", {
   animations: true,
   name: "",
   avatar: 0,
+  photo: "",
 });
 
 export const useSettings = store.useValue;

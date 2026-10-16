@@ -6,108 +6,167 @@ import type { ReactNode } from "react";
 import { AVATAR_HUES } from "@/lib/profile";
 import { cn } from "@/lib/utils";
 
-/* The pieces Profile and Settings share: a card, a heading above it, and rows with a tinted icon. */
+/*
+  Grouped lists in the style of the phone's own Settings: one rounded block
+  per group, one-line rows of a fixed height, a small coloured icon at the
+  start, dividers that begin after the icon, and any explanation kept in a
+  quiet footnote under the group instead of inside the rows.
+*/
 
-export const CARD = "overflow-hidden rounded-2xl border border-dusk-edge bg-white/[0.035]";
-export const ROW = "flex w-full items-center gap-3.5 px-4 py-3 text-left";
+export const CARD = "overflow-hidden rounded-[14px] bg-white/[0.05]";
+/** Every row is the same height, so a list reads as a list. */
+export const ROW = "flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left text-[0.9375rem] transition-colors active:bg-white/[0.06]";
+/** The divider starts under the text, not under the icon. */
+const DIVIDE = "[&>li+li]:relative [&>li+li]:before:absolute [&>li+li]:before:top-0 [&>li+li]:before:right-0 [&>li+li]:before:left-[3.75rem] [&>li+li]:before:h-px [&>li+li]:before:bg-white/[0.07]";
 
-/** A heading above a card; the optional count is for things that need attention. */
+/** A group: a small heading, the block of rows, and an optional footnote. */
+export function Group({
+  id,
+  title,
+  footer,
+  tone,
+  action,
+  badge,
+  children,
+  plain = false,
+}: {
+  id: string;
+  title?: string;
+  footer?: ReactNode;
+  tone?: "warn";
+  action?: ReactNode;
+  badge?: number;
+  children: ReactNode;
+  /** For lists whose rows have no leading icon: the divider starts at the edge. */
+  plain?: boolean;
+}) {
+  return (
+    <section aria-labelledby={title ? id : undefined} className="mt-7">
+      {title && (
+        <div className="mb-1.5 flex items-center gap-2 px-4">
+          <h2 id={id} className="text-[0.75rem] font-semibold tracking-[0.06em] text-haze uppercase">
+            {title}
+          </h2>
+          {badge ? <span className="grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full bg-good px-1 text-[0.6875rem] font-bold text-night">{badge}</span> : null}
+          <span className="flex-1" />
+          {action}
+        </div>
+      )}
+      <ul className={cn(CARD, plain ? "[&>li+li]:border-t [&>li+li]:border-white/[0.07]" : DIVIDE)}>{children}</ul>
+      {footer && <p className={cn("mt-1.5 px-4 text-[0.75rem] leading-relaxed", tone === "warn" ? "text-stale" : "text-haze")}>{footer}</p>}
+    </section>
+  );
+}
+
+/** Kept for the Profile page's own headings. */
 export function Heading({ id, children, badge, action }: { id: string; children: ReactNode; badge?: number; action?: ReactNode }) {
   return (
-    <div className="mb-2 flex items-center gap-2 px-1">
-      <h2 id={id} className="t-section">
+    <div className="mb-1.5 flex items-center gap-2 px-4">
+      <h2 id={id} className="text-[0.75rem] font-semibold tracking-[0.06em] text-haze uppercase">
         {children}
       </h2>
-      {badge ? <span className="grid h-5 min-w-5 place-items-center rounded-full bg-good px-1.5 text-xs font-bold text-night">{badge}</span> : null}
+      {badge ? <span className="grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full bg-good px-1 text-[0.6875rem] font-bold text-night">{badge}</span> : null}
       <span className="flex-1" />
       {action}
     </div>
   );
 }
 
-/** The icon sits in a small tinted square, so a list of settings can be scanned by shape. */
-export function Tile({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "good" | "bad" }) {
+/** The small coloured square with a white glyph that starts a row. */
+export function Tile({ children, hue = 220, tone }: { children: ReactNode; hue?: number; tone?: "bad" | "grey" }) {
+  const bg = tone === "bad" ? "hsl(2 66% 50%)" : tone === "grey" ? "hsl(220 8% 38%)" : `hsl(${hue} 58% 46%)`;
   return (
-    <span
-      aria-hidden
-      className={cn(
-        "grid size-9 shrink-0 place-items-center rounded-[0.625rem]",
-        tone === "good" ? "bg-good/15 text-good" : tone === "bad" ? "bg-bad/15 text-bad" : "bg-white/[0.07] text-ink/80",
-      )}
-    >
+    <span aria-hidden className="grid size-7 shrink-0 place-items-center rounded-[7px] text-white [&>svg]:size-[1.0625rem] [&>svg]:stroke-[1.9]" style={{ background: bg }}>
       {children}
     </span>
   );
 }
 
-/** A settings row with an on/off switch. */
-export function SwitchRow({
+/** A row with an on/off switch. */
+export function SwitchRow({ icon, hue, title, on, onChange }: { icon: ReactNode; hue?: number; title: string; on: boolean; onChange: (on: boolean) => void }) {
+  return (
+    <li>
+      <button type="button" role="switch" aria-checked={on} onClick={() => onChange(!on)} className={ROW}>
+        <Tile hue={hue}>{icon}</Tile>
+        <span className="min-w-0 flex-1 truncate">{title}</span>
+        <span className={cn("relative h-[1.625rem] w-[2.75rem] shrink-0 rounded-full transition-colors duration-200", on ? "bg-good" : "bg-white/[0.16]")}>
+          <span className={cn("absolute top-[0.1875rem] left-[0.1875rem] size-[1.25rem] rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.4)] transition-transform duration-200", on && "translate-x-[1.125rem]")} />
+        </span>
+      </button>
+    </li>
+  );
+}
+
+/** A row that goes somewhere (or does something); `value` is a short answer on the right. */
+export function LinkRow({
   icon,
+  hue,
+  tone,
   title,
-  sub,
-  on,
-  onChange,
+  value,
+  onClick,
+  href,
+  chevron = true,
+  danger = false,
 }: {
   icon: ReactNode;
+  hue?: number;
+  tone?: "bad" | "grey";
   title: string;
-  sub: string;
-  on: boolean;
-  onChange: (on: boolean) => void;
+  value?: string;
+  onClick?: () => void;
+  href?: string;
+  chevron?: boolean;
+  danger?: boolean;
 }) {
-  return (
-    <button type="button" role="switch" aria-checked={on} onClick={() => onChange(!on)} className={ROW}>
-      <Tile>{icon}</Tile>
-      <span className="min-w-0 flex-1">
-        <span className="block leading-snug">{title}</span>
-        <span className="block text-[0.8125rem] leading-snug text-haze">{sub}</span>
-      </span>
-      <span className={cn("relative h-7 w-12 shrink-0 rounded-full transition-colors", on ? "bg-good" : "bg-dusk-edge")}>
-        <span className={cn("absolute top-1 left-1 size-5 rounded-full bg-ink shadow transition-transform duration-200", on && "translate-x-5")} />
-      </span>
-    </button>
-  );
-}
-
-/** A tappable row that goes somewhere (or does something). */
-export function LinkRow({ icon, title, sub, onClick, href, chevron = true }: { icon: ReactNode; title: string; sub?: string; onClick?: () => void; href?: string; chevron?: boolean }) {
   const inner = (
     <>
-      <Tile>{icon}</Tile>
-      <span className="min-w-0 flex-1">
-        <span className="block leading-snug">{title}</span>
-        {sub && <span className="block text-[0.8125rem] leading-snug text-haze">{sub}</span>}
-      </span>
-      {chevron && <ChevronRight className="size-5 shrink-0 text-haze" aria-hidden />}
+      <Tile hue={hue} tone={tone}>
+        {icon}
+      </Tile>
+      <span className={cn("min-w-0 flex-1 truncate", danger && "text-bad")}>{title}</span>
+      {value && <span className="max-w-[40%] truncate text-[0.875rem] text-haze">{value}</span>}
+      {chevron && <ChevronRight className="-mr-1 size-[1.125rem] shrink-0 text-white/30" aria-hidden />}
     </>
   );
-  return href ? (
-    <Link href={href} className={ROW}>
-      {inner}
-    </Link>
-  ) : (
-    <button type="button" onClick={onClick} className={ROW}>
-      {inner}
-    </button>
+  return (
+    <li>
+      {href ? (
+        <Link href={href} className={ROW}>
+          {inner}
+        </Link>
+      ) : (
+        <button type="button" onClick={onClick} className={ROW}>
+          {inner}
+        </button>
+      )}
+    </li>
   );
 }
 
-/** Your circle: the first letter of your name on your colour, or a person if you haven't picked a name. */
-export function Avatar({ name, hue = 0, size = 64 }: { name: string; hue?: number; size?: number }) {
+/** Your circle: your photo, or the first letter of your name on your colour, or a person. */
+export function Avatar({ name, hue = 0, size = 64, photo }: { name: string; hue?: number; size?: number; photo?: string }) {
   const h = AVATAR_HUES[((hue % AVATAR_HUES.length) + AVATAR_HUES.length) % AVATAR_HUES.length]!;
   const letter = name.trim().slice(0, 1).toUpperCase();
+  if (photo) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- a small picture kept on this phone as a data address
+      <img src={photo} alt="" width={size} height={size} className="shrink-0 rounded-full object-cover select-none" style={{ width: size, height: size, boxShadow: "0 0 0 1px rgb(255 255 255 / 0.1)" }} draggable={false} />
+    );
+  }
   return (
     <span
       aria-hidden
-      className="grid shrink-0 place-items-center rounded-full font-bold text-night select-none"
+      className="grid shrink-0 place-items-center rounded-full font-semibold text-night select-none"
       style={{
         width: size,
         height: size,
         fontSize: size * 0.42,
-        background: `linear-gradient(145deg, hsl(${h} 70% 68%), hsl(${h} 62% 48%))`,
-        boxShadow: `0 0 0 3px hsl(${h} 70% 60% / 0.18)`,
+        background: `linear-gradient(150deg, hsl(${h} 70% 70%), hsl(${h} 60% 46%))`,
+        boxShadow: "0 0 0 1px rgb(255 255 255 / 0.12)",
       }}
     >
-      {letter || <User style={{ width: size * 0.5, height: size * 0.5 }} />}
+      {letter || <User strokeWidth={1.75} style={{ width: size * 0.5, height: size * 0.5 }} />}
     </span>
   );
 }

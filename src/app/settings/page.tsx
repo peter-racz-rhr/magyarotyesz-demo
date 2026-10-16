@@ -1,11 +1,11 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, FileText, Globe, Landmark, LocateFixed, MapPinCheck, Download, Eye, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, Download, Eye, FileText, Globe, Landmark, LocateFixed, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BACK, PageTransition } from "@/components/page-transition";
-import { CARD, Heading, LinkRow, ROW, SwitchRow, Tile } from "@/components/settings-ui";
+import { Group, LinkRow, SwitchRow, Tile } from "@/components/settings-ui";
 import { btn } from "@/components/ui/buttons";
 import { REMOTE } from "@/lib/api";
 import { useT } from "@/lib/i18n";
@@ -69,10 +69,12 @@ export default function SettingsPage() {
 
   /** A file with what this phone holds about you, to keep (or to attach to a data request). */
   const exportData = () => {
+    const { photo: _photo, ...shared } = settings; // the photo is a big data address; leave it out
+    void _photo;
     const data = {
       exportedAt: new Date().toISOString(),
-      profile: { id: userId, name: settings.name },
-      settings,
+      profile: { id: userId, name: settings.name, hasPhoto: Boolean(settings.photo) },
+      settings: shared,
       placesYouShared: mine.map(({ id, name, code, kind, access, price, hours, note, latitude, longitude, addedAt, confirms, reports }) => ({
         id, name, code, kind, access, price, hours, note, latitude, longitude, addedAt, confirms, reports,
       })),
@@ -90,194 +92,92 @@ export default function SettingsPage() {
   return (
     <PageTransition>
       <main className="mx-auto w-full max-w-md px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-16">
-        <Link href="/profile" transitionTypes={BACK} className="-ml-2 mt-3 inline-flex h-10 items-center gap-1.5 rounded-full px-2 text-sm text-haze hover:text-ink">
-          <ArrowLeft className="size-4" aria-hidden /> {t.settings.back}
-        </Link>
-        <h1 className="t-display mt-2">{t.settings.title}</h1>
+        <div className="flex h-11 items-center">
+          <Link href="/profile" transitionTypes={BACK} className="-ml-2 inline-flex h-11 items-center gap-1 rounded-full pr-3 pl-1.5 text-[0.9375rem] text-good active:opacity-60">
+            <ArrowLeft className="size-[1.125rem]" strokeWidth={2} aria-hidden /> {t.settings.back}
+          </Link>
+        </div>
+        <h1 className="mt-1 px-1 text-[2rem] leading-tight font-bold tracking-tight">{t.settings.title}</h1>
 
-        <section className="mt-8" aria-labelledby="general-heading">
-          <Heading id="general-heading">{t.settings.general}</Heading>
-          <ul className={cn(CARD, "divide-y divide-dusk-edge")}>
-            <li className="flex items-center gap-3.5 px-4 py-2.5">
-              <Tile>
-                <Globe className="size-5" />
-              </Tile>
-              <span className="flex-1">{t.profile.language}</span>
-              <div role="radiogroup" aria-label={t.profile.language} className="flex rounded-full bg-night p-1">
-                {(["en", "hu"] as Lang[]).map((key) => (
-                  <button
-                    key={key}
-                    type="button"
-                    role="radio"
-                    aria-checked={settings.lang === key}
-                    onClick={() => updateSettings({ lang: key })}
-                    className={cn("h-8 rounded-full px-3.5 text-sm font-semibold transition-colors", settings.lang === key ? "bg-ink text-night" : "text-haze")}
-                  >
-                    {key === "en" ? "EN" : "HU"}
-                  </button>
-                ))}
-              </div>
-            </li>
-            <li>
-              <SwitchRow
-                icon={<Bell className="size-5" />}
-                title={t.profile.notify}
-                sub={notifyBlocked ? t.profile.notifyBlocked : t.profile.notifySub}
-                on={settings.notify}
-                onChange={toggleNotify}
-              />
-            </li>
-            <li>
-              <LinkRow icon={<RotateCcw className="size-5" />} title={t.profile.intro} sub={t.profile.introSub} onClick={showIntro} />
-            </li>
-          </ul>
-        </section>
+        <Group id="general-heading" title={t.settings.general}>
+          <li className="flex min-h-12 items-center gap-3 px-4 py-2 text-[0.9375rem]">
+            <Tile hue={212}>
+              <Globe />
+            </Tile>
+            <span className="flex-1">{t.profile.language}</span>
+            <div role="radiogroup" aria-label={t.profile.language} className="flex rounded-full bg-black/40 p-0.5">
+              {(["en", "hu"] as Lang[]).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  role="radio"
+                  aria-checked={settings.lang === key}
+                  onClick={() => updateSettings({ lang: key })}
+                  className={cn("h-7 min-w-11 rounded-full px-3 text-[0.8125rem] font-semibold transition-colors", settings.lang === key ? "bg-white/[0.92] text-night" : "text-haze")}
+                >
+                  {key === "en" ? "EN" : "HU"}
+                </button>
+              ))}
+            </div>
+          </li>
+          <SwitchRow icon={<Bell />} hue={6} title={t.profile.notify} on={settings.notify} onChange={toggleNotify} />
+          <LinkRow icon={<RotateCcw />} hue={268} title={t.profile.intro} onClick={showIntro} />
+        </Group>
+        {notifyBlocked && <p className="mt-1.5 px-4 text-[0.75rem] text-stale">{t.profile.notifyBlocked}</p>}
 
-        <section className="mt-8" aria-labelledby="map-heading">
-          <Heading id="map-heading">{t.settings.mapGroup}</Heading>
-          <ul className={cn(CARD, "divide-y divide-dusk-edge")}>
-            <li>
-              <SwitchRow
-                icon={<LocateFixed className="size-5" />}
-                title={t.profile.location}
-                sub={locationBlocked ? t.profile.locationBlocked : t.profile.locationSub}
-                on={settings.location}
-                onChange={toggleLocation}
-              />
-            </li>
-            <li>
-              <SwitchRow
-                icon={<Box className="size-5" />}
-                title={t.profile.buildings3d}
-                sub={t.profile.buildings3dSub}
-                on={settings.buildings3d}
-                onChange={(on) => updateSettings({ buildings3d: on })}
-              />
-            </li>
-            {!REMOTE && (
-              <li>
-                <SwitchRow
-                  icon={<MapPinCheck className="size-5" />}
-                  title={t.profile.onTheSpot}
-                  sub={t.profile.onTheSpotSub}
-                  on={settings.nearbyCheck}
-                  onChange={(on) => updateSettings({ nearbyCheck: on })}
-                />
-              </li>
-            )}
-          </ul>
-        </section>
+        <Group id="map-heading" title={t.settings.mapGroup} footer={locationBlocked ? t.profile.locationBlocked : t.settings.footerMap} tone={locationBlocked ? "warn" : undefined}>
+          <SwitchRow icon={<LocateFixed />} hue={212} title={t.profile.location} on={settings.location} onChange={toggleLocation} />
+          <SwitchRow icon={<Box />} hue={150} title={t.profile.buildings3d} on={settings.buildings3d} onChange={(on) => updateSettings({ buildings3d: on })} />
+          {!REMOTE && <SwitchRow icon={<MapPinCheck />} hue={32} title={t.profile.onTheSpot} on={settings.nearbyCheck} onChange={(on) => updateSettings({ nearbyCheck: on })} />}
+        </Group>
 
-        <section className="mt-8" aria-labelledby="codes-heading">
-          <Heading id="codes-heading">{t.settings.codesGroup}</Heading>
-          <ul className={cn(CARD, "divide-y divide-dusk-edge")}>
-            <li>
-              <SwitchRow
-                icon={<Eye className="size-5" />}
-                title={t.settings.showCodes}
-                sub={t.settings.showCodesSub}
-                on={settings.showCodes}
-                onChange={(on) => updateSettings({ showCodes: on })}
-              />
-            </li>
-            <li>
-              <SwitchRow
-                icon={<Sparkles className="size-5" />}
-                title={t.settings.animations}
-                sub={t.settings.animationsSub}
-                on={settings.animations}
-                onChange={(on) => updateSettings({ animations: on })}
-              />
-            </li>
-            <li>
-              <SwitchRow
-                icon={<Vibrate className="size-5" />}
-                title={t.settings.haptics}
-                sub={t.settings.hapticsSub}
-                on={settings.haptics}
-                onChange={(on) => updateSettings({ haptics: on })}
-              />
-            </li>
-          </ul>
-        </section>
+        <Group id="codes-heading" title={t.settings.codesGroup} footer={t.settings.footerCodes}>
+          <SwitchRow icon={<Eye />} hue={46} title={t.settings.showCodes} on={settings.showCodes} onChange={(on) => updateSettings({ showCodes: on })} />
+          <SwitchRow icon={<Sparkles />} hue={282} title={t.settings.animations} on={settings.animations} onChange={(on) => updateSettings({ animations: on })} />
+          <SwitchRow icon={<Vibrate />} hue={330} title={t.settings.haptics} on={settings.haptics} onChange={(on) => updateSettings({ haptics: on })} />
+        </Group>
 
-        <section className="mt-8" aria-labelledby="data-heading">
-          <Heading id="data-heading">{t.settings.dataGroup}</Heading>
-          <ul className={cn(CARD, "divide-y divide-dusk-edge")}>
-            <li>
-              <LinkRow
-                icon={<Download className="size-5" />}
-                title={t.settings.export}
-                sub={exported ? t.settings.exported : t.settings.exportSub}
-                onClick={exportData}
-                chevron={false}
-              />
-            </li>
-            <li>
-              <LinkRow icon={<FileText className="size-5" />} title={docs.terms.title} href="/terms" />
-            </li>
-            <li>
-              <LinkRow icon={<ShieldCheck className="size-5" />} title={docs.privacy.title} href="/privacy" />
-            </li>
-            <li>
-              <LinkRow icon={<Landmark className="size-5" />} title={docs.imprint.title} href="/imprint" />
-            </li>
-          </ul>
-        </section>
+        <Group id="data-heading" title={t.settings.dataGroup} footer={exported ? t.settings.exported : t.settings.footerData}>
+          <LinkRow icon={<Download />} hue={212} title={t.settings.export} onClick={exportData} chevron={false} />
+          <LinkRow icon={<FileText />} tone="grey" title={docs.terms.title} href="/terms" />
+          <LinkRow icon={<ShieldCheck />} tone="grey" title={docs.privacy.title} href="/privacy" />
+          <LinkRow icon={<Landmark />} tone="grey" title={docs.imprint.title} href="/imprint" />
+        </Group>
 
         {!REMOTE && (mine.length > 0 || !toilets.some((x) => !x.mine)) && (
-          <section className="mt-8" aria-labelledby="demo-heading">
-            <Heading id="demo-heading">{t.profile.demo}</Heading>
-            <ul className={cn(CARD, "divide-y divide-dusk-edge")}>
-              {!toilets.some((x) => !x.mine) && (
-                <li>
-                  <LinkRow icon={<Users className="size-5" />} title={t.profile.demoOthers} sub={t.profile.demoOthersSub} onClick={addDemoToilets} />
-                </li>
-              )}
-              {mine.length > 0 && (
-                <li>
-                  <LinkRow icon={<Smartphone className="size-5" />} title={t.profile.simulate} sub={t.profile.simulateSub} onClick={simulate} />
-                </li>
-              )}
-            </ul>
-            <p className="mt-2 px-1 text-[0.8125rem] text-haze">{t.profile.demoSub}</p>
-          </section>
+          <Group id="demo-heading" title={t.profile.demo} footer={t.profile.demoSub}>
+            {!toilets.some((x) => !x.mine) && <LinkRow icon={<Users />} hue={190} title={t.profile.demoOthers} onClick={addDemoToilets} />}
+            {mine.length > 0 && <LinkRow icon={<Smartphone />} hue={190} title={t.profile.simulate} onClick={simulate} />}
+          </Group>
         )}
 
         {!REMOTE && (
-          <section className="mt-8" aria-label={t.profile.deleteAll}>
-            <div className={CARD}>
-              {confirmClear ? (
-                <div className="flex items-center gap-3 px-4 py-3">
-                  <span className="flex-1 text-sm">{t.profile.deleteConfirm}</span>
-                  <button type="button" onClick={() => setConfirmClear(false)} className={cn(btn.quiet, btn.sm)}>
-                    {t.profile.keep}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      clearToilets();
-                      clearAlerts();
-                      setConfirmClear(false);
-                    }}
-                    className={cn(btn.sm, "inline-flex items-center rounded-full bg-bad font-semibold text-night active:scale-[0.97]")}
-                  >
-                    {t.profile.delete}
-                  </button>
-                </div>
-              ) : (
-                <button type="button" onClick={() => setConfirmClear(true)} className={cn(ROW, "text-bad")}>
-                  <Tile tone="bad">
-                    <Trash2 className="size-5" />
-                  </Tile>
-                  <span className="flex-1">{t.profile.deleteAll}</span>
+          <Group id="danger" plain>
+            {confirmClear ? (
+              <li className="flex min-h-12 items-center gap-3 px-4 py-2">
+                <span className="flex-1 text-sm">{t.profile.deleteConfirm}</span>
+                <button type="button" onClick={() => setConfirmClear(false)} className={cn(btn.quiet, btn.sm)}>
+                  {t.profile.keep}
                 </button>
-              )}
-            </div>
-          </section>
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearToilets();
+                    clearAlerts();
+                    setConfirmClear(false);
+                  }}
+                  className={cn(btn.sm, "inline-flex items-center rounded-full bg-bad font-semibold text-night active:scale-[0.97]")}
+                >
+                  {t.profile.delete}
+                </button>
+              </li>
+            ) : (
+              <LinkRow icon={<Trash2 />} tone="bad" danger title={t.profile.deleteAll} onClick={() => setConfirmClear(true)} chevron={false} />
+            )}
+          </Group>
         )}
 
-        <footer className="mt-8 text-[0.8125rem] leading-relaxed text-haze">{REMOTE ? t.sync.footer : t.profile.footer}</footer>
+        <footer className="mt-8 px-4 text-[0.75rem] leading-relaxed text-haze">{REMOTE ? t.sync.footer : t.profile.footer}</footer>
       </main>
     </PageTransition>
   );
