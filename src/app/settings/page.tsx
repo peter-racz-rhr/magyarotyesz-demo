@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, Download, Eye, FileText, Globe, Landmark, LocateFixed, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,13 +9,13 @@ import { MapStylePicker } from "@/components/map-style-picker";
 import { Group, LinkRow, SwitchRow, Tile } from "@/components/settings-ui";
 import { btn } from "@/components/ui/buttons";
 import { REMOTE } from "@/lib/api";
-import { useT } from "@/lib/i18n";
+import { alertLine, useT } from "@/lib/i18n";
 import { LEGAL } from "@/lib/legal-text";
 import { requestLocation } from "@/lib/location";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
 import { updateSettings, useSettings, type Lang } from "@/lib/settings";
-import { useUserId } from "@/lib/sync";
+import { fetchMyData, useUserId } from "@/lib/sync";
 import { addDemoToilets, clearAlerts, clearToilets, simulateActivity, useToilets } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
 
@@ -63,17 +63,20 @@ export default function SettingsPage() {
     for (const alert of simulateActivity()) {
       void notify(
         "magyarotyesz",
-        alert.kind === "report" ? t.profile.alertReport(alert.name) : t.profile.alertSuggestion(alert.name, alert.code ?? ""),
+        alertLine(t, alert),
       );
     }
   };
 
   /** A file with what this phone holds about you, to keep (or to attach to a data request). */
-  const exportData = () => {
+  const exportData = async () => {
     const { photo: _photo, ...shared } = settings; // the photo is a big data address; leave it out
     void _photo;
+    // The server's side of the story: votes, suggestions and reports are only there.
+    const server = REMOTE ? await fetchMyData() : null;
     const data = {
       exportedAt: new Date().toISOString(),
+      server,
       profile: { id: userId, name: settings.name, hasPhoto: Boolean(settings.photo) },
       settings: shared,
       placesYouShared: mine.map(({ id, name, code, kind, access, price, hours, note, latitude, longitude, addedAt, confirms, reports }) => ({
@@ -147,7 +150,8 @@ export default function SettingsPage() {
         </Group>
 
         <Group id="data-heading" title={t.settings.dataGroup} footer={exported ? t.settings.exported : t.settings.footerData}>
-          <LinkRow icon={<Download />} hue={212} title={t.settings.export} onClick={exportData} chevron={false} />
+          <LinkRow icon={<Download />} hue={212} title={t.settings.export} onClick={() => void exportData()} chevron={false} />
+          {REMOTE && <LinkRow icon={<KeyRound />} hue={268} title={t.settings.backup} href="/backup" />}
           <LinkRow icon={<FileText />} tone="grey" title={docs.terms.title} href="/terms" />
           <LinkRow icon={<ShieldCheck />} tone="grey" title={docs.privacy.title} href="/privacy" />
           <LinkRow icon={<Landmark />} tone="grey" title={docs.imprint.title} href="/imprint" />

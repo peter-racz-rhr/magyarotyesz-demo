@@ -21,8 +21,9 @@ import {
     queue of what it still has to send (see sync.ts)
 */
 
-export const KIND_KEYS = ["cafe", "restaurant", "bar", "mall", "station", "other"] as const;
-export type Kind = (typeof KIND_KEYS)[number];
+/** What you can pick for a new place; "other" is gone (a place has to say what it is) but older places may still carry it. */
+export const KIND_KEYS = ["cafe", "restaurant", "fastfood", "bar", "mall", "station", "public"] as const;
+export type Kind = (typeof KIND_KEYS)[number] | "other";
 
 export const ACCESS_KEYS = ["free", "customers", "paid"] as const;
 export type Access = (typeof ACCESS_KEYS)[number];
@@ -239,8 +240,10 @@ export type Alert = {
   id: string;
   toiletId: string;
   name: string;
-  kind: "report" | "suggestion";
+  kind: "report" | "suggestion" | "removed";
   code?: string;
+  /** For "removed": why (a code like "auto:reports", or the words of the person who checked). */
+  reason?: string;
   at: string;
   read: boolean;
 };
@@ -305,6 +308,20 @@ export function trust(t: Toilet) {
   const votes = t.confirms + t.reports;
   return votes === 0 ? 0.5 : t.confirms / votes;
 }
+
+/** Nobody but the person who shared it has said the code works. (Places with no code are not "unconfirmed".) */
+export const isUnconfirmed = (t: Toilet) => t.code !== "" && t.confirms <= 1 && t.reports === 0 && !t.mine;
+
+const STALE_DAYS = 30;
+/** A code nobody has confirmed for a month may have changed. */
+export function isStale(t: Toilet, now = Date.now()) {
+  if (t.code === "") return false;
+  const last = t.confirmedAt ? Date.parse(t.confirmedAt) : Number.NaN;
+  return Number.isNaN(last) ? false : now - last > STALE_DAYS * 86400000;
+}
+
+/** A link that opens the map on this place. */
+export const placeLink = (t: Toilet) => `${window.location.origin}/map?place=${t.id}`;
 
 /** Red (nobody gets in) through orange to green (everybody does). */
 export function trustColor(t: Toilet) {

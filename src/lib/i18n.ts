@@ -7,10 +7,33 @@ import { formatDistance, type Access, type Kind } from "./toilets";
 /* Every word on screen, in English and Hungarian. */
 
 const en = {
-  kinds: { cafe: "Café", restaurant: "Restaurant", bar: "Bar", mall: "Mall", station: "Station", other: "Other" } as Record<Kind, string>,
+  kinds: { cafe: "Café", restaurant: "Restaurant", fastfood: "Fast food", bar: "Bar", mall: "Mall", station: "Station", public: "Public toilet", other: "Other" } as Record<Kind, string>,
   access: { free: "Free to use", customers: "Customers only", paid: "Paid" } as Record<Access, string>,
   tabs: { map: "Map", nearby: "Nearby", profile: "Profile" },
   refresh: { refreshing: "Refreshing…" },
+  backup: {
+    title: "Back up my profile",
+    back: "Settings",
+    intro: "Your profile lives on this phone. If you lose the phone or clear its data, your places and your name are out of your hands. Keep the code below, or scan the QR code with your new phone, to get them back.",
+    show: "Show my backup code",
+    hide: "Hide it",
+    warning: "Anyone with this code can act as you. Keep it private, like a password.",
+    copy: "Copy code",
+    copied: "Copied",
+    qrNote: "Scan it with your other phone's camera to open this profile there.",
+    noProfile: "This phone has no profile yet. It gets one when you add or check your first place.",
+    restoreTitle: "Restore a profile",
+    restoreHint: "Paste a backup code or the link from the QR code. This phone becomes that profile, and anything not yet sent from this phone is dropped.",
+    restorePlaceholder: "Backup code or link",
+    restore: "Restore",
+    confirm: "Replace this phone's profile with that one?",
+    confirmYes: "Yes, replace it",
+    invalid: "That doesn't look like a backup code.",
+    unknown: "The server doesn't know that profile.",
+    offline: "No connection. Try again when you are online.",
+    done: "Done. This phone is now that profile.",
+    demo: "Backups need the shared server; this demo has none.",
+  },
   settings: {
     title: "Settings",
     back: "Profile",
@@ -33,6 +56,7 @@ const en = {
     export: "Download my data",
     exportSub: "A file with your name, settings and the places you shared.",
     exported: "Saved to your downloads.",
+    backup: "Back up or move my profile",
   },
   legal: {
     back: "Back",
@@ -92,6 +116,10 @@ const en = {
     errCity: "magyarotyesz only covers Budapest for now.",
     errCodeChars: "A code can use letters, numbers and # * + - . / only.",
     errBad: "Please keep names and notes friendly: that wording isn't allowed.",
+    errKind: "Pick what kind of place it is.",
+    errOnlyToilet: "Tick the box: only share codes that open a toilet.",
+    onlyToilet: "This code only opens a toilet, not a gate, an office or a private door.",
+    codeFree: "Code (leave empty if none is needed)",
     agree: "By adding a toilet you agree to the",
     errPriceMax: (n: number) => `Toilets here cost up to ${n} Ft. Check the price.`,
     priceMax: (n: number) => `Up to ${n} Ft`,
@@ -158,6 +186,11 @@ const en = {
     show: "Show the code",
     hide: "Hide the code",
     tapToShow: "Tap to show code",
+    noCode: "No code needed",
+    unconfirmed: "New: nobody else has confirmed this code yet",
+    stale: "Not confirmed for over a month. The code may be out of date.",
+    share: "Share",
+    linkCopied: "Link copied",
     copy: "Copy the code",
     votes: (yes: number, no: number) => `${yes} got in · ${no} didn't`,
     gotIn: (percent: number) => `${percent}% got in`,
@@ -189,7 +222,7 @@ const en = {
     baby: "Baby changing",
     report: "Report",
     reportTitle: "What's wrong with this place?",
-    reportReasons: { offensive: "Offensive or hateful", private: "Private, shouldn't be listed", wrong: "Wrong place or details", closed: "Closed or gone", other: "Something else" } as Record<string, string>,
+    reportReasons: { offensive: "Offensive or hateful", private: "Private, shouldn't be listed", nottoilet: "Not a toilet (a gate, an office…)", wrong: "Wrong place or details", closed: "Closed or gone", other: "Something else" } as Record<string, string>,
     reportSent: "Thanks, we'll look at it.",
     reportDemo: "Thanks. (In the demo nothing is sent.)",
   },
@@ -252,6 +285,11 @@ const en = {
     noAlerts: "Nothing yet. If someone says one of your codes stopped working, you'll see it here.",
     alertReport: (name: string) => `Someone said the code at ${name} doesn't work.`,
     alertSuggestion: (name: string, code: string) => `New code suggested for ${name}: ${code}`,
+    alertRemoved: (name: string, why: string) => `${name} was taken off the map. ${why}`,
+    removeReasons: {
+      "auto:reports": "Several people reported it, so it is hidden until it has been checked.",
+      "auto:nottoilet": "Someone reported that it is not a toilet, so it is hidden until it has been checked.",
+    } as Record<string, string>,
     clearAlerts: "Clear",
     mine: "Codes you shared",
     mineEmpty: "None yet. Next time you get in somewhere, tap the map and share the code.",
@@ -288,10 +326,33 @@ const en = {
 export type Dict = typeof en;
 
 const hu: Dict = {
-  kinds: { cafe: "Kávézó", restaurant: "Étterem", bar: "Bár", mall: "Bevásárlóközpont", station: "Állomás", other: "Egyéb" },
+  kinds: { cafe: "Kávézó", restaurant: "Étterem", fastfood: "Gyorsétterem", bar: "Bár", mall: "Bevásárlóközpont", station: "Állomás", public: "Nyilvános WC", other: "Egyéb" } as Record<Kind, string>,
   access: { free: "Ingyenes", customers: "Csak vendégeknek", paid: "Fizetős" },
   tabs: { map: "Térkép", nearby: "Közelben", profile: "Profil" },
   refresh: { refreshing: "Frissítés…" },
+  backup: {
+    title: "Profil mentése",
+    back: "Beállítások",
+    intro: "A profilod ezen a telefonon van. Ha elveszted a telefont vagy törlöd az adatait, a helyeid és a neved elvesznek. Őrizd meg az alábbi kódot, vagy olvasd be a QR-kódot az új telefonoddal, és visszakapod őket.",
+    show: "Mentőkód megmutatása",
+    hide: "Elrejtés",
+    warning: "Aki ismeri ezt a kódot, a nevedben tud eljárni. Tartsd titokban, mint egy jelszót.",
+    copy: "Kód másolása",
+    copied: "Kimásolva",
+    qrNote: "Olvasd be a másik telefon kamerájával, hogy ott is megnyíljon ez a profil.",
+    noProfile: "Ennek a telefonnak még nincs profilja. Akkor kap, amikor az első helyet hozzáadod vagy ellenőrzöd.",
+    restoreTitle: "Profil visszaállítása",
+    restoreHint: "Illessz be egy mentőkódot vagy a QR-kódból kapott linket. Ez a telefon az a profil lesz, és ami még nem ment el erről a telefonról, elvész.",
+    restorePlaceholder: "Mentőkód vagy link",
+    restore: "Visszaállítás",
+    confirm: "Lecseréled ennek a telefonnak a profilját arra?",
+    confirmYes: "Igen, cseréld le",
+    invalid: "Ez nem tűnik mentőkódnak.",
+    unknown: "A szerver nem ismeri ezt a profilt.",
+    offline: "Nincs kapcsolat. Próbáld újra, ha van net.",
+    done: "Kész. Ez a telefon mostantól az a profil.",
+    demo: "A mentéshez a közös szerver kell; ebben a demóban nincs.",
+  },
   settings: {
     title: "Beállítások",
     back: "Profil",
@@ -314,6 +375,7 @@ const hu: Dict = {
     export: "Adataim letöltése",
     exportSub: "Egy fájl a nevedről, a beállításaidról és a megosztott helyeidről.",
     exported: "Elmentve a letöltések közé.",
+    backup: "Profil mentése vagy átvitele",
   },
   legal: {
     back: "Vissza",
@@ -373,6 +435,10 @@ const hu: Dict = {
     errCity: "A magyarotyesz egyelőre csak Budapestet fedi le.",
     errCodeChars: "A kód csak betűt, számot és a # * + - . / jeleket tartalmazhat.",
     errBad: "Kérjük, maradjon kedves a név és a megjegyzés: ez a megfogalmazás nem engedélyezett.",
+    errKind: "Válaszd ki, milyen hely ez.",
+    errOnlyToilet: "Pipáld be: csak olyan kódot oszthatsz meg, ami mosdót nyit.",
+    onlyToilet: "Ez a kód csak egy mosdót nyit, nem kaput, irodát vagy magánajtót.",
+    codeFree: "Kód (hagyd üresen, ha nem kell)",
     agree: "Hozzáadással elfogadod a következőket:",
     errPriceMax: (n: number) => `Itt a mosdók ára legfeljebb ${n} Ft. Nézd át az árat.`,
     priceMax: (n: number) => `Legfeljebb ${n} Ft`,
@@ -438,6 +504,11 @@ const hu: Dict = {
     show: "Kód mutatása",
     hide: "Kód elrejtése",
     tapToShow: "Koppints a kódért",
+    noCode: "Nem kell kód",
+    unconfirmed: "Új: még senki más nem erősítette meg ezt a kódot",
+    stale: "Több mint egy hónapja nem erősítették meg. A kód lehet, hogy elavult.",
+    share: "Megosztás",
+    linkCopied: "Link kimásolva",
     copy: "Kód másolása",
     votes: (yes: number, no: number) => `${yes} bejutott · ${no} nem`,
     gotIn: (percent: number) => `${percent}% bejutott`,
@@ -469,7 +540,7 @@ const hu: Dict = {
     baby: "Pelenkázó",
     report: "Jelentés",
     reportTitle: "Mi a baj ezzel a hellyel?",
-    reportReasons: { offensive: "Sértő vagy gyűlöletkeltő", private: "Magán, nem kellene szerepelnie", wrong: "Rossz hely vagy adatok", closed: "Bezárt vagy megszűnt", other: "Valami más" } as Record<string, string>,
+    reportReasons: { offensive: "Sértő vagy gyűlöletkeltő", private: "Magán, nem kellene szerepelnie", nottoilet: "Nem mosdó (kapu, iroda…)", wrong: "Rossz hely vagy adatok", closed: "Bezárt vagy megszűnt", other: "Valami más" } as Record<string, string>,
     reportSent: "Köszönjük, megnézzük.",
     reportDemo: "Köszönjük. (A demóban nem megy el semmi.)",
   },
@@ -531,6 +602,11 @@ const hu: Dict = {
     noAlerts: "Még semmi. Ha valaki szerint az egyik kódod nem működik, itt látod.",
     alertReport: (name: string) => `Valaki szerint nem működik a kód itt: ${name}.`,
     alertSuggestion: (name: string, code: string) => `Új kódot javasoltak ide: ${name}: ${code}`,
+    alertRemoved: (name: string, why: string) => `${name} lekerült a térképről. ${why}`,
+    removeReasons: {
+      "auto:reports": "Többen jelentették, ezért rejtve van, amíg meg nem nézik.",
+      "auto:nottoilet": "Valaki jelentette, hogy nem mosdó, ezért rejtve van, amíg meg nem nézik.",
+    } as Record<string, string>,
     clearAlerts: "Törlés",
     mine: "Általad megosztott kódok",
     mineEmpty: "Még nincs. Ha legközelebb bejutsz valahova, koppints a térképre, és oszd meg a kódot.",
@@ -563,6 +639,13 @@ const hu: Dict = {
     footer: "Demó: a kódok ezen a telefonon vannak elmentve, és internet nélkül is elérhetők. Térkép © OpenFreeMap, © OpenMapTiles, adatok © OpenStreetMap közreműködők. Műholdkép: Sentinel-2 cloudless, EOX (Copernicus-adatok).",
   },
 };
+
+/** One line for an alert: a report, a suggestion, or a place taken off the map and why. */
+export function alertLine(t: Dict, alert: { kind: "report" | "suggestion" | "removed"; name: string; code?: string | null; reason?: string }) {
+  if (alert.kind === "report") return t.profile.alertReport(alert.name);
+  if (alert.kind === "removed") return t.profile.alertRemoved(alert.name, t.profile.removeReasons[alert.reason ?? ""] ?? alert.reason ?? "");
+  return t.profile.alertSuggestion(alert.name, alert.code ?? "");
+}
 
 /** The sentence for a failed on-the-spot check. */
 export function spotMessage(t: Dict, spot: SpotCheck & { ok: false }) {

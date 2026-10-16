@@ -9,7 +9,7 @@ import { Avatar, CARD, Group } from "@/components/settings-ui";
 import { HealthDot } from "@/components/toilet-card";
 import { btn } from "@/components/ui/buttons";
 import { REMOTE } from "@/lib/api";
-import { useT } from "@/lib/i18n";
+import { alertLine, useT } from "@/lib/i18n";
 import { useSettings } from "@/lib/settings";
 import { dismissNotice, syncNow, useGotInTotal, usePendingCount, useNotices, useSyncStatus, useUserId } from "@/lib/sync";
 import { ago, clearAlerts, markAlertsRead, removeToilet, useAlerts, useToilets } from "@/lib/toilets";
@@ -169,7 +169,7 @@ export default function ProfilePage() {
                 <span aria-hidden className={cn("mt-2 size-2 shrink-0 rounded-full", alert.read ? "bg-white/20" : "bg-good shadow-[0_0_8px_1px_var(--good)]")} />
                 <span className="min-w-0 flex-1">
                   <span className="block text-[0.9375rem] leading-snug">
-                    {alert.kind === "report" ? t.profile.alertReport(alert.name) : t.profile.alertSuggestion(alert.name, alert.code ?? "")}
+                    {alertLine(t, alert)}
                   </span>
                   <span className="block text-[0.8125rem] text-haze">{ago(alert.at, lang)}</span>
                 </span>

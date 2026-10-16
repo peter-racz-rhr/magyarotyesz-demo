@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { REMOTE } from "@/lib/api";
-import { useT } from "@/lib/i18n";
+import { alertLine, useT } from "@/lib/i18n";
 import { notify } from "@/lib/notify";
 import { onNewAlerts, syncNow } from "@/lib/sync";
 
@@ -20,7 +20,7 @@ export function SyncRunner() {
       for (const alert of fresh) {
         void notify(
           "magyarotyesz",
-          alert.kind === "report" ? t.profile.alertReport(alert.name) : t.profile.alertSuggestion(alert.name, alert.code ?? ""),
+          alertLine(t, alert),
         );
       }
     });

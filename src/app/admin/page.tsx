@@ -99,6 +99,8 @@ export default function AdminPage() {
   const [busy, setBusy] = useState(false);
   // The one destructive action waiting for a second tap.
   const [confirm, setConfirm] = useState<string | null>(null);
+  // Shown to the owner in their alerts when a place is hidden or deleted (the DSA wants a reason).
+  const [reason, setReason] = useState("");
 
   const signOut = useCallback((message = "") => {
     remember(null);
@@ -243,6 +245,24 @@ export default function AdminPage() {
         ))}
       </div>
 
+      <label className="mt-3 block text-sm text-haze">
+        Reason for hide / delete (the owner sees it)
+        <input
+          value={reason}
+          maxLength={200}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder="e.g. opens a building gate, not a toilet"
+          className="mt-1 h-10 w-full rounded-lg border border-dusk-edge bg-transparent px-3 text-ink"
+        />
+      </label>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {["Not a toilet", "Private or unsafe code", "Offensive content", "Venue asked for removal"].map((r) => (
+          <button key={r} type="button" onClick={() => setReason(r)} className="h-8 rounded-full border border-dusk-edge px-3 text-xs text-haze">
+            {r}
+          </button>
+        ))}
+      </div>
+
       {error && (
         <p role="alert" className="mt-3 text-sm text-stale">
           {error}
@@ -291,14 +311,14 @@ export default function AdminPage() {
                   <Eye className="size-4" aria-hidden /> Restore
                 </button>
               ) : (
-                <button type="button" disabled={busy} onClick={() => act("h" + t.id, `/v1/admin/toilets/${t.id}/hide`, "POST")} className={cn(btn.secondary, btn.sm, "px-3")}>
+                <button type="button" disabled={busy} onClick={() => act("h" + t.id, `/v1/admin/toilets/${t.id}/hide`, "POST", { reason: reason.trim() })} className={cn(btn.secondary, btn.sm, "px-3")}>
                   <EyeOff className="size-4" aria-hidden /> Hide
                 </button>
               )}
               <button
                 type="button"
                 disabled={busy}
-                onClick={() => act("del" + t.id, `/v1/admin/toilets/${t.id}`, "DELETE")}
+                onClick={() => act("del" + t.id, `/v1/admin/toilets/${t.id}${reason.trim() ? `?reason=${encodeURIComponent(reason.trim())}` : ""}`, "DELETE")}
                 className={cn(btn.secondary, btn.sm, "px-3 text-bad", confirm === "del" + t.id && "border-bad bg-bad/15")}
               >
                 <Trash2 className="size-4" aria-hidden /> {confirm === "del" + t.id ? "Tap to delete" : "Delete"}

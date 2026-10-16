@@ -41,7 +41,7 @@ type Me = {
   owns: string[];
   votes: Record<string, boolean>;
   suggestions: Record<string, { id: string; code: string; at: string }[]>;
-  alerts: { id: string; toiletId: string; name: string; kind: "report" | "suggestion"; code: string | null; at: string; read: boolean }[];
+  alerts: { id: string; toiletId: string; name: string; kind: "report" | "suggestion" | "removed"; code: string | null; at: string; read: boolean; reason?: string }[];
   addsLeftToday: number;
   /** Running total of people who got in with this phone's codes; kept by the server across code changes. */
   gotIn?: number;
@@ -228,7 +228,7 @@ const alertsView = (): Alert[] => {
   return meStore
     .get()
     .alerts.filter((a) => !cleared || a.at > cleared)
-    .map((a) => ({ id: a.id, toiletId: a.toiletId, name: a.name, kind: a.kind, code: a.code ?? undefined, at: a.at, read: a.read }));
+    .map((a) => ({ id: a.id, toiletId: a.toiletId, name: a.name, kind: a.kind, code: a.code ?? undefined, at: a.at, read: a.read, reason: a.reason }));
 };
 let lastAlerts: { m: Me; c: string; out: Alert[] } | null = null;
 function alerts() {
@@ -313,6 +313,57 @@ export function syncNow(): Promise<void> {
     }
   })();
   return running;
+}
+
+/* ------------------------- backup and export ------------------------- */
+
+/** Whether this phone has a profile on the server yet (it gets one with its first action). */
+export const hasIdentity = () => identity.get() !== null;
+
+/**
+ * The profile as one piece of text: id and secret token. Whoever holds it can act as this profile,
+ * so it is only shown when asked for.
+ */
+export const backupCode = () => {
+  const me = identity.get();
+  return me ? `mo1.${me.userId}.${me.token}` : null;
+};
+
+const CODE = /^mo1\.(u_[A-Za-z0-9_-]+)\.([A-Za-z0-9_-]{20,})$/;
+
+/** Takes a code (or a link that ends in one) and makes this phone that profile, if the server knows it. */
+export async function restoreBackup(text: string): Promise<"ok" | "invalid" | "unknown" | "offline"> {
+  const raw = decodeURIComponent(text.trim().split("restore=").pop() ?? "").trim();
+  const match = raw.match(CODE);
+  if (!match) return "invalid";
+  const [, userId, token] = match;
+  try {
+    await api<Me>("/v1/me", { token });
+  } catch (e) {
+    if (e instanceof ApiFailure && e.status === 401) return "unknown";
+    return "offline";
+  }
+  // Unsent changes belonged to the old profile and would be refused for the new one.
+  outbox.set([]);
+  noticeStore.set([]);
+  meStore.set({ owns: [], votes: {}, suggestions: {}, alerts: [], addsLeftToday: 10, gotIn: 0 });
+  identity.set({ userId: userId!, token: token! });
+  // The name and photo shown now are the old profile's: the server's name comes back with the next sync.
+  updateSettings({ name: "", photo: "" });
+  void syncNow();
+  return "ok";
+}
+
+/** Everything the server holds for this profile (for "Download my data"). Null when there is none yet or no answer. */
+export async function fetchMyData(): Promise<unknown | null> {
+  const me = identity.get();
+  if (!me) return null;
+  try {
+    const res = await api<unknown>("/v1/me/export", { token: me.token });
+    return res.notModified ? null : res.data;
+  } catch {
+    return null;
+  }
 }
 
 async function ensureIdentity() {

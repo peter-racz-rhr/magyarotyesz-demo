@@ -26,6 +26,7 @@ import {
   KIND_KEYS,
   addToilet,
   addedToday,
+  getToilets,
   inBudapest,
   distance,
   isOpen,
@@ -243,7 +244,8 @@ export default function MapPage() {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
-  const [kind, setKind] = useState<Kind>("other");
+  const [kind, setKind] = useState<Kind | null>(null);
+  const [onlyToilet, setOnlyToilet] = useState(false);
   const [access, setAccess] = useState<Access>("customers");
   const [price, setPrice] = useState("");
   const [hoursMode, setHoursMode] = useState<"unknown" | "always" | "set">("unknown");
@@ -312,6 +314,27 @@ export default function MapPage() {
     });
   };
 
+  // A shared link (/map?place=...) opens that place as soon as it is known and the map is ready.
+  const wanted = useRef<string | null>(null);
+  useEffect(() => {
+    wanted.current = new URLSearchParams(window.location.search).get("place");
+    if (!wanted.current) return;
+    let tries = 0;
+    const timer = window.setInterval(() => {
+      const found = getToilets().find((x) => x.id === wanted.current);
+      if (found && mapRef.current) {
+        window.clearInterval(timer);
+        wanted.current = null;
+        window.history.replaceState(null, "", "/map");
+        openCard(found, 17);
+      } else if (++tries > 40) {
+        window.clearInterval(timer);
+      }
+    }, 400);
+    return () => window.clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const flash = (text: string) => {
     setNotice(text);
     window.setTimeout(() => setNotice(null), 3200);
@@ -361,7 +384,8 @@ export default function MapPage() {
       setName("");
       setCode("");
       setNote("");
-      setKind("other");
+      setKind(null);
+      setOnlyToilet(false);
       setAccess("customers");
       setPrice("");
       setHoursMode("unknown");
@@ -384,8 +408,12 @@ export default function MapPage() {
     const cleanName = tidy(name, LIMITS.name);
     const cleanedCode = cleanCode(code);
     if (!cleanName || !validName(cleanName)) return setError(t.add.errName);
-    if (!code.trim()) return setError(t.add.errCode);
-    if (!validCode(cleanedCode)) return setError(t.add.errCodeChars);
+    // A free toilet may have no code at all ("no code needed"); anything else needs one.
+    const finalAccess = paidFor ? "paid" : access === "paid" ? "free" : access;
+    if (!code.trim() && finalAccess !== "free") return setError(t.add.errCode);
+    if (code.trim() && !validCode(cleanedCode)) return setError(t.add.errCodeChars);
+    if (!kind) return setError(t.add.errKind);
+    if (!onlyToilet) return setError(t.add.errOnlyToilet);
     if (!checkFields({ name: cleanName, note: tidy(note, LIMITS.note) }).ok) return setError(t.add.errBad);
     if (access === "paid" && Number(price) > LIMITS.price) return setError(t.add.errPriceMax(LIMITS.price));
     if (!inBudapest(draft)) return setError(t.add.errCity);
@@ -402,7 +430,7 @@ export default function MapPage() {
       name: cleanName,
       code: cleanedCode,
       kind,
-      access: paidFor ? "paid" : access === "paid" ? "free" : access,
+      access: finalAccess,
       price: paidFor ? Number(price) : undefined,
       hours,
       wheelchair: wheelchair || undefined,
@@ -624,7 +652,7 @@ export default function MapPage() {
               />
               <LimitedInput
                 aria-label={t.add.code}
-                placeholder={t.add.code}
+                placeholder={access === "free" ? t.add.codeFree : t.add.code}
                 value={code}
                 onValueChange={(v) => {
                   setCode(v);
@@ -637,6 +665,16 @@ export default function MapPage() {
                 autoCapitalize="characters"
                 className={cn(field, "h-14 w-full font-mono text-[1.375rem] tracking-[0.16em] placeholder:font-sans placeholder:text-base placeholder:tracking-normal")}
               />
+              <div className="flex flex-col gap-2 pt-1">
+                <p className="px-1 text-xs text-haze">{t.add.kind}</p>
+                <Choice label={t.add.kind} keys={KIND_KEYS} labels={t.kinds} value={kind as Kind} onChange={(v) => { setKind(v); setError(null); }} />
+                <p className="px-1 pt-1 text-xs text-haze">{t.add.who}</p>
+                <Choice label={t.add.who} keys={ACCESS_KEYS} labels={t.access} value={access} onChange={setAccess} />
+              </div>
+              <label className="flex items-start gap-3 px-1 py-1 text-[0.8125rem] leading-snug">
+                <input type="checkbox" checked={onlyToilet} onChange={(e) => { setOnlyToilet(e.target.checked); setError(null); }} className="mt-0.5 size-5 shrink-0 accent-[var(--good)]" />
+                <span>{t.add.onlyToilet}</span>
+              </label>
               <p className="px-1 text-xs leading-relaxed text-haze">
                 {t.add.agree} <LegalLinks />
               </p>
@@ -647,8 +685,6 @@ export default function MapPage() {
               </div>
               <div ref={detailsBox} inert={!details} style={{ height: 0 }} className="-mx-1 overflow-hidden px-1">
               <div ref={detailsInner} className="flex flex-col gap-3 pb-1">
-              <Choice label={t.add.kind} keys={KIND_KEYS} labels={t.kinds} value={kind} onChange={setKind} />
-              <Choice label={t.add.who} keys={ACCESS_KEYS} labels={t.access} value={access} onChange={setAccess} />
               {access === "paid" && (
                 <label className="flex items-center gap-3">
                   <span className="text-sm text-haze">{t.add.price}</span>

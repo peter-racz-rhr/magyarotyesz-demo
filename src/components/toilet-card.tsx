@@ -1,6 +1,6 @@
 "use client";
 
-import { Accessibility, Baby, Check, Copy, Eye, Flag, Navigation, Pencil, ThumbsDown, ThumbsUp } from "lucide-react";
+import { Accessibility, Baby, Check, Copy, Eye, Flag, Navigation, Pencil, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { LimitedInput } from "@/components/limited-input";
@@ -19,6 +19,9 @@ import {
   dismissSuggestion,
   editToilet,
   isOpen,
+  isStale,
+  isUnconfirmed,
+  placeLink,
   reportCode,
   reportToilet,
   suggestCode,
@@ -36,10 +39,11 @@ import { cn } from "@/lib/utils";
 export function HealthDot({ toilet, className }: { toilet: Toilet; className?: string }) {
   const color = trustColor(toilet);
   const doubtful = trust(toilet) < 0.5;
+  const stale = isStale(toilet);
   return (
     <span
       aria-hidden
-      className={cn("block size-2.5 shrink-0 rounded-full", className)}
+      className={cn("block size-2.5 shrink-0 rounded-full", stale && "opacity-45", className)}
       style={
         doubtful
           ? { background: "var(--night)", boxShadow: `inset 0 0 0 2.5px ${color}, 0 0 0 1.5px var(--night), 0 0 8px 1px color-mix(in srgb, ${color} 45%, transparent)` }
@@ -83,7 +87,9 @@ function EditForm({ toilet, onDone }: { toilet: Toilet; onDone: () => void }) {
     event.preventDefault();
     const cleanName = tidy(name, LIMITS.name);
     const cleanedCode = cleanCode(code);
-    if (!validName(cleanName) || !validCode(cleanedCode)) return;
+    // A free toilet may have no code at all.
+    const codeOk = cleanedCode === "" ? toilet.access === "free" : validCode(cleanedCode);
+    if (!validName(cleanName) || !codeOk) return;
     const cleanNote = tidy(note, LIMITS.note);
     if (!checkFields({ name: cleanName, note: cleanNote }).ok) return setError(t.add.errBad);
     editToilet(toilet.id, { name: cleanName, code: cleanedCode, note: cleanNote });
@@ -129,7 +135,7 @@ function EditForm({ toilet, onDone }: { toilet: Toilet; onDone: () => void }) {
         <button type="button" onClick={onDone} className={cn(btn.quiet, btn.md)}>
           {t.card.cancel}
         </button>
-        <button type="submit" disabled={!validName(tidy(name, LIMITS.name)) || !validCode(cleanCode(code))} className={cn(btn.primary, btn.md)}>
+        <button type="submit" disabled={!validName(tidy(name, LIMITS.name)) || !(cleanCode(code) === "" ? toilet.access === "free" : validCode(cleanCode(code)))} className={cn(btn.primary, btn.md)}>
           {t.card.save}
         </button>
       </div>
@@ -158,6 +164,7 @@ export function ToiletCard({
   const { showCodes } = useSettings();
   const [shown, setShown] = useState(showCodes);
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [editing, setEditing] = useState(false);
   // After a vote: thanks, or (after "no") asking for the new code.
   const [step, setStep] = useState<null | "thanks" | "new-code" | "suggested">(null);
@@ -176,6 +183,22 @@ export function ToiletCard({
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
       // Clipboard blocked: the code is on screen anyway.
+    }
+  };
+
+  /** The phone's own share sheet where there is one; otherwise the link goes to the clipboard. */
+  const share = async () => {
+    const url = placeLink(toilet);
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: toilet.name, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      window.setTimeout(() => setLinkCopied(false), 1800);
+    } catch {
+      // Cancelled, or blocked: nothing to do.
     }
   };
 
@@ -234,6 +257,7 @@ export function ToiletCard({
             {access}
           </p>
           {toilet.hours && <HoursLine toilet={toilet} className="mt-0.5 block text-sm" />}
+          {isUnconfirmed(toilet) && <p className="mt-1 text-xs text-stale">{t.card.unconfirmed}</p>}
           {toilet.pending && (
             <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-haze">
               <span aria-hidden className="size-1.5 rounded-full bg-stale" />
@@ -241,6 +265,9 @@ export function ToiletCard({
             </p>
           )}
         </div>
+        <button type="button" onClick={share} aria-label={linkCopied ? t.card.linkCopied : t.card.share} className={cn(btn.quiet, "-mt-1 size-9", toilet.mine ? "" : "-mr-1")}>
+          {linkCopied ? <Check className="size-4 text-good" aria-hidden /> : <Share2 className="size-4" aria-hidden />}
+        </button>
         {toilet.mine && (
           <button
             type="button"
@@ -262,6 +289,11 @@ export function ToiletCard({
 
       {/* The code: the reason you're here */}
       <div className="mt-3 flex items-stretch gap-2">
+        {toilet.code === "" ? (
+          <div className="flex h-16 min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border border-good/40 bg-good/[0.07] text-base font-semibold">
+            <Check className="size-5 text-good" aria-hidden /> {t.card.noCode}
+          </div>
+        ) : (
         <button
           type="button"
           onClick={() => setShown((s) => !s)}
@@ -308,6 +340,7 @@ export function ToiletCard({
             </span>
           )}
         </button>
+        )}
         <a
           href={directionsUrl(toilet)}
           target="_blank"
@@ -319,6 +352,8 @@ export function ToiletCard({
           {t.card.directions}
         </a>
       </div>
+
+      {isStale(toilet) && <p className="mt-2 text-xs text-stale">{t.card.stale}</p>}
 
       {/* How many got in: plain words, the dot carries the colour */}
       <p className="mt-3 flex items-center gap-2 text-sm text-ink/85">
