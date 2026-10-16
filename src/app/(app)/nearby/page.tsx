@@ -41,6 +41,9 @@ function useKeyboardMode(active: boolean) {
   }, [active]);
 }
 
+/** Looking up an address shows the toilets within this many metres of it. */
+const ADDRESS_RADIUS = 500;
+
 export default function NearbyPage() {
   const { t: d } = useT();
   const here = useHere();
@@ -53,6 +56,8 @@ export default function NearbyPage() {
   // idle | loading | done | failed: what the address lookup is doing, so the panel can say so.
   const [lookup, setLookup] = useState<"idle" | "loading" | "done" | "failed">("idle");
   const [retry, setRetry] = useState(0);
+  // Past the radius too, when you ask for it.
+  const [farther, setFarther] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   useKeyboardMode(focused);
 
@@ -109,7 +114,10 @@ export default function NearbyPage() {
   // Names you typed, nearest to you (or the address you picked); the list is
   // everything, nearest to the address, when you're searching for a place.
   const named = byDistance(nameMatches, origin ?? mine);
-  const sorted = anchor ? byDistance(toilets, anchor) : named;
+  // Searching for a place shows what is within walking distance of it, nothing farther unless you ask.
+  const aroundAnchor = anchor ? byDistance(toilets, anchor) : [];
+  const within = aroundAnchor.filter((x) => x.metres <= ADDRESS_RADIUS);
+  const sorted = anchor ? (farther ? aroundAnchor : within) : named;
 
   const done = () => {
     input.current?.blur();
@@ -117,6 +125,7 @@ export default function NearbyPage() {
   };
   const pickPlace = (place: Place) => {
     setOrigin(place);
+    setFarther(false);
     setQuery("");
     setPlaces([]);
     setOpen(null);
@@ -165,7 +174,10 @@ export default function NearbyPage() {
               {origin && (
                 <button
                   type="button"
-                  onClick={() => setOrigin(null)}
+                  onClick={() => {
+                    setOrigin(null);
+                    setFarther(false);
+                  }}
                   aria-label={d.nearby.backToMe}
                   className="grid size-8 shrink-0 place-items-center rounded-full bg-dusk text-haze hover:text-ink"
                 >
@@ -194,10 +206,28 @@ export default function NearbyPage() {
           <p className="mt-10 max-w-[32ch] text-haze">
             {d.nearby.empty}
           </p>
+        ) : anchor && sorted.length === 0 ? (
+          <div className="mt-10">
+            <p className="max-w-[32ch] text-haze">{d.nearby.noneWithin(anchor.label)}</p>
+            <ActionButton variant="secondary" className="mt-5 h-12" onClick={() => setFarther(true)}>
+              {d.nearby.showFarther}
+            </ActionButton>
+          </div>
         ) : sorted.length === 0 ? (
           <p className="mt-10 max-w-[32ch] text-haze">{d.nearby.noMatch(q)}</p>
         ) : (
-          <ul className="mt-8 divide-y divide-dusk-edge border-y border-dusk-edge">
+          <>
+          {anchor && (
+            <p className="mt-6 flex items-center gap-3 text-sm text-haze">
+              <span className="flex-1">{farther ? d.nearby.allByDistance : d.nearby.countWithin(within.length)}</span>
+              {origin && aroundAnchor.length > within.length && (
+                <button type="button" onClick={() => setFarther((f) => !f)} className="font-semibold text-ink">
+                  {farther ? d.nearby.onlyWithin : d.nearby.showFarther}
+                </button>
+              )}
+            </p>
+          )}
+          <ul className="mt-3 divide-y divide-dusk-edge border-y border-dusk-edge">
             {sorted.map(({ toilet, metres }) => {
               const isOpen = open === toilet.id;
               return (
@@ -239,6 +269,7 @@ export default function NearbyPage() {
               );
             })}
           </ul>
+          </>
         )}
       </main>
 
