@@ -134,7 +134,7 @@ export default function ProfilePage() {
                 <span aria-hidden className="size-2 shrink-0 rounded-full bg-bad" />
                 <span className="min-w-0 flex-1">
                   <span className="block text-[0.9375rem] leading-snug">{t.sync.notice(notice.type, notice.name)}</span>
-                  <span className="block text-[0.8125rem] text-haze">{t.sync.errors[notice.code] ?? notice.message}</span>
+                  <span className="block text-[0.8125rem] text-haze">{notice.code === "validation" && notice.message ? notice.message : (t.sync.errors[notice.code] ?? notice.message)}</span>
                 </span>
                 <button type="button" onClick={() => dismissNotice(notice.id)} className="py-1 text-[0.875rem] font-semibold text-haze active:text-ink">
                   {t.sync.dismiss}

@@ -66,6 +66,8 @@ const meStore = createLocalStore<Me>("magyarotyesz:me", { owns: [], votes: {}, s
 export const useUserId = () => identity.useValue()?.userId ?? null;
 export const useGotInTotal = () => meStore.useValue().gotIn ?? 0;
 const outbox = createLocalStore<OutAction[]>("magyarotyesz:outbox", []);
+/** The name we last tried to send, so a name the server turned down is not sent over and over. */
+const profileTried = createLocalStore<string>("magyarotyesz:profile-tried", "");
 const noticeStore = createLocalStore<Notice[]>("magyarotyesz:notices", []);
 const clearedAt = createLocalStore<string>("magyarotyesz:alerts-cleared", "");
 const seenAlerts = createLocalStore<string[] | null>("magyarotyesz:alerts-seen", null);
@@ -355,7 +357,10 @@ async function flush(acked: Set<string>, notices: Notice[]) {
     for (const a of batch) {
       acked.add(a.id);
       const r = byId.get(a.id);
-      if (r?.status === "rejected") {
+      // A server that is a version behind doesn't know "set_profile" yet: the name stays on this phone and goes
+      // out by itself once the server is updated (see `me`), so there is nothing to scare anyone with.
+      const oldServer = a.type === "set_profile" && r?.error === "validation" && /unknown action/i.test(r.message ?? "");
+      if (r?.status === "rejected" && !oldServer) {
         notices.push({ id: a.id, type: a.type, code: r.error ?? "rejected", message: r.message ?? "", name: a.name, at: now });
       }
     }
@@ -414,6 +419,12 @@ async function refreshMe() {
   // A name chosen on another visit (same id) shows up here too; one typed on this phone wins.
   if (displayName && !getSettings().name) updateSettings({ name: displayName });
   meStore.set({ owns, votes, suggestions, alerts: list, addsLeftToday, gotIn: gotIn ?? 0 });
+  // The server knows about names (it sent the field) but not ours: send it once.
+  const mine = getSettings().name;
+  if (displayName !== undefined && mine && mine !== displayName && profileTried.get() !== mine && !outbox.get().some((a) => a.type === "set_profile")) {
+    profileTried.set(mine);
+    enqueue("set_profile", { displayName: mine });
+  }
 
   // Phone notifications for alerts we haven't shown yet (never for the very first fetch).
   const seen = seenAlerts.get();
