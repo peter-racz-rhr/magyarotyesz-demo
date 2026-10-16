@@ -23,7 +23,15 @@ function findBuildings(map: MapLibreGL.Map) {
   return found && "source" in found && found.source ? { source: found.source as string, sourceLayer: (found as { "source-layer"?: string })["source-layer"], id: found.id } : null;
 }
 
-function add(map: MapLibreGL.Map) {
+/** On the light map the blocks are cream and white; a grey block would be far too harsh there. */
+function colours(variant: "dark" | "light") {
+  const height = ["coalesce", ["to-number", ["get", "render_height"]], ["to-number", ["get", "height"]], 12];
+  return variant === "light"
+    ? ["interpolate", ["linear"], height, 0, "#fcfaf5", 25, "#f5f0e4", 70, "#ece5d4"]
+    : ["interpolate", ["linear"], height, 0, "#1d2026", 25, "#2a2f38", 70, "#3a414d"];
+}
+
+function add(map: MapLibreGL.Map, variant: "dark" | "light") {
   if (map.getLayer(LAYER)) return;
   const base = findBuildings(map);
   if (!base) return;
@@ -38,12 +46,12 @@ function add(map: MapLibreGL.Map) {
     minzoom: 14.5,
     paint: {
       // Taller buildings are a little lighter, so a skyline has depth even in the dark.
-      "fill-extrusion-color": ["interpolate", ["linear"], height, 0, "#1d2026", 25, "#2a2f38", 70, "#3a414d"],
+      "fill-extrusion-color": colours(variant),
       // Rise from the ground as you zoom in instead of popping up.
       "fill-extrusion-height": ["interpolate", ["linear"], ["zoom"], 14.5, 0, 15.7, height],
       "fill-extrusion-base": ["interpolate", ["linear"], ["zoom"], 14.5, 0, 15.7, floor],
       "fill-extrusion-opacity": 0.94,
-      "fill-extrusion-vertical-gradient": true,
+      "fill-extrusion-vertical-gradient": variant !== "light", // cream walls stay even, no dark foot
     },
   } as unknown as MapLibreGL.FillExtrusionLayerSpecification);
   // The flat outlines would only poke through the roofs.
@@ -66,12 +74,17 @@ function remove(map: MapLibreGL.Map) {
   }
 }
 
-export function Buildings3D({ enabled }: { enabled: boolean }) {
+export function Buildings3D({ enabled, variant = "dark" }: { enabled: boolean; variant?: "dark" | "light" }) {
   const { map, isLoaded } = useMap();
 
   useEffect(() => {
     if (!map || !isLoaded) return;
-    const apply = () => (enabled ? add(map) : remove(map));
+    const apply = () => {
+      if (!enabled) return remove(map);
+      // A change of look (dark/light) repaints the blocks.
+      if (map.getLayer(LAYER)) map.removeLayer(LAYER);
+      add(map, variant);
+    };
     apply();
     // A new base style (light/dark) wipes our layer: put it back.
     map.on("style.load", apply);
@@ -81,7 +94,7 @@ export function Buildings3D({ enabled }: { enabled: boolean }) {
     return () => {
       map.off("style.load", apply);
     };
-  }, [map, isLoaded, enabled]);
+  }, [map, isLoaded, enabled, variant]);
 
   return null;
 }

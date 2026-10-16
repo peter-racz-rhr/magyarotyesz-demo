@@ -436,7 +436,7 @@ export default function MapPage() {
           className="h-full w-full"
         >
           <TapToAdd onTap={startDraft} onDismiss={() => setFocus(null)} />
-          <Buildings3D enabled={buildings3d} />
+          <Buildings3D enabled={buildings3d} variant={base.key === "light" ? "light" : "dark"} />
 
           {visible.map((toilet) => (
             <MapMarker key={toilet.id} latitude={toilet.latitude} longitude={toilet.longitude}>

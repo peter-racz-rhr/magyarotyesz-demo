@@ -5,7 +5,7 @@
 
     night.json      the dark map, recoloured to deep navy water, teal parks and blue roads
     day.json        Positron with a little colour in the water and the parks
-    satellite.json  Esri World Imagery with the night map's labels on top
+    satellite.json  EOX Sentinel-2 cloudless (CC BY 4.0) with the night map's labels on top
 */
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -106,8 +106,11 @@ recolour(day, {
 out("day", day);
 
 /* ---------------------------- satellite ---------------------------- */
-// Imagery from Esri's World Imagery service (attribution is required; see the app's footer
-// and imprint). Streets and places are written on top, using the night map's label layers.
+// Imagery: EOX "Sentinel-2 cloudless 2016", a free picture of the whole Earth made from Copernicus
+// Sentinel-2 data. EOX licenses the 2016 layer under CC BY 4.0, which allows commercial use with
+// credit (the later years are non-commercial only). Pixels are 10 m, so it is a city-scale picture,
+// not a street-level one. Set SATELLITE_TILES (and SATELLITE_ATTRIBUTION) when building to use
+// another provider. Streets and places are written on top, using the night map's label layers.
 const labelIds = ["water_name", "highway_name_other", "highway_name_motorway", ...placeSoft, ...placeStrong];
 const labels = labelIds.map((id) => {
   const l = structuredClone(night.layers.find((x) => x.id === id));
@@ -122,10 +125,11 @@ const satellite = {
   sources: {
     imagery: {
       type: "raster",
-      tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
+      tiles: [process.env.SATELLITE_TILES ?? "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2016_3857/default/g/{z}/{y}/{x}.jpg"],
       tileSize: 256,
-      maxzoom: 19,
-      attribution: "Imagery © Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      // Sharper than this does not exist in the data; the map stretches the last level.
+      maxzoom: Number(process.env.SATELLITE_MAXZOOM ?? 13),
+      attribution: process.env.SATELLITE_ATTRIBUTION ?? "Sentinel-2 cloudless – https://s2maps.eu by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2016 & 2017)",
     },
     openmaptiles: night.sources.openmaptiles,
   },

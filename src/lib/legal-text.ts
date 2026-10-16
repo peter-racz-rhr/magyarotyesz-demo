@@ -82,7 +82,7 @@ const en: Record<DocKey, Doc> = {
         p: [
           "Server: hosted at Oracle Cloud Infrastructure in Frankfurt, Germany.",
           "App hosting: Vercel Inc. delivers the web app and sees your IP address when it loads.",
-          "Map and search: map tiles come from OpenFreeMap (OpenStreetMap data) and, in the satellite view, aerial images from Esri. If you search for an address, the text you type and the area are sent to Photon (komoot.io) or OpenStreetMap Nominatim. These services see your IP address and request.",
+          "Map and search: map tiles come from OpenFreeMap (OpenStreetMap data) and, in the satellite view, a satellite picture from EOX (tiles.maps.eox.at, Austria). If you search for an address, the text you type and the area are sent to Photon (komoot.io) or OpenStreetMap Nominatim. These services see your IP address and request.",
           "Some of these providers are outside the EU and rely on the safeguards described in their own policies. We do not sell data.",
         ],
       },
@@ -113,7 +113,7 @@ const en: Record<DocKey, Doc> = {
       { h: "Contact", p: ["{email}", "Use this address for questions, privacy requests, takedown requests and notices about illegal content. We aim to reply within a few working days."] },
       { h: "Service", p: ["magyarotyesz, a free community map of toilet door codes in Budapest. Not a commercial service; no fee is charged."] },
       { h: "Hosting", p: ["Web app: Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA.", "Server: Oracle Cloud Infrastructure, Frankfurt, Germany."] },
-      { h: "Map data", p: ["Map © OpenFreeMap, © OpenMapTiles, data © OpenStreetMap contributors. Style based on the CartoDB basemaps (CC BY 3.0).", "Satellite imagery © Esri, Maxar, Earthstar Geographics and the GIS User Community."] },
+      { h: "Map data", p: ["Map © OpenFreeMap, © OpenMapTiles, data © OpenStreetMap contributors. Style based on the CartoDB basemaps (CC BY 3.0).", "Satellite: Sentinel-2 cloudless – https://s2maps.eu by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2016 & 2017), CC BY 4.0."] },
     ],
   },
 };
@@ -182,7 +182,7 @@ const hu: Record<DocKey, Doc> = {
         p: [
           "Szerver: Oracle Cloud Infrastructure, Frankfurt, Németország.",
           "Az app kiszolgálása: a Vercel Inc. szolgálja ki a webappot, betöltéskor látja az IP-címedet.",
-          "Térkép és keresés: a térképcsempéket az OpenFreeMap adja (OpenStreetMap adatok), a műholdas nézetben pedig az Esri légifelvételei. Címkereséskor a beírt szöveg és a terület a Photon (komoot.io) vagy az OpenStreetMap Nominatim felé megy. Ezek látják az IP-címedet és a kérést.",
+          "Térkép és keresés: a térképcsempéket az OpenFreeMap adja (OpenStreetMap adatok), a műholdas nézetben pedig az EOX műholdképe (tiles.maps.eox.at, Ausztria). Címkereséskor a beírt szöveg és a terület a Photon (komoot.io) vagy az OpenStreetMap Nominatim felé megy. Ezek látják az IP-címedet és a kérést.",
           "Néhány szolgáltató az EU-n kívül működik, és a saját szabályzatukban leírt garanciákra támaszkodnak. Adatot nem adunk el.",
         ],
       },
@@ -211,7 +211,7 @@ const hu: Record<DocKey, Doc> = {
       { h: "Kapcsolat", p: ["{email}", "Kérdésekkel, adatkezelési kérésekkel, eltávolítási kérésekkel és jogellenes tartalomról szóló bejelentésekkel erre a címre írj. Néhány munkanapon belül igyekszünk válaszolni."] },
       { h: "Szolgáltatás", p: ["magyarotyesz, ingyenes közösségi térkép budapesti mosdók ajtókódjairól. Nem üzleti szolgáltatás, díjat nem számítunk fel."] },
       { h: "Tárhely", p: ["Webapp: Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA.", "Szerver: Oracle Cloud Infrastructure, Frankfurt, Németország."] },
-      { h: "Térképadatok", p: ["Térkép © OpenFreeMap, © OpenMapTiles, adatok © OpenStreetMap közreműködők. A stílus a CartoDB alaptérképeken alapul (CC BY 3.0).", "Műholdkép © Esri, Maxar, Earthstar Geographics és a GIS User Community."] },
+      { h: "Térképadatok", p: ["Térkép © OpenFreeMap, © OpenMapTiles, adatok © OpenStreetMap közreműködők. A stílus a CartoDB alaptérképeken alapul (CC BY 3.0).", "Műholdkép: Sentinel-2 cloudless – https://s2maps.eu, EOX IT Services GmbH (módosított Copernicus Sentinel-adatokat tartalmaz, 2016 és 2017), CC BY 4.0."] },
     ],
   },
 };
