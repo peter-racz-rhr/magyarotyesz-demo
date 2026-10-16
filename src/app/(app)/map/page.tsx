@@ -1,8 +1,8 @@
 "use client";
 
 import "@/lib/maplibre-worker";
-import { Accessibility, Baby, ChevronUp, LocateFixed, Zap, X } from "lucide-react";
-import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { Accessibility, Baby, LocateFixed, Zap, X } from "lucide-react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AddedBurst, AddedCheck, DropIn } from "@/components/added-burst";
 import { LegalLinks } from "@/components/legal-page";
@@ -142,89 +142,6 @@ function Toggle({ on, onChange, icon, children }: { on: boolean; onChange: (on: 
   );
 }
 
-/** Pulling further than this (px) counts as a pull, not a tap. */
-const PULL_PX = 8;
-
-/**
- * The add sheet's details follow your finger: pull the top of the sheet up
- * and they open as far as you pull; let go past a third of the way and they
- * snap open, otherwise they fold back. Pulling down folds them away, and
- * pulling down with nothing left to fold closes the sheet.
- */
-function useSheetPull({ onOpenChange, onClose }: { onOpenChange: (open: boolean) => void; onClose: () => void }) {
-  const box = useRef<HTMLDivElement>(null);
-  const inner = useRef<HTMLDivElement>(null);
-  const open = useRef(false);
-  const press = useRef<{ y: number; from: number; moved: boolean } | null>(null);
-  const swallow = useRef(false);
-
-  const full = () => inner.current?.scrollHeight ?? 0;
-  const height = () => box.current?.getBoundingClientRect().height ?? 0;
-
-  /** Glide to open or folded from wherever it is now. */
-  const settle = (to: boolean) => {
-    const el = box.current;
-    if (!el) return;
-    open.current = to;
-    onOpenChange(to);
-    el.style.transition = "height 280ms cubic-bezier(0.2, 0.8, 0.2, 1)";
-    el.style.height = `${height()}px`;
-    void el.offsetHeight;
-    el.style.height = `${to ? full() : 0}px`;
-    const done = () => {
-      el.removeEventListener("transitionend", done);
-      el.style.transition = "";
-      // Open means "as tall as it needs", so choosing Paid or Set hours can grow it.
-      if (open.current) el.style.height = "auto";
-    };
-    el.addEventListener("transitionend", done);
-  };
-
-  const grip = {
-    onPointerDown: (e: ReactPointerEvent) => {
-      open.current = height() > 0;
-      press.current = { y: e.clientY, from: height(), moved: false };
-    },
-    onPointerMove: (e: ReactPointerEvent) => {
-      const state = press.current;
-      const el = box.current;
-      if (!state || !el) return;
-      const dy = e.clientY - state.y;
-      if (!state.moved && Math.abs(dy) < PULL_PX) return;
-      state.moved = true;
-      el.style.transition = "none";
-      el.style.height = `${Math.max(0, Math.min(full(), state.from - dy))}px`;
-    },
-    onPointerUp: (e: ReactPointerEvent) => {
-      const state = press.current;
-      press.current = null;
-      if (!state?.moved) return;
-      swallow.current = true;
-      window.setTimeout(() => (swallow.current = false), 0);
-      const dy = e.clientY - state.y;
-      const wasOpen = state.from > 0;
-      // Folded and pulled down: that's "close this sheet".
-      if (!wasOpen && dy > 60) {
-        settle(false);
-        onClose();
-        return;
-      }
-      const shown = height() / Math.max(1, full());
-      settle(wasOpen ? shown > 0.7 : shown > 0.3);
-    },
-    onPointerCancel: () => {
-      press.current = null;
-      settle(open.current);
-    },
-    onClickCapture: (e: React.MouseEvent) => {
-      if (!swallow.current) return;
-      e.preventDefault();
-      e.stopPropagation();
-    },
-  };
-  return { box, inner, grip };
-}
-
 export default function MapPage() {
   const { t } = useT();
   const mapRef = useRef<MapRef>(null);
@@ -254,7 +171,6 @@ export default function MapPage() {
   const [wheelchair, setWheelchair] = useState(false);
   const [baby, setBaby] = useState(false);
   const [note, setNote] = useState("");
-  const [details, setDetails] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [justAdded, setJustAdded] = useState<{ id: string; name: string } | null>(null);
@@ -349,8 +265,6 @@ export default function MapPage() {
     }, 220);
   };
 
-  const { box: detailsBox, inner: detailsInner, grip } = useSheetPull({ onOpenChange: setDetails, onClose: closeSheet });
-
   const locate = async () => {
     if (here.status === "off") return flash(t.map.locationOff);
     if (here.coords) {
@@ -391,7 +305,6 @@ export default function MapPage() {
       setHoursMode("unknown");
       setWheelchair(false);
       setBaby(false);
-      setDetails(false);
       setError(null);
     }
     setFocus(null);
@@ -413,7 +326,7 @@ export default function MapPage() {
     if (!code.trim() && finalAccess !== "free") return setError(t.add.errCode);
     if (code.trim() && !validCode(cleanedCode)) return setError(t.add.errCodeChars);
     if (!kind) return setError(t.add.errKind);
-    if (!onlyToilet) return setError(t.add.errOnlyToilet);
+    if (code.trim() && !onlyToilet) return setError(t.add.errOnlyToilet);
     if (!checkFields({ name: cleanName, note: tidy(note, LIMITS.note) }).ok) return setError(t.add.errBad);
     if (access === "paid" && Number(price) > LIMITS.price) return setError(t.add.errPriceMax(LIMITS.price));
     if (!inBudapest(draft)) return setError(t.add.errCity);
@@ -609,150 +522,153 @@ export default function MapPage() {
                 : "animate-in slide-in-from-bottom duration-300 ease-out",
             )}
           >
-            {/* Pull this part up for the details, down to fold them away */}
-            <div {...grip} className="-mx-5 touch-none px-5">
-              <div className="flex justify-center pt-2 pb-3">
-                <span aria-hidden className="h-1 w-10 rounded-full bg-dusk-edge" />
-              </div>
-              {/* Add sits up top so it stays reachable above the keyboard. */}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={closeSheet}
-                  aria-label={t.add.cancel}
-                  className="-ml-2 grid size-10 shrink-0 place-items-center rounded-full text-haze hover:text-ink"
-                >
-                  <X className="size-5" />
-                </button>
-                <h2 className="t-section min-w-0 flex-1 truncate">{t.add.title}</h2>
-                <button type="submit" disabled={busy} className={cn(btn.primary, "h-10 px-5 text-[0.9375rem]")}>
-                  {busy ? "…" : t.add.add}
-                </button>
-              </div>
+            <div className="flex justify-center pt-2 pb-3">
+              <span aria-hidden className="h-1 w-10 rounded-full bg-dusk-edge" />
+            </div>
+            {/* Add sits up top so it stays reachable above the keyboard. */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={closeSheet}
+                aria-label={t.add.cancel}
+                className="-ml-2 grid size-10 shrink-0 place-items-center rounded-full text-haze hover:text-ink"
+              >
+                <X className="size-5" />
+              </button>
+              <h2 className="t-section min-w-0 flex-1 truncate">{t.add.title}</h2>
+              <button type="submit" disabled={busy} className={cn(btn.primary, "h-10 px-5 text-[0.9375rem]")}>
+                {busy ? "…" : t.add.add}
+              </button>
             </div>
 
-            <div className="mt-4 flex flex-col gap-3">
+            <div className="mt-4 flex flex-col gap-5 pb-2">
               {error && (
                 <p role="alert" className="text-sm text-bad">
                   {error}
                 </p>
               )}
-              <LimitedInput
-                aria-label={t.add.place}
-                placeholder={t.add.place}
-                value={name}
-                onValueChange={(v) => {
-                  setName(v);
-                  setError(null);
-                }}
-                max={LIMITS.name}
-                clean={(v) => cleanText(v, LIMITS.name)}
-                rejectedHint={t.add.textHint}
-                className={cn(field, "w-full")}
-              />
-              <LimitedInput
-                aria-label={t.add.code}
-                placeholder={access === "free" ? t.add.codeFree : t.add.code}
-                value={code}
-                onValueChange={(v) => {
-                  setCode(v);
-                  setError(null);
-                }}
-                max={LIMITS.code}
-                clean={cleanCode}
-                rejectedHint={t.add.codeHint}
-                autoComplete="off"
-                autoCapitalize="characters"
-                className={cn(field, "h-14 w-full font-mono text-[1.375rem] tracking-[0.16em] placeholder:font-sans placeholder:text-base placeholder:tracking-normal")}
-              />
-              <div className="flex flex-col gap-2 pt-1">
-                <p className="px-1 text-xs text-haze">{t.add.kind}</p>
-                <Choice label={t.add.kind} keys={KIND_KEYS} labels={t.kinds} value={kind as Kind} onChange={(v) => { setKind(v); setError(null); }} />
-                <p className="px-1 pt-1 text-xs text-haze">{t.add.who}</p>
-                <Choice label={t.add.who} keys={ACCESS_KEYS} labels={t.access} value={access} onChange={setAccess} />
-              </div>
-              <label className="flex items-start gap-3 px-1 py-1 text-[0.8125rem] leading-snug">
-                <input type="checkbox" checked={onlyToilet} onChange={(e) => { setOnlyToilet(e.target.checked); setError(null); }} className="mt-0.5 size-5 shrink-0 accent-[var(--good)]" />
-                <span>{t.add.onlyToilet}</span>
-              </label>
+
+              {/* 1. What and where */}
+              <section className="flex flex-col gap-3">
+                <LimitedInput
+                  aria-label={t.add.place}
+                  placeholder={t.add.place}
+                  value={name}
+                  onValueChange={(v) => {
+                    setName(v);
+                    setError(null);
+                  }}
+                  max={LIMITS.name}
+                  clean={(v) => cleanText(v, LIMITS.name)}
+                  rejectedHint={t.add.textHint}
+                  className={cn(field, "w-full")}
+                />
+                <div className="flex flex-col gap-2">
+                  <p className="px-1 text-xs text-haze">{t.add.kind}</p>
+                  <Choice label={t.add.kind} keys={KIND_KEYS} labels={t.kinds} value={kind as Kind} onChange={(v) => { setKind(v); setError(null); }} />
+                </div>
+              </section>
+
+              {/* 2. Who can use it, the price when it costs, and the code */}
+              <section className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
+                  <p className="px-1 text-xs text-haze">{t.add.who}</p>
+                  <Choice label={t.add.who} keys={ACCESS_KEYS} labels={t.access} value={access} onChange={setAccess} />
+                </div>
+                {access === "paid" && (
+                  <label className="flex items-center gap-3 px-1">
+                    <span className="text-sm text-haze">{t.add.price}</span>
+                    <input
+                      inputMode="numeric"
+                      value={price}
+                      maxLength={String(LIMITS.price).length}
+                      onChange={(e) => {
+                        setPrice(e.target.value.replace(/\D/g, "").replace(/^0+/, ""));
+                        setError(null);
+                      }}
+                      placeholder={t.add.priceFree}
+                      aria-invalid={Number(price) > LIMITS.price}
+                      className={cn(field, "h-10 w-24", Number(price) > LIMITS.price && "border-bad focus:border-bad")}
+                    />
+                    <span className="text-sm text-haze">Ft</span>
+                    {Number(price) > LIMITS.price && (
+                      <span role="alert" className="text-sm text-bad">
+                        {t.add.priceMax(LIMITS.price)}
+                      </span>
+                    )}
+                  </label>
+                )}
+                <LimitedInput
+                  aria-label={t.add.code}
+                  placeholder={access === "free" ? t.add.codeFree : t.add.code}
+                  value={code}
+                  onValueChange={(v) => {
+                    setCode(v);
+                    setError(null);
+                  }}
+                  max={LIMITS.code}
+                  clean={cleanCode}
+                  rejectedHint={t.add.codeHint}
+                  autoComplete="off"
+                  autoCapitalize="characters"
+                  className={cn(field, "h-14 w-full font-mono text-[1.375rem] tracking-[0.16em] placeholder:font-sans placeholder:text-base placeholder:tracking-normal")}
+                />
+                {code.trim() && (
+                <label className="flex items-start gap-3 rounded-2xl border border-dusk-edge px-3.5 py-3 text-[0.8125rem] leading-snug">
+                  <input type="checkbox" checked={onlyToilet} onChange={(e) => { setOnlyToilet(e.target.checked); setError(null); }} className="mt-0.5 size-5 shrink-0 accent-[var(--good)]" />
+                  <span>{t.add.onlyToilet}</span>
+                </label>
+                )}
+              </section>
+
+              {/* 3. Nice to have */}
+              <section className="flex flex-col gap-3">
+                <p className="px-1 text-xs text-haze">{t.add.optional}</p>
+                <div>
+                  <p className="mb-1.5 px-1 text-sm text-haze">{t.add.hours}</p>
+                  <Choice
+                    label={t.add.hours}
+                    keys={["unknown", "always", "set"] as const}
+                    labels={{ unknown: t.add.hoursUnknown, always: t.add.hours247, set: t.add.hoursSet }}
+                    value={hoursMode}
+                    onChange={setHoursMode}
+                  />
+                  {hoursMode === "set" && (
+                    <div className="mt-2 flex items-center gap-3 text-sm text-haze">
+                      <label className="flex items-center gap-2">
+                        {t.add.opens}
+                        <input type="time" value={opens} onChange={(e) => setOpens(e.target.value)} className={cn(field, "h-10 px-3 text-ink [color-scheme:dark]")} />
+                      </label>
+                      <label className="flex items-center gap-2">
+                        {t.add.closes}
+                        <input type="time" value={closes} onChange={(e) => setCloses(e.target.value)} className={cn(field, "h-10 px-3 text-ink [color-scheme:dark]")} />
+                      </label>
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  <Toggle on={wheelchair} onChange={setWheelchair} icon={<Accessibility className="size-4" aria-hidden />}>
+                    {t.add.wheelchair}
+                  </Toggle>
+                  <Toggle on={baby} onChange={setBaby} icon={<Baby className="size-4" aria-hidden />}>
+                    {t.add.baby}
+                  </Toggle>
+                </div>
+                <LimitedInput
+                  aria-label={t.add.note}
+                  placeholder={t.add.note}
+                  value={note}
+                  onValueChange={setNote}
+                  max={LIMITS.note}
+                  clean={(v) => cleanText(v, LIMITS.note)}
+                  rejectedHint={t.add.textHint}
+                  className={cn(field, "w-full")}
+                />
+              </section>
+
               <p className="px-1 text-xs leading-relaxed text-haze">
                 {t.add.agree} <LegalLinks />
               </p>
-              {/* Everything else is optional: pull the sheet up and it opens */}
-              <div {...grip} className={cn("-mx-5 flex touch-none items-center justify-center gap-2 px-5 py-1.5 text-sm text-haze transition-opacity", details && "hidden")}>
-                <ChevronUp className="size-4" aria-hidden />
-                {t.add.pullUp}
-              </div>
-              <div ref={detailsBox} inert={!details} style={{ height: 0 }} className="-mx-1 overflow-hidden px-1">
-              <div ref={detailsInner} className="flex flex-col gap-3 pb-1">
-              {access === "paid" && (
-                <label className="flex items-center gap-3">
-                  <span className="text-sm text-haze">{t.add.price}</span>
-                  <input
-                    inputMode="numeric"
-                    value={price}
-                    maxLength={String(LIMITS.price).length}
-                    onChange={(e) => {
-                      setPrice(e.target.value.replace(/\D/g, "").replace(/^0+/, ""));
-                      setError(null);
-                    }}
-                    placeholder={t.add.priceFree}
-                    aria-invalid={Number(price) > LIMITS.price}
-                    className={cn(field, "h-10 w-24", Number(price) > LIMITS.price && "border-bad focus:border-bad")}
-                  />
-                  <span className="text-sm text-haze">Ft</span>
-                  {Number(price) > LIMITS.price && (
-                    <span role="alert" className="text-sm text-bad">
-                      {t.add.priceMax(LIMITS.price)}
-                    </span>
-                  )}
-                </label>
-              )}
-
-              <div>
-                <p className="mb-1.5 text-sm text-haze">{t.add.hours}</p>
-                <Choice
-                  label={t.add.hours}
-                  keys={["unknown", "always", "set"] as const}
-                  labels={{ unknown: t.add.hoursUnknown, always: t.add.hours247, set: t.add.hoursSet }}
-                  value={hoursMode}
-                  onChange={setHoursMode}
-                />
-                {hoursMode === "set" && (
-                  <div className="mt-2 flex items-center gap-3 text-sm text-haze">
-                    <label className="flex items-center gap-2">
-                      {t.add.opens}
-                      <input type="time" value={opens} onChange={(e) => setOpens(e.target.value)} className={cn(field, "h-10 px-3 text-ink [color-scheme:dark]")} />
-                    </label>
-                    <label className="flex items-center gap-2">
-                      {t.add.closes}
-                      <input type="time" value={closes} onChange={(e) => setCloses(e.target.value)} className={cn(field, "h-10 px-3 text-ink [color-scheme:dark]")} />
-                    </label>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-wrap gap-1.5">
-                <Toggle on={wheelchair} onChange={setWheelchair} icon={<Accessibility className="size-4" aria-hidden />}>
-                  {t.add.wheelchair}
-                </Toggle>
-                <Toggle on={baby} onChange={setBaby} icon={<Baby className="size-4" aria-hidden />}>
-                  {t.add.baby}
-                </Toggle>
-              </div>
-
-              <LimitedInput
-                aria-label={t.add.note}
-                placeholder={t.add.note}
-                value={note}
-                onValueChange={setNote}
-                max={LIMITS.note}
-                clean={(v) => cleanText(v, LIMITS.note)}
-                rejectedHint={t.add.textHint}
-                className={cn(field, "w-full")}
-              />
-              </div>
-              </div>
             </div>
           </form>
         )}

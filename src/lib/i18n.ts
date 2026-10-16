@@ -126,7 +126,7 @@ const en = {
     priceFree: "Free",
     codeHint: "Letters, numbers and # * + - . / only",
     textHint: "No emoji, please",
-    pullUp: "Pull up for more details",
+    optional: "Optional, but it helps",
   },
 
   spot: {
@@ -445,7 +445,7 @@ const hu: Dict = {
     priceFree: "Ingyenes",
     codeHint: "Csak betű, szám és # * + - . /",
     textHint: "Emoji nélkül, kérlek",
-    pullUp: "Húzd fel a további részletekért",
+    optional: "Nem kötelező, de sokat segít",
   },
 
   spot: {
