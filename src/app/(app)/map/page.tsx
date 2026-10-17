@@ -1,8 +1,8 @@
 "use client";
 
 import "@/lib/maplibre-worker";
-import { Accessibility, Baby, LocateFixed, Zap, X } from "lucide-react";
-import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
+import { Accessibility, Baby, ChevronUp, LocateFixed, Zap, X } from "lucide-react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AddedBurst, AddedCheck, DropIn } from "@/components/added-burst";
 import { LegalLinks } from "@/components/legal-page";
@@ -152,6 +152,95 @@ function ZoomCap({ max }: { max: number }) {
   return null;
 }
 
+/** Pulling further than this (px) counts as a pull, not a tap. */
+const PULL_PX = 8;
+
+/**
+ * The add sheet's details follow your finger: pull the top of the sheet up
+ * and they open as far as you pull; let go past a third of the way and they
+ * snap open, otherwise they fold back. Pulling down folds them away, and
+ * pulling down with nothing left to fold closes the sheet.
+ */
+function useSheetPull({ onOpenChange, onClose }: { onOpenChange: (open: boolean) => void; onClose: () => void }) {
+  const box = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  const open = useRef(false);
+  const press = useRef<{ y: number; from: number; moved: boolean } | null>(null);
+  const swallow = useRef(false);
+
+  const full = () => inner.current?.scrollHeight ?? 0;
+  const height = () => box.current?.getBoundingClientRect().height ?? 0;
+
+  /** Glide to open or folded from wherever it is now. */
+  const settle = (to: boolean) => {
+    const el = box.current;
+    if (!el) return;
+    open.current = to;
+    onOpenChange(to);
+    el.style.transition = "height 280ms cubic-bezier(0.2, 0.8, 0.2, 1)";
+    el.style.height = `${height()}px`;
+    void el.offsetHeight;
+    el.style.height = `${to ? full() : 0}px`;
+    const done = () => {
+      el.removeEventListener("transitionend", done);
+      el.style.transition = "";
+      // Open means "as tall as it needs", so choosing Paid or Set hours can grow it.
+      if (open.current) el.style.height = "auto";
+    };
+    el.addEventListener("transitionend", done);
+  };
+
+  const grip = {
+    onPointerDown: (e: ReactPointerEvent) => {
+      // Keep receiving the pull when the finger (or mouse) leaves the handle as the sheet grows.
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // Not every browser can capture here; the pull still works while it stays over the handle.
+      }
+      open.current = height() > 0;
+      press.current = { y: e.clientY, from: height(), moved: false };
+    },
+    onPointerMove: (e: ReactPointerEvent) => {
+      const state = press.current;
+      const el = box.current;
+      if (!state || !el) return;
+      const dy = e.clientY - state.y;
+      if (!state.moved && Math.abs(dy) < PULL_PX) return;
+      state.moved = true;
+      el.style.transition = "none";
+      el.style.height = `${Math.max(0, Math.min(full(), state.from - dy))}px`;
+    },
+    onPointerUp: (e: ReactPointerEvent) => {
+      const state = press.current;
+      press.current = null;
+      if (!state?.moved) return;
+      swallow.current = true;
+      window.setTimeout(() => (swallow.current = false), 0);
+      const dy = e.clientY - state.y;
+      const wasOpen = state.from > 0;
+      // Folded and pulled down: that's "close this sheet".
+      if (!wasOpen && dy > 60) {
+        settle(false);
+        onClose();
+        return;
+      }
+      const shown = height() / Math.max(1, full());
+      settle(wasOpen ? shown > 0.7 : shown > 0.3);
+    },
+    onPointerCancel: () => {
+      press.current = null;
+      settle(open.current);
+    },
+    onClickCapture: (e: React.MouseEvent) => {
+      if (!swallow.current) return;
+      e.preventDefault();
+      e.stopPropagation();
+    },
+  };
+  return { box, inner, grip };
+}
+
 export default function MapPage() {
   const { t } = useT();
   const mapRef = useRef<MapRef>(null);
@@ -266,6 +355,7 @@ export default function MapPage() {
     window.setTimeout(() => setNotice(null), 3200);
   };
 
+  const [details, setDetails] = useState(false);
   const [closing, setClosing] = useState(false);
   const closeSheet = () => {
     setClosing(true);
@@ -274,6 +364,8 @@ export default function MapPage() {
       setClosing(false);
     }, 220);
   };
+
+  const { box: detailsBox, inner: detailsInner, grip } = useSheetPull({ onOpenChange: setDetails, onClose: closeSheet });
 
   const locate = async () => {
     if (here.status === "off") return flash(t.map.locationOff);
@@ -315,6 +407,7 @@ export default function MapPage() {
       setHoursMode("unknown");
       setWheelchair(false);
       setBaby(false);
+      setDetails(false);
       setError(null);
     }
     setFocus(null);
@@ -540,6 +633,8 @@ export default function MapPage() {
                 : "animate-in slide-in-from-bottom duration-300 ease-out",
             )}
           >
+            {/* Pull this part up for the extras, down to fold them away */}
+            <div {...grip} className="-mx-5 touch-none px-5 select-none">
             <div className="flex justify-center pt-2 pb-3">
               <span aria-hidden className="h-1 w-10 rounded-full bg-dusk-edge" />
             </div>
@@ -557,6 +652,7 @@ export default function MapPage() {
               <button type="submit" disabled={busy || !ready} className={cn(btn.primary, "h-10 px-5 text-[0.9375rem]")}>
                 {busy ? "…" : t.add.add}
               </button>
+            </div>
             </div>
 
             <div className="mt-4 flex flex-col gap-5 pb-2">
@@ -639,54 +735,59 @@ export default function MapPage() {
                 )}
               </section>
 
-              {/* 3. Nice to have */}
-              <section className="flex flex-col gap-3">
-                <p className="px-1 text-xs text-haze">{t.add.optional}</p>
-                <div>
-                  <p className="mb-1.5 px-1 text-sm text-haze">{t.add.hours}</p>
-                  <Choice
-                    label={t.add.hours}
-                    keys={["unknown", "always", "set"] as const}
-                    labels={{ unknown: t.add.hoursUnknown, always: t.add.hours247, set: t.add.hoursSet }}
-                    value={hoursMode}
-                    onChange={setHoursMode}
-                  />
-                  {hoursMode === "set" && (
-                    <div className="mt-2 flex items-center gap-3 text-sm text-haze">
-                      <label className="flex items-center gap-2">
-                        {t.add.opens}
-                        <input type="time" value={opens} onChange={(e) => setOpens(e.target.value)} className={cn(field, "h-10 px-3 text-ink [color-scheme:dark]")} />
-                      </label>
-                      <label className="flex items-center gap-2">
-                        {t.add.closes}
-                        <input type="time" value={closes} onChange={(e) => setCloses(e.target.value)} className={cn(field, "h-10 px-3 text-ink [color-scheme:dark]")} />
-                      </label>
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  <Toggle on={wheelchair} onChange={setWheelchair} icon={<Accessibility className="size-4" aria-hidden />}>
-                    {t.add.wheelchair}
-                  </Toggle>
-                  <Toggle on={baby} onChange={setBaby} icon={<Baby className="size-4" aria-hidden />}>
-                    {t.add.baby}
-                  </Toggle>
-                </div>
-                <LimitedInput
-                  aria-label={t.add.note}
-                  placeholder={t.add.note}
-                  value={note}
-                  onValueChange={setNote}
-                  max={LIMITS.note}
-                  clean={(v) => cleanText(v, LIMITS.note)}
-                  rejectedHint={t.add.textHint}
-                  className={cn(field, "w-full")}
-                />
-              </section>
-
               <p className="px-1 text-xs leading-relaxed text-haze">
                 {t.add.agree} <LegalLinks />
               </p>
+
+              {/* 3. Nice to have: pull the sheet up and it opens */}
+              <div {...grip} className={cn("-mx-5 -mt-2 touch-none items-center justify-center gap-2 px-5 py-1.5 text-sm text-haze select-none", details ? "hidden" : "flex")}>
+                <ChevronUp className="size-4" aria-hidden />
+                {t.add.pullUp}
+              </div>
+              <div ref={detailsBox} inert={!details} style={{ height: 0 }} className="-mx-1 -mt-3 overflow-hidden px-1">
+                <div ref={detailsInner} className="flex flex-col gap-3 pb-1">
+                  <div>
+                    <p className="mb-1.5 px-1 text-sm text-haze">{t.add.hours}</p>
+                    <Choice
+                      label={t.add.hours}
+                      keys={["unknown", "always", "set"] as const}
+                      labels={{ unknown: t.add.hoursUnknown, always: t.add.hours247, set: t.add.hoursSet }}
+                      value={hoursMode}
+                      onChange={setHoursMode}
+                    />
+                    {hoursMode === "set" && (
+                      <div className="mt-2 flex items-center gap-3 text-sm text-haze">
+                        <label className="flex items-center gap-2">
+                          {t.add.opens}
+                          <input type="time" value={opens} onChange={(e) => setOpens(e.target.value)} className={cn(field, "h-10 px-3 text-ink [color-scheme:dark]")} />
+                        </label>
+                        <label className="flex items-center gap-2">
+                          {t.add.closes}
+                          <input type="time" value={closes} onChange={(e) => setCloses(e.target.value)} className={cn(field, "h-10 px-3 text-ink [color-scheme:dark]")} />
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    <Toggle on={wheelchair} onChange={setWheelchair} icon={<Accessibility className="size-4" aria-hidden />}>
+                      {t.add.wheelchair}
+                    </Toggle>
+                    <Toggle on={baby} onChange={setBaby} icon={<Baby className="size-4" aria-hidden />}>
+                      {t.add.baby}
+                    </Toggle>
+                  </div>
+                  <LimitedInput
+                    aria-label={t.add.note}
+                    placeholder={t.add.note}
+                    value={note}
+                    onValueChange={setNote}
+                    max={LIMITS.note}
+                    clean={(v) => cleanText(v, LIMITS.note)}
+                    rejectedHint={t.add.textHint}
+                    className={cn(field, "w-full")}
+                  />
+                </div>
+              </div>
             </div>
           </form>
         )}
