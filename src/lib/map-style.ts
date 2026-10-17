@@ -29,13 +29,19 @@ function useBasemapDown() {
   useEffect(() => {
     if (verdict !== "unknown") return;
     const controller = new AbortController();
-    const timer = window.setTimeout(() => controller.abort(), 9000);
+    let timedOut = false;
+    const timer = window.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 9000);
     fetch("https://tiles.openfreemap.org/planet", { signal: controller.signal, cache: "no-store" })
       .then((r) => {
         if (!r.ok) throw new Error("down");
         verdict = "up";
       })
       .catch(() => {
+        // Leaving the page (or React re-running this effect) cancels the check; that says nothing about the service.
+        if (controller.signal.aborted && !timedOut) return;
         // No network at all looks the same as a service that is down; the fallback needs the network too, so nothing is lost.
         verdict = "down";
         setDown(true);
