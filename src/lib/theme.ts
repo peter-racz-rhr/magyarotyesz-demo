@@ -36,11 +36,15 @@ export function ThemeRunner() {
   const look = useLook();
   useEffect(() => {
     document.documentElement.dataset.theme = look;
-    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.remove());
-    const meta = document.createElement("meta");
-    meta.name = "theme-color";
-    meta.content = THEME_COLOR[look];
-    document.head.appendChild(meta);
+    // Next draws its own theme-color tag: change it in place (removing it breaks React's bookkeeping).
+    const metas = document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]');
+    if (metas.length) metas.forEach((m) => (m.content = THEME_COLOR[look]));
+    else {
+      const meta = document.createElement("meta");
+      meta.name = "theme-color";
+      meta.content = THEME_COLOR[look];
+      document.head.appendChild(meta);
+    }
   }, [look]);
   return null;
 }

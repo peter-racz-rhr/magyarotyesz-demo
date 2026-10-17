@@ -1,16 +1,18 @@
 "use client";
 
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "motion/react";
+import { Bell, MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { LegalLinks } from "@/components/legal-page";
 import { ActionButton } from "@/components/onboarding/action-button";
+import { TermsStep } from "@/components/onboarding/terms-step";
 import { FORWARD, PageTransition } from "@/components/page-transition";
 import { Wordmark } from "@/components/wordmark";
 import { useT } from "@/lib/i18n";
 import { requestLocation } from "@/lib/location";
 import { updateSettings } from "@/lib/settings";
-import { markOnboarded } from "@/lib/onboarding";
+import { askForNotifications } from "@/lib/notify";
+import { hasAcceptedTerms, hasOnboarded, markOnboarded, markTermsAccepted } from "@/lib/onboarding";
 import { cn } from "@/lib/utils";
 
 /*
@@ -102,6 +104,7 @@ export default function WelcomePage() {
   const [pressed, setPressed] = useState<{ key: string; n: number } | null>(null);
   const [open, setOpen] = useState(false);
   const [locating, setLocating] = useState(false);
+  const [step, setStep] = useState<"hero" | "terms" | "perms">("hero");
   const timers = useRef<number[]>([]);
 
   const unlock = () => {
@@ -146,8 +149,21 @@ export default function WelcomePage() {
     return () => timers.current.forEach(window.clearTimeout);
   }, [reduce]);
 
-  const enter = async (askLocation: boolean) => {
-    if (askLocation) {
+  // Someone who already got in before the terms step existed only needs to agree.
+  useEffect(() => {
+    if (hasOnboarded() && !hasAcceptedTerms()) {
+      queueMicrotask(() => {
+        unlock();
+        setStep("terms");
+      });
+    } else if (hasOnboarded() && hasAcceptedTerms()) {
+      router.replace("/map");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const enter = async (askPermissions: boolean) => {
+    if (askPermissions) {
       setLocating(true);
       // Asking for the nearest toilet is asking for location: switch it on.
       updateSettings({ location: true });
@@ -155,10 +171,12 @@ export default function WelcomePage() {
         await requestLocation();
       } catch {
         // No location: the map starts on Budapest instead.
+        updateSettings({ location: false });
       }
+      updateSettings({ notify: await askForNotifications().catch(() => false) });
     }
-    // "Just show me the map" is also a no to location; it can be switched on later in Settings.
-    if (!askLocation) updateSettings({ location: false });
+    // "Not now" is also a no to location and notifications; both can be switched on later in Settings.
+    if (!askPermissions) updateSettings({ location: false, notify: false });
     markOnboarded();
     router.replace("/map", { transitionTypes: FORWARD });
   };
@@ -201,13 +219,7 @@ export default function WelcomePage() {
                       {t.welcome.sub}
                     </p>,
                     <div key="b" className="mt-9 flex flex-col gap-2">
-                      <ActionButton onClick={() => enter(true)} disabled={locating}>
-                        {locating ? t.welcome.finding : t.welcome.find}
-                      </ActionButton>
-                      <ActionButton variant="quiet" className="h-12" onClick={() => enter(false)}>
-                        {t.welcome.mapOnly}
-                      </ActionButton>
-                      <LegalLinks className="mt-4 block text-center text-xs text-haze" />
+                      <ActionButton onClick={() => setStep("terms")}>{t.welcome.continue}</ActionButton>
                     </div>,
                   ].map((child) => (
                     <motion.div
@@ -223,6 +235,52 @@ export default function WelcomePage() {
             </AnimatePresence>
           </div>
         </div>
+
+        {/* Step 2: the terms, read to the end. Step 3: location and notifications. */}
+        {open && step === "terms" && (
+          <div className="absolute inset-0 z-20 bg-night">
+            <TermsStep
+              onAgree={() => {
+                markTermsAccepted();
+                if (hasOnboarded()) router.replace("/map", { transitionTypes: FORWARD });
+                else setStep("perms");
+              }}
+            />
+          </div>
+        )}
+        {open && step === "perms" && (
+          <div className="absolute inset-0 z-20 flex flex-col bg-night px-6 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1.5rem)]">
+            <div className="flex h-12 items-center">
+              <Wordmark className="text-[1.375rem] font-bold tracking-[-0.04em]" />
+            </div>
+            <div className="mt-auto">
+              <h1 className="text-[2.5rem] leading-[0.98] font-bold tracking-[-0.03em] [font-stretch:90%]">{t.welcome.permsTitle}</h1>
+              <p className="mt-3 text-[1.0625rem] leading-snug text-haze">{t.welcome.permsBody}</p>
+              <ul className="mt-6 flex flex-col gap-3">
+                {[
+                  { key: "loc", icon: <MapPin className="size-5" aria-hidden />, title: t.welcome.permsLocation, body: t.welcome.permsLocationWhy },
+                  { key: "not", icon: <Bell className="size-5" aria-hidden />, title: t.welcome.permsNotify, body: t.welcome.permsNotifyWhy },
+                ].map((row) => (
+                  <li key={row.key} className="flex gap-4 rounded-[22px] bg-fg/[0.055] p-4">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-full bg-good/15 text-good">{row.icon}</span>
+                    <span>
+                      <span className="block text-[1.0625rem] font-semibold">{row.title}</span>
+                      <span className="mt-0.5 block text-[0.9375rem] leading-snug text-haze">{row.body}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 flex flex-col gap-2">
+                <ActionButton onClick={() => enter(true)} disabled={locating}>
+                  {locating ? t.welcome.finding : t.welcome.allow}
+                </ActionButton>
+                <ActionButton variant="quiet" className="h-12" onClick={() => enter(false)} disabled={locating}>
+                  {t.welcome.notNow}
+                </ActionButton>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* The door: two halves that slide apart once the code is right */}
         <AnimatePresence>

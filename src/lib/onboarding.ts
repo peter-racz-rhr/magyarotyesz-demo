@@ -19,8 +19,16 @@ function write(key: string, value: string) {
 
 export const hasOnboarded = () => read(ONBOARDED_KEY) === "1";
 export const markOnboarded = () => write(ONBOARDED_KEY, "1");
-export const hasAcceptedTerms = () => read(TERMS_KEY) === "1";
-export const markTermsAccepted = () => write(TERMS_KEY, "1");
+/** Bump when the terms change in a way people must agree to again. */
+export const TERMS_VERSION = "2026-10";
+export const hasAcceptedTerms = () => {
+  try {
+    return (JSON.parse(read(TERMS_KEY) ?? "null") as { v?: string } | null)?.v === TERMS_VERSION;
+  } catch {
+    return false;
+  }
+};
+export const markTermsAccepted = () => write(TERMS_KEY, JSON.stringify({ v: TERMS_VERSION, at: new Date().toISOString() }));
 
 export function resetOnboarding() {
   try {

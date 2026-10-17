@@ -23,6 +23,30 @@ function fill(text: string, missing: string) {
   });
 }
 
+/** The text of one document without the page around it (used where the terms must be read before agreeing). */
+export function LegalBody({ doc }: { doc: DocKey }) {
+  const { t } = useT();
+  const { lang } = useSettings();
+  const d = LEGAL[lang][doc];
+  return (
+    <article>
+      <h2 className="text-[1.375rem] leading-tight font-bold">{d.title}</h2>
+      <p className="mt-1 text-sm text-haze">{d.updated}</p>
+      {d.intro && <p className="mt-4 leading-relaxed text-ink/90">{fill(d.intro, t.legal.missing)}</p>}
+      {d.sections.map((s) => (
+        <section key={s.h} className="mt-6">
+          <h3 className="text-[1.0625rem] font-semibold">{s.h}</h3>
+          {s.p.filter((p) => p !== "{phone}" || OPERATOR.phone).map((p) => (
+            <p key={p} className="mt-2 text-[0.9375rem] leading-relaxed text-ink/85">
+              {fill(p, t.legal.missing)}
+            </p>
+          ))}
+        </section>
+      ))}
+    </article>
+  );
+}
+
 export function LegalPage({ doc }: { doc: DocKey }) {
   const { t } = useT();
   const { lang } = useSettings();

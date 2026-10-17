@@ -46,6 +46,15 @@ const en: Record<DocKey, Doc> = {
         ],
       },
       {
+        h: "Who is responsible",
+        p: [
+          "magyarotyesz only passes on what its users share. We do not open doors, we do not give anyone permission to enter a place, and we are not a party between you and the people who run it. A code that works is not a right to enter.",
+          "You are responsible for what you do with a code and for what you share. If you use a code and cause damage or harm, you answer for it to the owner or to whoever was harmed, not magyarotyesz. If you share a code you are not entitled to share, or one that opens more than a toilet, you answer for that too.",
+          "We are a hosting service for what users add. We do not check every entry beforehand, but we remove illegal or reported content quickly once we know of it (see Reporting and removal). Other users' entries are theirs, not ours.",
+          "Nothing in these terms limits liability that the law does not allow to be limited, for example for harm caused on purpose or by gross negligence, or for injury to life, body or health.",
+        ],
+      },
+      {
         h: "No guarantees",
         p: [
           "The service is free and provided as it is. We do not guarantee that it is available, accurate or error free. To the extent the law allows, we are not liable for loss caused by a wrong or outdated code or by the service being unavailable. Nothing here limits liability that cannot be limited by law.",
@@ -151,6 +160,15 @@ const hu: Record<DocKey, Doc> = {
           "Ha elrejtünk vagy eltávolítunk egy általad megosztott helyet, az appban (Profil, Értesítések) megmondjuk, miért.",
           "Ha egy hely üzemeltetője vagy, és nem szeretnéd, hogy a kódjuk szerepeljen (például csak vendégeknek szól), írj a {email} címre a hely nevével és címével, és 48 órán belül eltávolítjuk. Ugyanide küldhetők a jogellenes tartalomról szóló bejelentések.",
           "Az EU digitális szolgáltatásokról szóló rendelete (DSA) szerinti kapcsolattartó pont felhasználóknak és hatóságoknak: {email}. Magyarul és angolul válaszolunk.",
+        ],
+      },
+      {
+        h: "Ki a felelős",
+        p: [
+          "A magyarotyesz csak azt adja tovább, amit a felhasználók megosztanak. Nem mi nyitjuk az ajtókat, senkinek nem adunk engedélyt egy helyre való belépéshez, és nem vagyunk szerződő fél közted és a hely üzemeltetője között. Az, hogy egy kód működik, nem jogosít fel belépésre.",
+          "Te felelsz azért, amit egy kóddal teszel, és azért, amit megosztasz. Ha egy kód használatával kárt vagy sérelmet okozol, azért a tulajdonosnak vagy a károsultnak felelsz, nem a magyarotyesznek. Ha olyan kódot osztasz meg, amelyet nem jogosult vagy megosztani, vagy amely többet nyit egy mosdónál, azért is te felelsz.",
+          "Mi a felhasználók által feltöltött tartalom tárhelyszolgáltatója vagyunk. Nem ellenőrzünk előre minden bejegyzést, de a jogsértő vagy jelentett tartalmat, amint tudomást szerzünk róla, gyorsan eltávolítjuk (lásd: Jelentés és eltávolítás). A többi felhasználó bejegyzései az övéik, nem a mieink.",
+          "E feltételek egyike sem korlátozza azt a felelősséget, amelyet jogszabály nem enged korlátozni, például a szándékosan vagy súlyos gondatlansággal okozott kárért, illetve az élet, testi épség vagy egészség károsításáért.",
         ],
       },
       {
