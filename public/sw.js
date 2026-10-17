@@ -9,7 +9,8 @@ const CACHE = "magyarotyesz-v2";
 // Map pieces from other servers (vector tiles, fonts, satellite). Seen once, they stay on the phone, so
 // the places you have looked at still show up with no signal. Capped so it never fills the storage.
 const MAP_CACHE = "magyarotyesz-map-v1";
-const MAP_HOSTS = ["tiles.openfreemap.org", "tiles.maps.eox.at", "basemaps.cartocdn.com"];
+// Satellite pictures (Esri) are left out on purpose: its licence does not allow copying them for offline use.
+const MAP_HOSTS = ["tiles.openfreemap.org", "basemaps.cartocdn.com"];
 const MAP_LIMIT = 4000;
 
 const trimMap = async () => {

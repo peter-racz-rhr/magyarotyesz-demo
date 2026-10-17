@@ -43,7 +43,7 @@ const en = {
     theme: "Appearance",
     themeNames: { system: "Auto", dark: "Dark", light: "Light" } as Record<string, string>,
     mapStyleNames: { auto: "Auto", dark: "Dark", light: "Light", satellite: "Satellite" } as Record<string, string>,
-    mapStyleHint: "Pick how the map looks. The satellite picture is free but coarse (about 10 m per pixel): good for the big picture, not for street detail.",
+    mapStyleHint: "Pick how the map looks. Auto follows the app's dark or light look.",
     codesGroup: "Codes",
     dataGroup: "Your data",
     footerMap: "Location is needed to add codes and say if they work. 3D tilts the map and raises the buildings; turn it off if the map feels slow.",
@@ -181,7 +181,7 @@ const en = {
     statusTitle: "Sync",
     server: "Shared with everyone through the magyarotyesz server.",
     removeNote: "Removes it for everyone.",
-    footer: "Codes are shared through the server and saved on this phone, so they work offline. Map © OpenFreeMap, © OpenMapTiles, data © OpenStreetMap contributors. Satellite: Sentinel-2 cloudless by EOX (Copernicus data).",
+    footer: "Codes are shared through the server and saved on this phone, so they work offline. Map © OpenFreeMap, © OpenMapTiles, data © OpenStreetMap contributors. Satellite: Esri World Imagery (Esri, Vantor, Earthstar Geographics).",
   },
 
   card: {
@@ -321,7 +321,7 @@ const en = {
     deleteConfirm: "Delete every code on this phone?",
     keep: "Keep",
     delete: "Delete",
-    footer: "Demo: codes are saved on this phone and work offline. Map © OpenFreeMap, © OpenMapTiles, data © OpenStreetMap contributors. Satellite: Sentinel-2 cloudless by EOX (Copernicus data).",
+    footer: "Demo: codes are saved on this phone and work offline. Map © OpenFreeMap, © OpenMapTiles, data © OpenStreetMap contributors. Satellite: Esri World Imagery (Esri, Vantor, Earthstar Geographics).",
   },
 };
 
@@ -364,7 +364,7 @@ const hu: Dict = {
     theme: "Megjelenés",
     themeNames: { system: "Auto", dark: "Sötét", light: "Világos" } as Record<string, string>,
     mapStyleNames: { auto: "Auto", dark: "Sötét", light: "Világos", satellite: "Műholdas" } as Record<string, string>,
-    mapStyleHint: "Válaszd ki, hogyan nézzen ki a térkép. A műholdkép ingyenes, de durva (kb. 10 m/pixel): a nagy képhez jó, az utcai részletekhez nem.",
+    mapStyleHint: "Válaszd ki, hogyan nézzen ki a térkép. Az Auto az app sötét vagy világos megjelenését követi.",
     codesGroup: "Kódok",
     dataGroup: "Az adataid",
     footerMap: "A helyhez kell, hogy kódot adhass hozzá vagy ellenőrizhess. A 3D megdönti a térképet és felhúzza az épületeket; kapcsold ki, ha lassúnak érzed.",
@@ -501,7 +501,7 @@ const hu: Dict = {
     statusTitle: "Szinkron",
     server: "A magyarotyesz szerveren át mindenkivel megosztva.",
     removeNote: "Mindenki számára törli.",
-    footer: "A kódok a szerveren át megosztottak, és ezen a telefonon is el vannak mentve, így net nélkül is működnek. Térkép © OpenFreeMap, © OpenMapTiles, adatok © OpenStreetMap közreműködők. Műholdkép: Sentinel-2 cloudless, EOX (Copernicus-adatok).",
+    footer: "A kódok a szerveren át megosztottak, és ezen a telefonon is el vannak mentve, így net nélkül is működnek. Térkép © OpenFreeMap, © OpenMapTiles, adatok © OpenStreetMap közreműködők. Műholdkép: Esri World Imagery (Esri, Vantor, Earthstar Geographics).",
   },
 
   card: {
@@ -640,7 +640,7 @@ const hu: Dict = {
     deleteConfirm: "Törlöd az összes kódot erről a telefonról?",
     keep: "Megtartom",
     delete: "Törlés",
-    footer: "Demó: a kódok ezen a telefonon vannak elmentve, és internet nélkül is elérhetők. Térkép © OpenFreeMap, © OpenMapTiles, adatok © OpenStreetMap közreműködők. Műholdkép: Sentinel-2 cloudless, EOX (Copernicus-adatok).",
+    footer: "Demó: a kódok ezen a telefonon vannak elmentve, és internet nélkül is elérhetők. Térkép © OpenFreeMap, © OpenMapTiles, adatok © OpenStreetMap közreműködők. Műholdkép: Esri World Imagery (Esri, Vantor, Earthstar Geographics).",
   },
 };
 

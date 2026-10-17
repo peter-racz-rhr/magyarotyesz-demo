@@ -15,7 +15,7 @@ const OWN: Record<MapStyleKey, string> = {
   satellite: "/map-styles/satellite.json",
 };
 
-/* If OpenFreeMap can't be reached, the old CARTO maps take over. Satellite keeps working (the imagery comes from EOX). */
+/* If OpenFreeMap can't be reached, the old CARTO maps take over. Satellite keeps working (the imagery comes from Esri). */
 const CARTO = {
   dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
   light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
