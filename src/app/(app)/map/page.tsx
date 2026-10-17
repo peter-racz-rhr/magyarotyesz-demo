@@ -114,7 +114,7 @@ function Choice<T extends string>({
           onClick={() => onChange(key)}
           className={cn(
             "h-9 rounded-full border px-3.5 text-sm font-semibold transition-colors",
-            value === key ? "border-ink bg-ink text-night" : "border-dusk-edge bg-night text-haze",
+            value === key ? "border-good bg-good/15 text-ink" : "border-dusk-edge bg-night text-haze",
           )}
         >
           {labels[key]}
@@ -322,6 +322,13 @@ export default function MapPage() {
     // Keep the pin in view above the sheet.
     mapRef.current?.easeTo({ center: [next.longitude, next.latitude], offset: [0, -200], duration: 500 });
   };
+
+  // Add lights up once the sheet can really be sent: the same rules the checks below enforce.
+  const ready =
+    validName(tidy(name, LIMITS.name)) &&
+    !!kind &&
+    (code.trim() ? validCode(cleanCode(code)) && onlyToilet : access !== "customers") &&
+    !(access === "paid" && Number(price) > LIMITS.price);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -547,7 +554,7 @@ export default function MapPage() {
                 <X className="size-5" />
               </button>
               <h2 className="t-section min-w-0 flex-1 truncate">{t.add.title}</h2>
-              <button type="submit" disabled={busy} className={cn(btn.primary, "h-10 px-5 text-[0.9375rem]")}>
+              <button type="submit" disabled={busy || !ready} className={cn(btn.primary, "h-10 px-5 text-[0.9375rem]")}>
                 {busy ? "…" : t.add.add}
               </button>
             </div>

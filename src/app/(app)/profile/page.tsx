@@ -10,7 +10,8 @@ import { HealthDot } from "@/components/toilet-card";
 import { btn } from "@/components/ui/buttons";
 import { REMOTE } from "@/lib/api";
 import { alertLine, useT } from "@/lib/i18n";
-import { useSettings } from "@/lib/settings";
+import { askForNotifications } from "@/lib/notify";
+import { updateSettings, useSettings } from "@/lib/settings";
 import { dismissNotice, syncNow, useGotInTotal, usePendingCount, useNotices, useSyncStatus, useUserId } from "@/lib/sync";
 import { ago, clearAlerts, markAlertsRead, removeToilet, useAlerts, useToilets } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,11 @@ export default function ProfilePage() {
   const userId = useUserId();
   const [editing, setEditing] = useState(false);
   const [copied, setCopied] = useState(false);
+  // Known only in the browser, so it is read after the first paint.
+  const [canNotify, setCanNotify] = useState(false);
+  useEffect(() => {
+    queueMicrotask(() => setCanNotify(typeof Notification !== "undefined" && Notification.permission !== "denied"));
+  }, []);
   const mine = toilets.filter((x) => x.mine);
   // People who got in with the codes you shared. The server keeps a running total (a new code resets the
   // votes, not this); without a server it is every "yes" on your codes except your own.
@@ -177,6 +183,20 @@ export default function ProfilePage() {
             ))
           )}
         </Group>
+
+        {/* Asked for here, once you have a place to be told about, not on day one */}
+        {mine.length > 0 && !settings.notify && canNotify && (
+          <div className={cn(CARD, "mt-3 flex items-center gap-3 p-4")}>
+            <p className="min-w-0 flex-1 text-[0.8125rem] leading-snug text-haze">{t.profile.notifyOffer}</p>
+            <button
+              type="button"
+              onClick={async () => updateSettings({ notify: await askForNotifications() })}
+              className={cn(btn.secondary, btn.sm, "shrink-0")}
+            >
+              {t.profile.notifyOn}
+            </button>
+          </div>
+        )}
 
         {/* Codes you shared */}
         <Group id="mine-heading" title={t.profile.mine} plain>

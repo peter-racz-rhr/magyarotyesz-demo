@@ -2,7 +2,7 @@
 
 import { Accessibility, Baby, Check, Copy, Eye, Flag, Navigation, Pencil, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { LimitedInput } from "@/components/limited-input";
 import { btn } from "@/components/ui/buttons";
 import { spotMessage, useT } from "@/lib/i18n";
@@ -163,6 +163,12 @@ export function ToiletCard({
   const { t, lang } = useT();
   const { showCodes } = useSettings();
   const [shown, setShown] = useState(showCodes);
+  // A code that was tapped open hides itself again after a minute (unless "show codes right away" is on).
+  useEffect(() => {
+    if (!shown || showCodes) return;
+    const timer = window.setTimeout(() => setShown(false), 60_000);
+    return () => window.clearTimeout(timer);
+  }, [shown, showCodes]);
   const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -175,7 +181,6 @@ export function ToiletCard({
   const [reporting, setReporting] = useState<"closed" | "pick" | "sent">("closed");
   const [reportedFar, setReportedFar] = useState(false);
   const suggestions = toilet.mine ? (toilet.suggestions ?? []) : [];
-  const votes = toilet.confirms + toilet.reports;
 
   const copy = async () => {
     try {
@@ -264,7 +269,7 @@ export function ToiletCard({
             {!inList && <>{t.kinds[toilet.kind]} · </>}
             {access}
           </p>
-          {toilet.hours && <HoursLine toilet={toilet} className="mt-0.5 block text-sm" />}
+          {toilet.hours && !inList && <HoursLine toilet={toilet} className="mt-0.5 block text-sm" />}
           {isUnconfirmed(toilet) && <p className="mt-1 text-xs text-stale">{t.card.unconfirmed}</p>}
           {toilet.pending && (
             <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-haze">
@@ -349,25 +354,23 @@ export function ToiletCard({
           )}
         </button>
         )}
-        <a
-          href={directionsUrl(toilet)}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={t.card.directions}
-          className={cn(btn.secondary, "h-16 w-16 flex-col gap-0.5 rounded-2xl px-0 text-[0.6875rem]")}
-        >
-          <Navigation className="size-5 text-good" aria-hidden />
-          {t.card.directions}
-        </a>
       </div>
+      <a
+        href={directionsUrl(toilet)}
+        target="_blank"
+        rel="noreferrer"
+        className={cn(btn.secondary, "mt-2 h-11 w-full gap-2 rounded-2xl text-[0.9375rem]")}
+      >
+        <Navigation className="size-[1.125rem] text-good" aria-hidden />
+        {t.card.directions}
+      </a>
 
       {isStale(toilet) && <p className="mt-2 text-xs text-stale">{t.card.stale}</p>}
 
       {/* How many got in: plain words, the dot carries the colour */}
       <p className="mt-3 flex items-center gap-2 text-sm text-ink/85">
         <HealthDot toilet={toilet} className="size-2" />
-        {votes > 0 && <span className="font-semibold">{t.card.gotIn(Math.round(trust(toilet) * 100))}</span>}
-        <span className="text-haze">{t.card.votes(toilet.confirms, toilet.reports)}</span>
+        <span className="font-semibold">{t.card.votes(toilet.confirms, toilet.reports)}</span>
       </p>
       <p className="mt-0.5 pl-4 text-xs text-haze">
         {t.card.lastWorked(ago(toilet.confirmedAt, lang))}

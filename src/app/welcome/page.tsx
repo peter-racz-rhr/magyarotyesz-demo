@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "motion/react";
-import { Bell, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ActionButton } from "@/components/onboarding/action-button";
@@ -11,7 +11,6 @@ import { Wordmark } from "@/components/wordmark";
 import { useT } from "@/lib/i18n";
 import { requestLocation } from "@/lib/location";
 import { updateSettings } from "@/lib/settings";
-import { askForNotifications } from "@/lib/notify";
 import { hasAcceptedTerms, hasOnboarded, markOnboarded, markTermsAccepted } from "@/lib/onboarding";
 import { cn } from "@/lib/utils";
 
@@ -173,10 +172,9 @@ export default function WelcomePage() {
         // No location: the map starts on Budapest instead.
         updateSettings({ location: false });
       }
-      updateSettings({ notify: await askForNotifications().catch(() => false) });
     }
-    // "Not now" is also a no to location and notifications; both can be switched on later in Settings.
-    if (!askPermissions) updateSettings({ location: false, notify: false });
+    // "Not now" is also a no to location; it can be switched on later in Settings. Notifications are asked for later, once there is something to be told about.
+    if (!askPermissions) updateSettings({ location: false });
     markOnboarded();
     router.replace("/map", { transitionTypes: FORWARD });
   };
@@ -188,13 +186,6 @@ export default function WelcomePage() {
       <main data-theme="dark" className="relative mx-auto min-h-dvh w-full max-w-md overflow-hidden bg-night text-ink">
         {/* Behind the door: the light, and the promise */}
         <div className="absolute inset-0">
-          <motion.div
-            aria-hidden
-            className="absolute inset-x-0 top-[18%] h-[60%] bg-[radial-gradient(closest-side,rgba(79,224,138,0.32),rgba(79,224,138,0.08)_55%,transparent)]"
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={open ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: reduce ? 0 : 1.2, ease: EASE_OUT }}
-          />
           <div className="relative flex min-h-dvh flex-col px-6 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1.5rem)]">
             <div className="flex h-12 items-center">
               <Wordmark className="text-[1.375rem] font-bold tracking-[-0.04em]" />
@@ -208,7 +199,7 @@ export default function WelcomePage() {
                   variants={{ shown: { transition: { staggerChildren: reduce ? 0 : 0.09, delayChildren: reduce ? 0 : 0.35 } } }}
                 >
                   {[
-                    <h1 key="h" className="text-[3.5rem] leading-[0.94] font-bold tracking-[-0.035em] [font-stretch:90%]">
+                    <h1 key="h" className="text-[3.25rem] leading-[1] font-bold tracking-[-0.02em] [font-stretch:92%]">
                       {t.welcome.headline.map((line, i) => (
                         <span key={i} className="block">
                           {line}
@@ -259,7 +250,6 @@ export default function WelcomePage() {
               <ul className="mt-6 flex flex-col gap-3">
                 {[
                   { key: "loc", icon: <MapPin className="size-5" aria-hidden />, title: t.welcome.permsLocation, body: t.welcome.permsLocationWhy },
-                  { key: "not", icon: <Bell className="size-5" aria-hidden />, title: t.welcome.permsNotify, body: t.welcome.permsNotifyWhy },
                 ].map((row) => (
                   <li key={row.key} className="flex gap-4 rounded-[22px] bg-fg/[0.055] p-4">
                     <span className="grid size-10 shrink-0 place-items-center rounded-full bg-good/15 text-good">{row.icon}</span>

@@ -41,17 +41,17 @@
   --glass-solid: #f6f3ee;
   --night: #f6f3ee;
   --ink: #1b1917;
-  --haze: #6b645d;
+  --haze: #635c55;
   --dusk: #ffffff;
   --dusk-edge: #ddd6cc;
   --ember: #d9531a;
   --gold: #b7791f;
   --rose: #c02e63;
-  --ok: #1d7a47;
-  --good: #12994a;
-  --stale: #a86a00;
-  --bad: #d12e26;
-  --error: #c0392b;
+  --ok: #176B3C;
+  --good: #0B6D33;
+  --stale: #855300;
+  --bad: #be2820;
+  --error: #b3331f;
   color-scheme: light;
 }
 
