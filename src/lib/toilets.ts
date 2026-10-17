@@ -194,14 +194,14 @@ export function editToilet(
 }
 
 /** Tell the server a place is offensive, private, wrong or gone. Without a server there is nobody to tell. */
-export function reportToilet(id: string, reason: string) {
-  if (REMOTE) enqueue("report_toilet", { toiletId: id, reason }, { name: nameOf(id) });
+export function reportToilet(id: string, reason: string, location?: Location) {
+  if (REMOTE) enqueue("report_toilet", { toiletId: id, reason }, { location, name: nameOf(id) });
 }
 
 /** Anyone else can only suggest a new code. */
-export function suggestCode(id: string, rawCode: string) {
+export function suggestCode(id: string, rawCode: string, location?: Location) {
   const code = cleanCode(rawCode);
-  if (REMOTE) return void enqueue("suggest_code", { toiletId: id, code }, { name: nameOf(id) });
+  if (REMOTE) return void enqueue("suggest_code", { toiletId: id, code }, { location, name: nameOf(id) });
   update(id, (t) => ({
     ...t,
     suggestions: [{ id: crypto.randomUUID(), code, at: new Date().toISOString() }, ...(t.suggestions ?? [])],

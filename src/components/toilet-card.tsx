@@ -88,7 +88,7 @@ function EditForm({ toilet, onDone }: { toilet: Toilet; onDone: () => void }) {
     const cleanName = tidy(name, LIMITS.name);
     const cleanedCode = cleanCode(code);
     // A free toilet may have no code at all.
-    const codeOk = cleanedCode === "" ? toilet.access === "free" : validCode(cleanedCode);
+    const codeOk = cleanedCode === "" ? toilet.access !== "customers" : validCode(cleanedCode);
     if (!validName(cleanName) || !codeOk) return;
     const cleanNote = tidy(note, LIMITS.note);
     if (!checkFields({ name: cleanName, note: cleanNote }).ok) return setError(t.add.errBad);
@@ -135,7 +135,7 @@ function EditForm({ toilet, onDone }: { toilet: Toilet; onDone: () => void }) {
         <button type="button" onClick={onDone} className={cn(btn.quiet, btn.md)}>
           {t.card.cancel}
         </button>
-        <button type="submit" disabled={!validName(tidy(name, LIMITS.name)) || !(cleanCode(code) === "" ? toilet.access === "free" : validCode(cleanCode(code)))} className={cn(btn.primary, btn.md)}>
+        <button type="submit" disabled={!validName(tidy(name, LIMITS.name)) || !(cleanCode(code) === "" ? toilet.access !== "customers" : validCode(cleanCode(code)))} className={cn(btn.primary, btn.md)}>
           {t.card.save}
         </button>
       </div>
@@ -173,6 +173,7 @@ export function ToiletCard({
   const [blocked, setBlocked] = useState<string | null>(null);
   // Reporting a place: closed, picking a reason, or done.
   const [reporting, setReporting] = useState<"closed" | "pick" | "sent">("closed");
+  const [reportedFar, setReportedFar] = useState(false);
   const suggestions = toilet.mine ? (toilet.suggestions ?? []) : [];
   const votes = toilet.confirms + toilet.reports;
 
@@ -220,7 +221,7 @@ export function ToiletCard({
     }
   };
 
-  const sendNewCode = (event: FormEvent) => {
+  const sendNewCode = async (event: FormEvent) => {
     event.preventDefault();
     const code = cleanCode(newCode);
     if (!validCode(code)) return;
@@ -229,7 +230,14 @@ export function ToiletCard({
       setStep("thanks");
       setShown(true);
     } else {
-      suggestCode(toilet.id, code);
+      // A suggestion, like a vote, has to come from the spot.
+      setBlocked(null);
+      const spot = await checkOnTheSpot(toilet);
+      if (!spot.ok) {
+        setBlocked(spotMessage(t, spot));
+        return;
+      }
+      suggestCode(toilet.id, code, spot.location);
       setStep("suggested");
     }
     setNewCode("");
@@ -455,8 +463,11 @@ export function ToiletCard({
                   <button
                     key={reason}
                     type="button"
-                    onClick={() => {
-                      reportToilet(toilet.id, reason);
+                    onClick={async () => {
+                      // Near the place the report counts at once; from afar it is kept for a person to look at.
+                      const spot = await checkOnTheSpot(toilet);
+                      reportToilet(toilet.id, reason, spot.ok ? spot.location : undefined);
+                      setReportedFar(!spot.ok);
                       setReporting("sent");
                     }}
                     className={cn(btn.secondary, btn.sm, "px-3")}
@@ -470,7 +481,7 @@ export function ToiletCard({
               </button>
             </div>
           )}
-          {reporting === "sent" && <p className="text-xs text-haze">{REMOTE ? t.card.reportSent : t.card.reportDemo}</p>}
+          {reporting === "sent" && <p className="text-xs text-haze">{REMOTE ? (reportedFar ? t.card.reportSentFar : t.card.reportSent) : t.card.reportDemo}</p>}
         </div>
       )}
     </div>

@@ -9,7 +9,7 @@ import { CARD } from "@/components/settings-ui";
 import { btn } from "@/components/ui/buttons";
 import { REMOTE } from "@/lib/api";
 import { useT } from "@/lib/i18n";
-import { backupCode, restoreBackup, useUserId } from "@/lib/sync";
+import { backupCode, restoreBackup, rotateBackup, useUserId } from "@/lib/sync";
 import { cn } from "@/lib/utils";
 
 /** Keep a profile safe, or move it to another phone: a code and a QR to save, and a box to restore one. */
@@ -22,7 +22,17 @@ export default function BackupPage() {
   const [input, setInput] = useState("");
   const [step, setStep] = useState<"idle" | "confirm" | "busy">("idle");
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
+  const [rotating, setRotating] = useState<"idle" | "confirm" | "busy">("idle");
+  const [rotateMsg, setRotateMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const code = shown && userId ? backupCode() : null;
+
+  const rotate = async () => {
+    setRotating("busy");
+    const result = await rotateBackup();
+    setRotating("idle");
+    setRotateMsg({ ok: result === "ok", text: result === "ok" ? t.backup.rotated : t.backup.rotateFail });
+    if (result === "ok") setShown(true);
+  };
 
   // A scanned QR opens this page with the code after "#restore=": put it in the box.
   useEffect(() => {
@@ -100,6 +110,30 @@ export default function BackupPage() {
                       <p className="text-center text-[0.8125rem] text-stale">{t.backup.warning}</p>
                     </div>
                   )}
+                  <div className="mt-5 border-t border-fg/[0.07] pt-4">
+                    {rotating === "confirm" ? (
+                      <>
+                        <p className="text-[0.8125rem] leading-relaxed text-haze">{t.backup.rotateWarn}</p>
+                        <div className="mt-3 flex gap-2">
+                          <button type="button" onClick={rotate} className={cn(btn.sm, "inline-flex items-center rounded-full bg-ink px-4 font-semibold text-night")}>
+                            {t.backup.rotateYes}
+                          </button>
+                          <button type="button" onClick={() => setRotating("idle")} className={cn(btn.secondary, btn.sm, "px-4")}>
+                            {t.card.cancel}
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <button type="button" disabled={rotating === "busy"} onClick={() => { setRotateMsg(null); setRotating("confirm"); }} className={cn(btn.secondary, btn.sm, "w-full")}>
+                        {t.backup.rotate}
+                      </button>
+                    )}
+                    {rotateMsg && (
+                      <p role="status" className={cn("mt-3 text-[0.8125rem]", rotateMsg.ok ? "text-good" : "text-bad")}>
+                        {rotateMsg.text}
+                      </p>
+                    )}
+                  </div>
                 </>
               )}
             </section>

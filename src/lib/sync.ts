@@ -354,6 +354,21 @@ export async function restoreBackup(text: string): Promise<"ok" | "invalid" | "u
   return "ok";
 }
 
+/** A new backup code: the old one (and any other phone using it) stops working at once. */
+export async function rotateBackup(): Promise<"ok" | "unknown" | "offline"> {
+  const me = identity.get();
+  if (!me) return "unknown";
+  try {
+    const res = await api<{ userId: string; token: string }>("/v1/me/rotate-token", { method: "POST", token: me.token });
+    if (res.notModified) return "offline";
+    identity.set({ userId: res.data.userId, token: res.data.token });
+    return "ok";
+  } catch (e) {
+    if (e instanceof ApiFailure && e.status === 401) return "unknown";
+    return "offline";
+  }
+}
+
 /** Everything the server holds for this profile (for "Download my data"). Null when there is none yet or no answer. */
 export async function fetchMyData(): Promise<unknown | null> {
   const me = identity.get();
@@ -384,7 +399,7 @@ const transient = (e: unknown) => e instanceof Offline || (e instanceof ApiFailu
  */
 async function flush(acked: Set<string>, notices: Notice[]) {
   for (;;) {
-    const batch = outbox.get().filter((a) => !acked.has(a.id)).slice(0, 100);
+    const batch = outbox.get().filter((a) => !acked.has(a.id)).slice(0, 20);
     if (batch.length === 0) return;
     const me = await ensureIdentity();
     let res;

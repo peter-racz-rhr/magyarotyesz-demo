@@ -333,7 +333,7 @@ export default function MapPage() {
     if (!cleanName || !validName(cleanName)) return setError(t.add.errName);
     // A free toilet may have no code at all ("no code needed"); anything else needs one.
     const finalAccess = paidFor ? "paid" : access === "paid" ? "free" : access;
-    if (!code.trim() && finalAccess !== "free") return setError(t.add.errCode);
+    if (!code.trim() && finalAccess === "customers") return setError(t.add.errCode);
     if (code.trim() && !validCode(cleanedCode)) return setError(t.add.errCodeChars);
     if (!kind) return setError(t.add.errKind);
     if (code.trim() && !onlyToilet) return setError(t.add.errOnlyToilet);
@@ -611,7 +611,7 @@ export default function MapPage() {
                 )}
                 <LimitedInput
                   aria-label={t.add.code}
-                  placeholder={access === "free" ? t.add.codeFree : t.add.code}
+                  placeholder={access !== "customers" ? t.add.codeFree : t.add.code}
                   value={code}
                   onValueChange={(v) => {
                     setCode(v);
