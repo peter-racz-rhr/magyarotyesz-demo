@@ -17,7 +17,7 @@ const LAYER = "magyarotyesz-buildings-3d";
 const TILT = 55;
 
 /** Where the base style keeps its buildings: the first layer that draws them. */
-export function findBuildings(map: MapLibreGL.Map) {
+function findBuildings(map: MapLibreGL.Map) {
   const layers = map.getStyle()?.layers ?? [];
   const found = layers.find((l) => "source-layer" in l && l["source-layer"] === "building") ?? layers.find((l) => /^building/.test(l.id) && "source" in l);
   return found && "source" in found && found.source ? { source: found.source as string, sourceLayer: (found as { "source-layer"?: string })["source-layer"], id: found.id } : null;
@@ -50,7 +50,7 @@ function add(map: MapLibreGL.Map, variant: "dark" | "light") {
       // Rise from the ground as you zoom in instead of popping up.
       "fill-extrusion-height": ["interpolate", ["linear"], ["zoom"], 14.5, 0, 15.7, height],
       "fill-extrusion-base": ["interpolate", ["linear"], ["zoom"], 14.5, 0, 15.7, floor],
-      "fill-extrusion-opacity": 1, // fully opaque, so the landmark models (a separate layer) are hidden or shown by plain depth
+      "fill-extrusion-opacity": 0.94,
       "fill-extrusion-vertical-gradient": variant !== "light", // cream walls stay even, no dark foot
     },
   } as unknown as MapLibreGL.FillExtrusionLayerSpecification);

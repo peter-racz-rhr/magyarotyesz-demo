@@ -16,7 +16,6 @@ import { Map, MapMarker, MapPopup, MarkerContent, useMap, type MapRef } from "@/
 import { spotMessage, useT } from "@/lib/i18n";
 import { requestLocation } from "@/lib/location";
 import { Buildings3D } from "@/components/buildings-3d";
-import { Landmarks3D } from "@/components/landmarks-3d";
 import { checkFields } from "@/lib/moderation";
 import { getSettings, useSettings } from "@/lib/settings";
 import { LIMITS, cleanCode, cleanText, tidy, validCode, validName } from "@/lib/limits";
@@ -490,7 +489,6 @@ export default function MapPage() {
           <TapToAdd onTap={startDraft} onDismiss={() => setFocus(null)} />
           <ZoomCap max={base.key === "satellite" ? 19 : 22} />
           <Buildings3D enabled={buildings3d && base.key !== "satellite"} variant={base.key === "light" ? "light" : "dark"} />
-          <Landmarks3D enabled={buildings3d && base.key !== "satellite"} variant={base.key === "light" ? "light" : "dark"} />
 
           {visible.map((toilet) => (
             <MapMarker key={toilet.id} latitude={toilet.latitude} longitude={toilet.longitude}>
