@@ -505,6 +505,18 @@ export default function MapPage() {
                     const dot = <HealthDot toilet={toilet} className={cn(isOpen(toilet) === false && "opacity-45")} />;
                     return justAdded?.id === toilet.id ? <DropIn>{dot}</DropIn> : dot;
                   })()}
+                  {/* A paid place carries a small "Ft" tag, so it reads as paid by its shape and letters, not only by colour */}
+                  {toilet.access === "paid" && (
+                    <span
+                      aria-hidden
+                      className={cn(
+                        "pointer-events-none absolute top-[calc(50%-17px)] left-[calc(50%+3px)] grid h-[14px] place-items-center rounded-[5px] bg-stale px-[3px] text-[0.5625rem] leading-none font-extrabold text-night ring-2 ring-night",
+                        isOpen(toilet) === false && "opacity-45",
+                      )}
+                    >
+                      Ft
+                    </span>
+                  )}
                 </span>
               </MarkerContent>
             </MapMarker>
