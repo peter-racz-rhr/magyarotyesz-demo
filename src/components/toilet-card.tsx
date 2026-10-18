@@ -1,6 +1,6 @@
 "use client";
 
-import { Accessibility, Baby, Check, Copy, Eye, Flag, Navigation, Pencil, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
+import { Accessibility, Baby, Check, Eye, Flag, Navigation, Pencil, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { LimitedInput } from "@/components/limited-input";
@@ -58,6 +58,15 @@ const field =
 const codeField = `${field} font-mono tracking-[0.12em] placeholder:font-sans placeholder:tracking-normal`;
 
 /** "Open · until 22:00", "Closed · opens 08:00", "Open 24/7", or nothing. */
+/** The code always fits: the longer it is, the smaller it is written (and a very long one wraps instead of being cut off). */
+function codeSize(code: string) {
+  const n = code.length;
+  if (n <= 7) return "text-[1.75rem] tracking-[0.1em]";
+  if (n <= 10) return "text-[1.5rem] tracking-[0.06em]";
+  if (n <= 13) return "text-[1.25rem] tracking-[0.04em]";
+  return "text-[1.0625rem] leading-tight tracking-[0.02em]";
+}
+
 export function HoursLine({ toilet, className }: { toilet: Toilet; className?: string }) {
   const { t } = useT();
   if (!toilet.hours) return null;
@@ -169,7 +178,6 @@ export function ToiletCard({
     const timer = window.setTimeout(() => setShown(false), 60_000);
     return () => window.clearTimeout(timer);
   }, [shown, showCodes]);
-  const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const [editing, setEditing] = useState(false);
   // After a vote: thanks, or (after "no") asking for the new code.
@@ -181,16 +189,6 @@ export function ToiletCard({
   const [reporting, setReporting] = useState<"closed" | "pick" | "sent">("closed");
   const [reportedFar, setReportedFar] = useState(false);
   const suggestions = toilet.mine ? (toilet.suggestions ?? []) : [];
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(toilet.code);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // Clipboard blocked: the code is on screen anyway.
-    }
-  };
 
   /** The phone's own share sheet where there is one; otherwise the link goes to the clipboard. */
   const share = async () => {
@@ -321,7 +319,7 @@ export function ToiletCard({
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 exit={{ opacity: 0, y: -8, filter: "blur(6px)" }}
                 transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                className="truncate pr-11 pl-4 font-mono text-[1.75rem] font-bold tracking-[0.1em] tabular-nums"
+                className={cn("max-w-full px-4 text-center font-mono font-bold tabular-nums break-all", codeSize(toilet.code))}
               >
                 {toilet.code}
               </motion.span>
@@ -338,20 +336,6 @@ export function ToiletCard({
               </motion.span>
             )}
           </AnimatePresence>
-          {shown && (
-            <span
-              role="button"
-              tabIndex={0}
-              onClick={(e) => {
-                e.stopPropagation();
-                void copy();
-              }}
-              aria-label={t.card.copy}
-              className="absolute right-2 grid size-10 place-items-center rounded-full text-haze hover:text-ink"
-            >
-              {copied ? <Check className="size-5 text-good" /> : <Copy className="size-5" />}
-            </span>
-          )}
         </button>
         )}
       </div>
