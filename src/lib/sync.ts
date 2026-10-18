@@ -41,7 +41,7 @@ type Me = {
   owns: string[];
   votes: Record<string, boolean>;
   suggestions: Record<string, { id: string; code: string; at: string }[]>;
-  alerts: { id: string; toiletId: string; name: string; kind: "report" | "suggestion" | "removed"; code: string | null; at: string; read: boolean; reason?: string }[];
+  alerts: { id: string; toiletId: string; name: string; kind: "report" | "suggestion" | "removed" | "message"; code: string | null; at: string; read: boolean; reason?: string; text?: string }[];
   addsLeftToday: number;
   /** Running total of people who got in with this phone's codes; kept by the server across code changes. */
   gotIn?: number;
@@ -228,7 +228,7 @@ const alertsView = (): Alert[] => {
   return meStore
     .get()
     .alerts.filter((a) => !cleared || a.at > cleared)
-    .map((a) => ({ id: a.id, toiletId: a.toiletId, name: a.name, kind: a.kind, code: a.code ?? undefined, at: a.at, read: a.read, reason: a.reason }));
+    .map((a) => ({ id: a.id, toiletId: a.toiletId, name: a.name, kind: a.kind, code: a.code ?? undefined, at: a.at, read: a.read, reason: a.reason, text: a.text }));
 };
 let lastAlerts: { m: Me; c: string; out: Alert[] } | null = null;
 function alerts() {

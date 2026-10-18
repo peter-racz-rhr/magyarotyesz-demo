@@ -314,6 +314,7 @@ const en = {
     alertReport: (name: string) => `Someone said the code at ${name} doesn't work.`,
     alertSuggestion: (name: string, code: string) => `New code suggested for ${name}: ${code}`,
     alertRemoved: (name: string, why: string) => `${name} was taken off the map. ${why}`,
+    alertMessage: (text: string) => `Message from magyarotyesz: ${text}`,
     removeReasons: {
       "auto:reports": "Several people reported it, so it is hidden until it has been checked.",
       "auto:nottoilet": "Someone reported that it is not a toilet, so it is hidden until it has been checked.",
@@ -659,6 +660,7 @@ const hu: Dict = {
     alertReport: (name: string) => `Valaki szerint nem működik a kód itt: ${name}.`,
     alertSuggestion: (name: string, code: string) => `Új kódot javasoltak ide: ${name}: ${code}`,
     alertRemoved: (name: string, why: string) => `${name} lekerült a térképről. ${why}`,
+    alertMessage: (text: string) => `Üzenet a magyarotyesztől: ${text}`,
     removeReasons: {
       "auto:reports": "Többen jelentették, ezért rejtve van, amíg meg nem nézik.",
       "auto:nottoilet": "Valaki jelentette, hogy nem mosdó, ezért rejtve van, amíg meg nem nézik.",
@@ -696,8 +698,9 @@ const hu: Dict = {
   },
 };
 
-/** One line for an alert: a report, a suggestion, or a place taken off the map and why. */
-export function alertLine(t: Dict, alert: { kind: "report" | "suggestion" | "removed"; name: string; code?: string | null; reason?: string }) {
+/** One line for an alert: a report, a suggestion, a place taken off the map and why, or a note from us. */
+export function alertLine(t: Dict, alert: { kind: "report" | "suggestion" | "removed" | "message"; name: string; code?: string | null; reason?: string; text?: string }) {
+  if (alert.kind === "message") return t.profile.alertMessage(alert.text ?? "");
   if (alert.kind === "report") return t.profile.alertReport(alert.name);
   if (alert.kind === "removed") return t.profile.alertRemoved(alert.name, t.profile.removeReasons[alert.reason ?? ""] ?? alert.reason ?? "");
   return t.profile.alertSuggestion(alert.name, alert.code ?? "");

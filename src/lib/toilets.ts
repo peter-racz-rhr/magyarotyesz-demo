@@ -240,8 +240,10 @@ export type Alert = {
   id: string;
   toiletId: string;
   name: string;
-  kind: "report" | "suggestion" | "removed";
+  kind: "report" | "suggestion" | "removed" | "message";
   code?: string;
+  /** For "message": the words of the person running the app. */
+  text?: string;
   /** For "removed": why (a code like "auto:reports", or the words of the person who checked). */
   reason?: string;
   at: string;
