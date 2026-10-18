@@ -255,6 +255,8 @@ export default function NearbyPage() {
                       <span className="block truncate font-semibold">{toilet.name}</span>
                       <span className="flex items-center gap-2 text-sm text-haze">
                         {d.kinds[toilet.kind]}
+                        {toilet.access === "paid" && <span className="rounded-full bg-stale/[0.14] px-2 py-0.5 text-xs font-bold text-stale">{toilet.price ? `${toilet.price} Ft` : d.access.paid}</span>}
+                        {toilet.code === "" && <span className="rounded-full bg-good/[0.14] px-2 py-0.5 text-xs font-semibold text-good">{d.card.noCodeTag}</span>}
                         <HoursLine toilet={toilet} className="text-xs" />
                       </span>
                     </span>

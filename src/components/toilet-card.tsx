@@ -1,6 +1,6 @@
 "use client";
 
-import { Accessibility, Baby, Check, Eye, Flag, Navigation, Pencil, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
+import { Accessibility, Baby, Check, Coins, Eye, Flag, Navigation, Pencil, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { LimitedInput } from "@/components/limited-input";
@@ -298,12 +298,25 @@ export function ToiletCard({
         </div>
       )}
 
+      {/* A paid toilet says so, loudly, even when it also has a code */}
+      {toilet.access === "paid" && toilet.code !== "" && (
+        <p className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-stale/50 bg-stale/[0.12] px-3 py-1 text-sm font-bold text-stale">
+          <Coins className="size-4" aria-hidden /> {t.card.paidBadge(toilet.price)}
+        </p>
+      )}
+
       {/* The code: the reason you're here */}
-      <div className="mt-3 flex items-stretch gap-2">
+      <div className={cn("flex items-stretch gap-2", toilet.access === "paid" && toilet.code !== "" ? "mt-2" : "mt-3")}>
         {toilet.code === "" ? (
-          <div className="flex h-16 min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border border-good/40 bg-good/[0.07] text-base font-semibold">
-            <Check className="size-5 text-good" aria-hidden /> {t.card.noCode}
-          </div>
+          toilet.access === "paid" ? (
+            <div className="flex h-16 min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border border-stale/50 bg-stale/[0.12] px-3 text-center text-base leading-tight font-bold text-stale">
+              <Coins className="size-5 shrink-0" aria-hidden /> {t.card.paidNoCode(toilet.price)}
+            </div>
+          ) : (
+            <div className="flex h-16 min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border border-good/40 bg-good/[0.07] px-3 text-center text-base leading-tight font-semibold">
+              <Check className="size-5 shrink-0 text-good" aria-hidden /> {t.card.freeNoCode}
+            </div>
+          )
         ) : (
         <button
           type="button"
