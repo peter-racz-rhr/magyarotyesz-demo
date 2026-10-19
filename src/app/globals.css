@@ -26,9 +26,9 @@
   --rose: #f0648c;
   --ok: #7fd6a4;
   --good: #4fe08a; /* code works */
-  --me: #f4efe9; /* the dot that is you on the map */
-  --me-ring: rgb(79 224 138 / 0.3);
-  --me-edge: transparent;
+  --me: #1a6fe6; /* the dot that is you on the map: blue on both themes, so it never looks like a place */
+  --me-ring: rgb(26 111 230 / 0.28);
+  --me-edge: #ffffff;
   --stale: #ffc247; /* not checked lately */
   --bad: #ff5f57; /* reported not working */
   --error: #ff8a7a;
@@ -52,7 +52,7 @@
   --rose: #c02e63;
   --ok: #176B3C;
   --good: #0B6D33;
-  --me: #1a6fe6; /* blue, so you never lose yourself among the green places */
+  --me: #1a6fe6;
   --me-ring: rgb(26 111 230 / 0.28);
   --me-edge: #ffffff;
   --stale: #855300;
