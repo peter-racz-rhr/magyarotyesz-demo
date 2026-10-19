@@ -541,7 +541,7 @@ export default function MapPage() {
           {here.coords && (
             <MapMarker latitude={here.coords.latitude} longitude={here.coords.longitude}>
               <MarkerContent>
-                <span className="relative block size-4 rounded-full bg-ink ring-4 ring-good/30" />
+                <span className="relative block size-4 rounded-full border-2 border-me-edge bg-me ring-4 ring-me-ring" />
               </MarkerContent>
             </MapMarker>
           )}

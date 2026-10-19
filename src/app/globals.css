@@ -26,6 +26,9 @@
   --rose: #f0648c;
   --ok: #7fd6a4;
   --good: #4fe08a; /* code works */
+  --me: #f4efe9; /* the dot that is you on the map */
+  --me-ring: rgb(79 224 138 / 0.3);
+  --me-edge: transparent;
   --stale: #ffc247; /* not checked lately */
   --bad: #ff5f57; /* reported not working */
   --error: #ff8a7a;
@@ -49,6 +52,9 @@
   --rose: #c02e63;
   --ok: #176B3C;
   --good: #0B6D33;
+  --me: #1a6fe6; /* blue, so you never lose yourself among the green places */
+  --me-ring: rgb(26 111 230 / 0.28);
+  --me-edge: #ffffff;
   --stale: #855300;
   --bad: #be2820;
   --error: #b3331f;
@@ -92,6 +98,9 @@
   --color-rose: var(--rose);
   --color-ok: var(--ok);
   --color-good: var(--good);
+  --color-me: var(--me);
+  --color-me-ring: var(--me-ring);
+  --color-me-edge: var(--me-edge);
   --color-stale: var(--stale);
   --color-bad: var(--bad);
   --color-error: var(--error);
