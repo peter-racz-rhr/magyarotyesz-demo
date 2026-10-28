@@ -342,10 +342,11 @@
 }
 
 /*
-  The dark colours of the navigation (Settings > Navigation). "classic" adds
-  nothing: it is the glass as it was. The others give the bar, orb, side bar and
-  handle one shared look, a lighter pill than the dark map behind it, the way the
-  white pill stands out on the light theme.
+  The dark colours of the glass (Settings > Navigation). "classic" adds nothing:
+  it is the glass as it was. The others give every glass control, the bar, orb,
+  side bar and handle, the search bar, the filters, Nearest and locate, one shared
+  look: a lighter pill than the dark map behind it, the way the white pill stands
+  out on the light theme.
 */
 html[data-theme="dark"][data-dark-bar="graphite"] {
   --dock-fill: rgba(46, 50, 57, 0.86);
@@ -371,7 +372,7 @@ html[data-theme="dark"][data-dark-bar="mint"] {
   --dock-ink: rgba(236, 239, 243, 0.66);
   --dock-lit: #7df0ae;
 }
-html[data-theme="dark"]:is([data-dark-bar="graphite"], [data-dark-bar="ink"], [data-dark-bar="mint"]) .app-dock {
+html[data-theme="dark"]:is([data-dark-bar="graphite"], [data-dark-bar="ink"], [data-dark-bar="mint"]) {
   .lq-surface {
     --lq-fill: var(--dock-fill);
     --lq-line: var(--dock-line);
@@ -407,19 +408,10 @@ html[data-nav="orb"] #dock-accessory > div > * {
   pointer-events: auto;
 }
 html[data-nav="orb"] #dock-accessory > div > :last-child {
-  margin-bottom: 4.625rem;
+  margin-bottom: 4.25rem;
 }
 html[data-nav="orb"] #dock-accessory > div > :first-child {
-  margin-bottom: 0.1875rem;
-}
-
-/* The orb itself is solid, so it never reads as just another round glass button. */
-html[data-nav="orb"] .app-dock .nav-orb-main.lq-surface {
-  --lq-fill: var(--ink);
-  --lq-line: transparent;
-}
-html[data-nav="orb"] .app-dock .nav-orb-main [data-dock-ink][data-lit] {
-  color: var(--night);
+  margin-bottom: 0;
 }
 
 /* The side bar floats over the pages, so they keep clear of it. */

@@ -10,7 +10,6 @@ import { PageTransition } from "@/components/page-transition";
 import { HealthDot, ToiletCard } from "@/components/toilet-card";
 import { btn } from "@/components/ui/buttons";
 import { LimitedInput } from "@/components/limited-input";
-import { LiquidIconButton } from "@/components/ui/liquid-icon-button";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { Map, MapMarker, MapPopup, MarkerContent, useMap, type MapRef } from "@/components/ui/map";
 import { spotMessage, useT } from "@/lib/i18n";
@@ -562,7 +561,7 @@ export default function MapPage() {
             the middle when it fits and scrolls sideways when it doesn't. */}
         {!draft && (
           <div data-pull-zone className="absolute inset-x-0 top-[max(env(safe-area-inset-top),0.75rem)] z-10 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <LiquidSurface radius={999} veil={0.5} className="mx-auto flex w-max gap-0.5 p-1">
+            <LiquidSurface radius={999} className="mx-auto flex w-max gap-0.5 p-1">
               {(Object.keys(t.map.filters) as (keyof Filters)[]).map((key) => (
                 <button
                   key={key}
@@ -603,9 +602,11 @@ export default function MapPage() {
                   {t.map.nearest}
                 </button>
               </LiquidSurface>
-              <LiquidIconButton label={t.map.locate} shape="circle" size="lg" onClick={locate}>
-                <LocateFixed className={cn("size-5", here.status === "locating" && "animate-pulse")} />
-              </LiquidIconButton>
+              <LiquidSurface radius={999} className="size-14">
+                <button type="button" aria-label={t.map.locate} onClick={locate} className="grid size-full place-items-center rounded-full">
+                  <LocateFixed className={cn("size-5", here.status === "locating" && "animate-pulse")} />
+                </button>
+              </LiquidSurface>
             </div>,
             dockSlot,
           )}

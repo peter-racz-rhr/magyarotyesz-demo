@@ -49,9 +49,9 @@ function NavLink({ item, onGo }: { item: Item; onGo?: () => void }) {
 const Accessory = ({ className }: { className: string }) => <div id="dock-accessory" className={cn("pointer-events-auto absolute", className)} />;
 
 const FAN: [number, number][] = [
-  [-98, 0],
-  [-69, -69],
-  [0, -98],
+  [-100, 0],
+  [-71, -71],
+  [0, -100],
 ];
 
 export function NavOrb({ items }: { items: Item[] }) {
@@ -72,20 +72,20 @@ export function NavOrb({ items }: { items: Item[] }) {
       className={cn("app-dock pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-end pr-5 transition-[translate,opacity,visibility] duration-300 ease-out", SAFE_BOTTOM)}
     >
       {open && <button type="button" aria-label="Close" tabIndex={-1} onClick={() => setOpen(false)} className="pointer-events-auto fixed inset-0 -z-10 cursor-default" />}
-      <div className="relative size-[3.875rem]">
+      <div className="relative size-14">
         <Accessory className="right-0 bottom-full mb-3 transition-opacity duration-200 [[data-nav-open]_&]:pointer-events-none [[data-nav-open]_&]:opacity-0" />
         {items.map((item, i) => (
           <LiquidSurface
             key={item.href}
             radius={999}
             inert={!open}
-            className="absolute right-[0.375rem] bottom-[0.375rem] size-[3.125rem] transition-[translate,scale,opacity] duration-300 ease-[cubic-bezier(.3,1.35,.5,1)]"
+            className="absolute inset-0 transition-[translate,scale,opacity] duration-300 ease-[cubic-bezier(.3,1.35,.5,1)]"
             style={{ translate: open ? `${FAN[i][0]}px ${FAN[i][1]}px` : "0 0", scale: open ? 1 : 0.5, opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none" }}
           >
             <NavLink item={item} onGo={() => setOpen(false)} />
           </LiquidSurface>
         ))}
-        <LiquidSurface radius={999} className="nav-orb-main pointer-events-auto absolute inset-0">
+        <LiquidSurface radius={999} className="pointer-events-auto absolute inset-0">
           <button
             type="button"
             aria-expanded={open}
@@ -151,7 +151,7 @@ export function NavHandle({ items }: { items: Item[] }) {
             <FloatingDock items={items} activeHref={current.href} className="w-full border-transparent bg-transparent backdrop-blur-none" />
           </LiquidSurface>
         ) : (
-          <LiquidSurface radius={999} className="pointer-events-auto mx-auto h-[3.125rem] w-[4.75rem] animate-in fade-in zoom-in-95 duration-200">
+          <LiquidSurface radius={999} className="pointer-events-auto mx-auto h-14 w-[4.75rem] animate-in fade-in zoom-in-95 duration-200">
             <button
               type="button"
               aria-label={current.title}

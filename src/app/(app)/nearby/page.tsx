@@ -380,7 +380,7 @@ export default function NearbyPage() {
           </AnimatePresence>
 
           <div className="relative isolate">
-            <LiquidSurface radius={999} veil={0.55} className="search-glass flex h-14 items-center gap-2 pr-1.5 pl-4">
+            <LiquidSurface radius={999} className="search-glass flex h-14 items-center gap-2 pr-1.5 pl-4">
               <Search className="size-5 shrink-0 text-haze" aria-hidden />
               <input
                 ref={input}
