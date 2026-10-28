@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, Palette, PanelBottom, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, Droplet, Layers, Palette, PanelBottom, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -20,8 +20,11 @@ import { addDemoToilets, clearAlerts, clearToilets, simulateActivity, useToilets
 import { cn } from "@/lib/utils";
 
 /** Everything you can change, in groups. Reached from the gear on the Profile page. */
+/** The pastels as they look in the light theme, for the colour picker. */
+const SWATCH = { mint: "#cfeadb", sky: "#cfe3f4", lavender: "#dcd6f2", peach: "#f6dccb", rose: "#f4d3dc" } as const;
+
 /** A row with a title and a wrapping set of options, for choices with more than three answers. */
-function ChoiceRow<K extends "navStyle" | "darkBar">({
+function ChoiceRow<K extends "navStyle" | "darkBar" | "glass">({
   icon,
   hue,
   title,
@@ -191,6 +194,31 @@ export default function SettingsPage() {
 
         <Group id="nav-heading" title={t.settings.navGroup} footer={t.settings.footerNav}>
           <ChoiceRow icon={<PanelBottom />} hue={162} title={t.settings.navStyle} names={t.settings.navNames} value={settings.navStyle} field="navStyle" />
+          <ChoiceRow icon={<Layers />} hue={24} title={t.settings.glass} names={t.settings.glassNames} value={settings.glass} field="glass" />
+          {settings.glass === "solid" && (
+            <li className="flex flex-col gap-2.5 px-4 py-3 text-[1rem]">
+              <span className="flex items-center gap-3.5">
+                <Tile hue={340}>
+                  <Droplet />
+                </Tile>
+                <span className="flex-1">{t.settings.solidColor}</span>
+              </span>
+              <div role="radiogroup" aria-label={t.settings.solidColor} className="flex justify-between px-1">
+                {(["mint", "sky", "lavender", "peach", "rose"] as const).map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    role="radio"
+                    aria-checked={settings.solidColor === key}
+                    aria-label={t.settings.solidNames[key]}
+                    onClick={() => updateSettings({ solidColor: key })}
+                    style={{ backgroundColor: SWATCH[key] }}
+                    className={cn("size-10 rounded-full ring-offset-2 ring-offset-dusk transition-shadow", settings.solidColor === key ? "ring-2 ring-ink" : "ring-1 ring-fg/15")}
+                  />
+                ))}
+              </div>
+            </li>
+          )}
           <ChoiceRow icon={<Palette />} hue={300} title={t.settings.darkBar} names={t.settings.darkBarNames} value={settings.darkBar} field="darkBar" />
         </Group>
 

@@ -34,12 +34,15 @@ export const THEME_COLOR: Record<Look, string> = { dark: "#121212", light: "#f6f
 /** Puts the look on the page (<html data-theme>) and the browser bar colour. Renders nothing. */
 export function ThemeRunner() {
   const look = useLook();
-  const { navStyle, darkBar } = useSettings();
+  const { navStyle, darkBar, glass, solidColor } = useSettings();
   useEffect(() => {
     document.documentElement.dataset.theme = look;
     // The navigation reads these two to dress itself (globals.css).
     document.documentElement.dataset.nav = navStyle;
-    document.documentElement.dataset.darkBar = darkBar;
+    // The solid look has its own colours, so the dark glass colours step aside.
+    document.documentElement.dataset.darkBar = glass === "solid" ? "classic" : darkBar;
+    document.documentElement.dataset.glass = glass;
+    document.documentElement.dataset.solid = solidColor;
     // Next draws its own theme-color tag: change it in place (removing it breaks React's bookkeeping).
     const metas = document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]');
     if (metas.length) metas.forEach((m) => (m.content = THEME_COLOR[look]));
@@ -49,7 +52,7 @@ export function ThemeRunner() {
       meta.content = THEME_COLOR[look];
       document.head.appendChild(meta);
     }
-  }, [look, navStyle, darkBar]);
+  }, [look, navStyle, darkBar, glass, solidColor]);
   return null;
 }
 

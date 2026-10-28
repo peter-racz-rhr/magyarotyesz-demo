@@ -18,6 +18,10 @@ export type Settings = {
   theme: "system" | "dark" | "light";
   /** How you move between Map, List and Profile: the bottom bar, or one round button that opens the pages. */
   navStyle: "bar" | "orb";
+  /** The material of the bars and buttons: liquid glass, or one flat pastel colour with no effects. */
+  glass: "liquid" | "solid";
+  /** The pastel the solid look uses. */
+  solidColor: "mint" | "sky" | "lavender" | "peach" | "rose";
   /** The colours of the navigation in the dark look. "classic" is how it used to look. */
   darkBar: "classic" | "graphite" | "ink" | "mint";
   /** Which base map: "auto" follows the app's look; or night, day or satellite. */
@@ -46,6 +50,8 @@ const store = createLocalStore<Settings>("magyarotyesz:settings", {
   theme: "system",
   navStyle: "bar",
   darkBar: "graphite",
+  glass: "liquid",
+  solidColor: "mint",
   mapStyle: "auto",
   showCodes: false,
   haptics: true,

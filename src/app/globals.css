@@ -415,6 +415,49 @@ html[data-nav="orb"] #dock-accessory > div > :first-child {
 }
 
 /*
+  Solid (Settings > Navigation): the bars and buttons become one flat pastel colour,
+  with none of the glass: no blur, lens, shine, rim or glow. The press still squishes.
+  In the dark look the same hue is a deep, muted tone, so text stays easy to read.
+*/
+html[data-glass="solid"] {
+  --solid: #cfeadb;
+  --solid-disc: rgb(0 0 0 / 0.1);
+}
+html[data-glass="solid"][data-solid="sky"] { --solid: #cfe3f4; }
+html[data-glass="solid"][data-solid="lavender"] { --solid: #dcd6f2; }
+html[data-glass="solid"][data-solid="peach"] { --solid: #f6dccb; }
+html[data-glass="solid"][data-solid="rose"] { --solid: #f4d3dc; }
+html[data-glass="solid"][data-theme="dark"] {
+  --solid: #24362f;
+  --solid-disc: rgb(255 255 255 / 0.14);
+}
+html[data-glass="solid"][data-theme="dark"][data-solid="sky"] { --solid: #25333f; }
+html[data-glass="solid"][data-theme="dark"][data-solid="lavender"] { --solid: #2f2c3f; }
+html[data-glass="solid"][data-theme="dark"][data-solid="peach"] { --solid: #3d2f28; }
+html[data-glass="solid"][data-theme="dark"][data-solid="rose"] { --solid: #3d2a31; }
+html[data-glass="solid"] .lq-surface,
+html[data-glass="solid"] .lq-button {
+  --lq-fill: var(--solid);
+  background: var(--solid);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 0;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.18);
+}
+html[data-glass="solid"] .lq-surface__edge,
+html[data-glass="solid"] .lq-surface__shader,
+html[data-glass="solid"] .lq-surface::after,
+html[data-glass="solid"] .lq-button::after {
+  display: none;
+}
+html[data-glass="solid"] .lq-surface * {
+  text-shadow: none !important;
+}
+html[data-glass="solid"] .dock-disc {
+  background: var(--solid-disc);
+}
+
+/*
   During page transitions only the pages animate. Everything else (the dock)
   is shown live instead of cross-fading two snapshots, so it stays still and
   its active disc keeps sliding.
