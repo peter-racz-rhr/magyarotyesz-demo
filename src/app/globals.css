@@ -388,6 +388,40 @@ html[data-theme="dark"]:is([data-dark-bar="graphite"], [data-dark-bar="ink"], [d
   }
 }
 
+/*
+  Orb: the map's own buttons sit beside the orb, not above it. "Nearest" goes to the
+  bottom left on the orb's row, the locate button stays just above the orb. The
+  slot itself lets taps through to the map; only the buttons catch them.
+*/
+html[data-nav="orb"] #dock-accessory {
+  right: 0;
+  bottom: 0;
+  margin-bottom: 0;
+  pointer-events: none;
+}
+html[data-nav="orb"] #dock-accessory > div {
+  width: calc(100vw - 2.5rem);
+  max-width: none;
+}
+html[data-nav="orb"] #dock-accessory > div > * {
+  pointer-events: auto;
+}
+html[data-nav="orb"] #dock-accessory > div > :last-child {
+  margin-bottom: 4.625rem;
+}
+html[data-nav="orb"] #dock-accessory > div > :first-child {
+  margin-bottom: 0.1875rem;
+}
+
+/* The orb itself is solid, so it never reads as just another round glass button. */
+html[data-nav="orb"] .app-dock .nav-orb-main.lq-surface {
+  --lq-fill: var(--ink);
+  --lq-line: transparent;
+}
+html[data-nav="orb"] .app-dock .nav-orb-main [data-dock-ink][data-lit] {
+  color: var(--night);
+}
+
 /* The side bar floats over the pages, so they keep clear of it. */
 html[data-nav="rail"] .app-content {
   padding-right: 4.25rem;

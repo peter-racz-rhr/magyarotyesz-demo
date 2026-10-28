@@ -85,7 +85,7 @@ export function NavOrb({ items }: { items: Item[] }) {
             <NavLink item={item} onGo={() => setOpen(false)} />
           </LiquidSurface>
         ))}
-        <LiquidSurface radius={999} className="pointer-events-auto absolute inset-0">
+        <LiquidSurface radius={999} className="nav-orb-main pointer-events-auto absolute inset-0">
           <button
             type="button"
             aria-expanded={open}

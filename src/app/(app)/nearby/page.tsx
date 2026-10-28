@@ -298,9 +298,11 @@ export default function NearbyPage() {
       <div
         className={cn(
           "nearby-search pointer-events-none fixed inset-x-0 z-50 flex justify-center transition-[bottom,translate,opacity] duration-300 ease-out",
-          focused || navStyle === "rail"
+          focused || navStyle === "rail" || navStyle === "orb"
             ? "bottom-[max(env(safe-area-inset-bottom),0.75rem)]"
             : "bottom-[calc(max(env(safe-area-inset-bottom),0.75rem)+5.25rem)]",
+          // Beside the orb, not above it: the bar stops short of the button on the right.
+          navStyle === "orb" && !focused && "justify-start pl-5",
           tucked && !focused && "translate-y-24 opacity-0",
         )}
       >
@@ -308,7 +310,7 @@ export default function NearbyPage() {
           className={cn(
             "transition-[width] duration-300 ease-out",
             !(tucked && !focused) && "pointer-events-auto",
-            focused ? "w-[min(calc(100vw-2rem),28rem)]" : "w-[min(calc(100vw-5rem),22rem)]",
+            focused ? "w-[min(calc(100vw-2rem),28rem)]" : navStyle === "orb" ? "w-[calc(100vw-7.125rem)] max-w-[22rem]" : "w-[min(calc(100vw-5rem),22rem)]",
           )}
         >
           <AnimatePresence>
