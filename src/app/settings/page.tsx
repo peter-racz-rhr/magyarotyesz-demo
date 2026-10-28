@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, Palette, PanelBottom, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -14,12 +14,52 @@ import { LEGAL } from "@/lib/legal-text";
 import { requestLocation } from "@/lib/location";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
-import { updateSettings, useSettings, type Lang } from "@/lib/settings";
+import { updateSettings, useSettings, type Lang, type Settings } from "@/lib/settings";
 import { fetchMyData, useUserId } from "@/lib/sync";
 import { addDemoToilets, clearAlerts, clearToilets, simulateActivity, useToilets } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
 
 /** Everything you can change, in groups. Reached from the gear on the Profile page. */
+/** A row with a title and a wrapping set of options, for choices with more than three answers. */
+function ChoiceRow<K extends "navStyle" | "darkBar">({
+  icon,
+  hue,
+  title,
+  names,
+  value,
+  field,
+}: {
+  icon: React.ReactNode;
+  hue: number;
+  title: string;
+  names: Record<string, string>;
+  value: Settings[K];
+  field: K;
+}) {
+  return (
+    <li className="flex flex-col gap-2.5 px-4 py-3 text-[1rem]">
+      <div className="flex items-center gap-3.5">
+        <Tile hue={hue}>{icon}</Tile>
+        <span className="flex-1">{title}</span>
+      </div>
+      <div role="radiogroup" aria-label={title} className="flex rounded-full bg-well p-0.5">
+        {Object.keys(names).map((key) => (
+          <button
+            key={key}
+            type="button"
+            role="radio"
+            aria-checked={value === key}
+            onClick={() => updateSettings({ [field]: key } as Partial<Settings>)}
+            className={cn("h-8 min-w-0 flex-1 rounded-full px-2 text-[0.8125rem] font-semibold transition-colors", value === key ? "bg-ink text-night" : "text-haze")}
+          >
+            {names[key]}
+          </button>
+        ))}
+      </div>
+    </li>
+  );
+}
+
 export default function SettingsPage() {
   const router = useRouter();
   const { t, lang } = useT();
@@ -148,6 +188,11 @@ export default function SettingsPage() {
           <LinkRow icon={<RotateCcw />} hue={268} title={t.profile.intro} onClick={showIntro} />
         </Group>
         {notifyBlocked && <p className="mt-2 px-5 text-[0.8125rem] text-stale">{t.profile.notifyBlocked}</p>}
+
+        <Group id="nav-heading" title={t.settings.navGroup} footer={t.settings.footerNav}>
+          <ChoiceRow icon={<PanelBottom />} hue={162} title={t.settings.navStyle} names={t.settings.navNames} value={settings.navStyle} field="navStyle" />
+          <ChoiceRow icon={<Palette />} hue={300} title={t.settings.darkBar} names={t.settings.darkBarNames} value={settings.darkBar} field="darkBar" />
+        </Group>
 
         <section className="mt-8" aria-labelledby="mapstyle-heading">
           <h2 id="mapstyle-heading" className="mb-2 px-5 text-[0.9375rem] font-semibold text-ink/65">

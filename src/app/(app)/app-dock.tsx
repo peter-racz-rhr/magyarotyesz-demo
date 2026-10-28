@@ -8,6 +8,8 @@ import { useT } from "@/lib/i18n";
 import { useNotices } from "@/lib/sync";
 import { useAlerts } from "@/lib/toilets";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
+import { useSettings } from "@/lib/settings";
+import { NavHandle, NavOrb, NavRail } from "./nav-alt";
 
 export function AppDock() {
   const pathname = usePathname();
@@ -24,6 +26,14 @@ export function AppDock() {
     ...item,
     transitionTypes: index > current ? FORWARD : index < current ? BACK : undefined,
   }));
+
+  const { navStyle } = useSettings();
+  if (navStyle !== "bar") {
+    const withState = items.map((item) => ({ ...item, active: item.href === pathname }));
+    if (navStyle === "orb") return <NavOrb items={withState} />;
+    if (navStyle === "rail") return <NavRail items={withState} />;
+    return <NavHandle items={withState} />;
+  }
 
   return (
     // No view-transition-name here: it would make this wrapper a backdrop

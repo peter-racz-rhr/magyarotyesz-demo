@@ -190,6 +190,8 @@ function IconContainer({
     >
       <div
         ref={ref}
+        data-dock-ink
+        data-lit={lit || undefined}
         className={cn(
           "relative flex h-full w-full items-center justify-center rounded-full transition-colors",
           // Outline icons straight on the glass; the current tab gets a soft lit oval.
@@ -202,7 +204,7 @@ function IconContainer({
           <motion.span
             layoutId="dock-active-disc"
             aria-hidden
-            className={cn("absolute inset-0 rounded-full transition-colors", sliding ? "bg-fg/22" : "bg-fg/14")}
+            className={cn("dock-disc absolute inset-0 rounded-full transition-colors", sliding ? "bg-fg/22" : "bg-fg/14")}
             transition={{ type: "spring", duration: 0.55, bounce: 0.12 }}
           />
         )}

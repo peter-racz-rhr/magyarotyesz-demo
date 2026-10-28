@@ -342,6 +342,58 @@
 }
 
 /*
+  The dark colours of the navigation (Settings > Navigation). "classic" adds
+  nothing: it is the glass as it was. The others give the bar, orb, side bar and
+  handle one shared look, a lighter pill than the dark map behind it, the way the
+  white pill stands out on the light theme.
+*/
+html[data-theme="dark"][data-dark-bar="graphite"] {
+  --dock-fill: rgba(46, 50, 57, 0.86);
+  --dock-line: rgba(255, 255, 255, 0.14);
+  --dock-tint: #9aa3ad;
+  --dock-disc: rgba(255, 255, 255, 0.13);
+  --dock-ink: rgba(236, 239, 243, 0.66);
+  --dock-lit: #ffffff;
+}
+html[data-theme="dark"][data-dark-bar="ink"] {
+  --dock-fill: rgba(12, 13, 15, 0.92);
+  --dock-line: rgba(255, 255, 255, 0.1);
+  --dock-tint: #777777;
+  --dock-disc: rgba(255, 255, 255, 0.1);
+  --dock-ink: rgba(236, 239, 243, 0.66);
+  --dock-lit: #ffffff;
+}
+html[data-theme="dark"][data-dark-bar="mint"] {
+  --dock-fill: rgba(26, 32, 30, 0.88);
+  --dock-line: rgba(110, 231, 160, 0.22);
+  --dock-tint: #4fe08a;
+  --dock-disc: rgba(79, 224, 138, 0.2);
+  --dock-ink: rgba(236, 239, 243, 0.66);
+  --dock-lit: #7df0ae;
+}
+html[data-theme="dark"]:is([data-dark-bar="graphite"], [data-dark-bar="ink"], [data-dark-bar="mint"]) .app-dock {
+  .lq-surface {
+    --lq-fill: var(--dock-fill);
+    --lq-line: var(--dock-line);
+    --lq-tint: var(--dock-tint);
+  }
+  .dock-disc {
+    background: var(--dock-disc);
+  }
+  [data-dock-ink] {
+    color: var(--dock-ink);
+  }
+  [data-dock-ink][data-lit] {
+    color: var(--dock-lit);
+  }
+}
+
+/* The side bar floats over the pages, so they keep clear of it. */
+html[data-nav="rail"] .app-content {
+  padding-right: 4.25rem;
+}
+
+/*
   During page transitions only the pages animate. Everything else (the dock)
   is shown live instead of cross-fading two snapshots, so it stays still and
   its active disc keeps sliding.

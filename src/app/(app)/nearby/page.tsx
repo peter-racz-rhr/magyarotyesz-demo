@@ -11,6 +11,7 @@ import { HealthDot, HoursLine, ToiletCard } from "@/components/toilet-card";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { searchPlaces, type Place } from "@/lib/geocode";
 import { useT, type Dict } from "@/lib/i18n";
+import { useSettings } from "@/lib/settings";
 import { distance, formatDistance, useToilets, type Toilet } from "@/lib/toilets";
 import { useHere } from "@/lib/use-here";
 import { cn } from "@/lib/utils";
@@ -48,6 +49,8 @@ const ADDRESS_RADIUS = 500;
 
 export default function NearbyPage() {
   const { t: d } = useT();
+  // The side bar leaves the bottom free, so the search bar can sit lower.
+  const { navStyle } = useSettings();
   const here = useHere();
   const toilets = useToilets();
   const [open, setOpen] = useState<string | null>(null);
@@ -295,7 +298,7 @@ export default function NearbyPage() {
       <div
         className={cn(
           "nearby-search pointer-events-none fixed inset-x-0 z-50 flex justify-center transition-[bottom,translate,opacity] duration-300 ease-out",
-          focused
+          focused || navStyle === "rail"
             ? "bottom-[max(env(safe-area-inset-bottom),0.75rem)]"
             : "bottom-[calc(max(env(safe-area-inset-bottom),0.75rem)+5.25rem)]",
           tucked && !focused && "translate-y-24 opacity-0",
