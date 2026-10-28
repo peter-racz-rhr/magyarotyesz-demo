@@ -296,6 +296,52 @@
 }
 
 /*
+  Pressing glass: keep the squish, drop what made it look worse.
+  - The library tilts, skews and leans every control in 3D and promotes it to
+    its own layer. While it moves, that layer is a bitmap being stretched, so
+    the label, icons and edge go soft and jagged. A flat scale and nudge keeps
+    the squish but is repainted sharp on every frame.
+  - The rim also brightens toward the finger on a press, which read as a white
+    outline. It keeps its resting brightness instead.
+*/
+@layer components {
+  .lq-surface,
+  .lq-button,
+  .lq-switch,
+  .lq-checkbox__box,
+  .lq-radio__control,
+  .lq-select__trigger,
+  .lq-chip,
+  .lq-pagination__item,
+  .lq-text-field__control {
+    transform: translate(
+        calc(var(--lq-magnet-x) + var(--lq-elastic-x)),
+        calc(var(--lq-lift) + var(--lq-magnet-y) + var(--lq-elastic-y))
+      )
+      scale(var(--lq-scale-x), var(--lq-scale-y));
+    transform-style: flat;
+    will-change: auto;
+  }
+
+  .lq-surface__edge {
+    background:
+      radial-gradient(
+        circle 124px at var(--lq-pointer-x) var(--lq-pointer-y),
+        rgba(255, 255, 255, 0.22),
+        rgba(255, 255, 255, 0.08) 36%,
+        transparent 72%
+      ),
+      linear-gradient(
+        var(--lq-edge-angle),
+        var(--lq-rim-bright) 0%,
+        var(--lq-rim-mid) 34%,
+        var(--lq-glass-shade) 62%,
+        var(--lq-rim-dim) 100%
+      );
+  }
+}
+
+/*
   During page transitions only the pages animate. Everything else (the dock)
   is shown live instead of cross-fading two snapshots, so it stays still and
   its active disc keeps sliding.
