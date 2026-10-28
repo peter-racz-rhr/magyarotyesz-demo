@@ -10,7 +10,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     // Liquid glass for the controls that float over the map.
     <AppGlass>
       <TermsGuard />
-      <div className="app-content pb-28">{children}</div>
+      <div className="pb-28">{children}</div>
       <PullToRefresh />
       <AppDock />
       <ViewTransitionDock />

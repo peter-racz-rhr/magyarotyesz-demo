@@ -49,7 +49,7 @@ const ADDRESS_RADIUS = 500;
 
 export default function NearbyPage() {
   const { t: d } = useT();
-  // The side bar leaves the bottom free, so the search bar can sit lower.
+  // Beside the orb the bottom is free, so the search bar sits lower.
   const { navStyle } = useSettings();
   const here = useHere();
   const toilets = useToilets();
@@ -298,7 +298,7 @@ export default function NearbyPage() {
       <div
         className={cn(
           "nearby-search pointer-events-none fixed inset-x-0 z-50 flex justify-center transition-[bottom,translate,opacity] duration-300 ease-out",
-          focused || navStyle === "rail" || navStyle === "orb"
+          focused || navStyle === "orb"
             ? "bottom-[max(env(safe-area-inset-bottom),0.75rem)]"
             : "bottom-[calc(max(env(safe-area-inset-bottom),0.75rem)+5.25rem)]",
           // Beside the orb, not above it: the bar stops short of the button on the right.

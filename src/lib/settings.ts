@@ -16,8 +16,8 @@ export type Settings = {
   buildings3d: boolean;
   /** The app's look: follow the phone, or always dark or light. */
   theme: "system" | "dark" | "light";
-  /** How you move between Map, List and Profile: the bottom bar, or one of three lighter ways. */
-  navStyle: "bar" | "orb" | "rail" | "handle";
+  /** How you move between Map, List and Profile: the bottom bar, or one round button that opens the pages. */
+  navStyle: "bar" | "orb";
   /** The colours of the navigation in the dark look. "classic" is how it used to look. */
   darkBar: "classic" | "graphite" | "ink" | "mint";
   /** Which base map: "auto" follows the app's look; or night, day or satellite. */

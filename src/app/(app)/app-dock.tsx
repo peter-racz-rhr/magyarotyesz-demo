@@ -9,7 +9,7 @@ import { useNotices } from "@/lib/sync";
 import { useAlerts } from "@/lib/toilets";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { useSettings } from "@/lib/settings";
-import { NavHandle, NavOrb, NavRail } from "./nav-alt";
+import { NavOrb } from "./nav-alt";
 
 export function AppDock() {
   const pathname = usePathname();
@@ -28,12 +28,8 @@ export function AppDock() {
   }));
 
   const { navStyle } = useSettings();
-  if (navStyle !== "bar") {
-    const withState = items.map((item) => ({ ...item, active: item.href === pathname }));
-    if (navStyle === "orb") return <NavOrb items={withState} />;
-    if (navStyle === "rail") return <NavRail items={withState} />;
-    return <NavHandle items={withState} />;
-  }
+  // Anything else a phone may still have saved (the side bar and handle are gone) shows the bar.
+  if (navStyle === "orb") return <NavOrb items={items.map((item) => ({ ...item, active: item.href === pathname }))} />;
 
   return (
     // No view-transition-name here: it would make this wrapper a backdrop

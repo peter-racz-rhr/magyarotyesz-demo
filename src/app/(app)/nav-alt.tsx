@@ -2,18 +2,15 @@
 
 import { X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { FloatingDock, type DockItem } from "@/components/ui/floating-dock";
+import { useEffect, useState } from "react";
+import type { DockItem } from "@/components/ui/floating-dock";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { cn } from "@/lib/utils";
 
 /*
-  Three lighter ways to move between the tabs, picked in Settings. They share
-  the glass and the dark colours of the bar (globals.css, `.app-dock`).
-  - Orb: one round button; tapping it fans the three pages out by your thumb.
-  - Side: a slim vertical bar on the right edge.
-  - Handle: a small button with the current page; it opens the full bar and
-    folds away again after a few seconds.
+  The orb: one round button; tapping it fans the three pages out by your thumb.
+  Picked in Settings; it shares the glass and the dark colours of the bar
+  (globals.css).
 */
 
 type Item = DockItem & { active: boolean };
@@ -100,77 +97,6 @@ export function NavOrb({ items }: { items: Item[] }) {
             {unread && !open && <span aria-hidden className="absolute top-2.5 right-2.5 size-2.5 rounded-full bg-good shadow-[0_0_0_2px_var(--dusk),0_0_8px_1px_var(--good)]" />}
           </button>
         </LiquidSurface>
-      </div>
-    </div>
-  );
-}
-
-export function NavRail({ items }: { items: Item[] }) {
-  return (
-    <div className="app-dock pointer-events-none fixed inset-0 z-50 transition-[translate,opacity,visibility] duration-300 ease-out">
-      <LiquidSurface radius={999} className="pointer-events-auto absolute top-[54%] right-3 -translate-y-1/2">
-        <nav aria-label="Pages" className="flex flex-col gap-1 p-1.5">
-          {items.map((item) => (
-            <div key={item.href} className="size-12">
-              <NavLink item={item} />
-            </div>
-          ))}
-        </nav>
-      </LiquidSurface>
-      <Accessory className={cn("right-3 bottom-[max(env(safe-area-inset-bottom),0.75rem)]")} />
-    </div>
-  );
-}
-
-const FOLD_MS = 4500;
-
-export function NavHandle({ items }: { items: Item[] }) {
-  const [open, setOpen] = useState(false);
-  // Any touch on the open bar starts the countdown again.
-  const [touched, setTouched] = useState(0);
-  const start = useRef<number | null>(null);
-  const current = items.find((i) => i.active) ?? items[0];
-
-  useEffect(() => {
-    if (!open) return;
-    const timer = window.setTimeout(() => setOpen(false), FOLD_MS);
-    return () => window.clearTimeout(timer);
-  }, [open, touched]);
-
-  return (
-    <div className={cn("app-dock pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center transition-[translate,opacity,visibility] duration-300 ease-out", SAFE_BOTTOM)}>
-      <div className="relative w-[min(calc(100vw-5rem),22rem)]">
-        <Accessory className="right-0 bottom-full mb-3" />
-        {open ? (
-          <LiquidSurface
-            radius={999}
-            className="pointer-events-auto w-full animate-in fade-in zoom-in-95 duration-200"
-            onPointerDown={() => setTouched((n) => n + 1)}
-            onClickCapture={(e) => (e.target as HTMLElement).closest("a") && setOpen(false)}
-          >
-            <FloatingDock items={items} activeHref={current.href} className="w-full border-transparent bg-transparent backdrop-blur-none" />
-          </LiquidSurface>
-        ) : (
-          <LiquidSurface radius={999} className="pointer-events-auto mx-auto h-14 w-[4.75rem] animate-in fade-in zoom-in-95 duration-200">
-            <button
-              type="button"
-              aria-label={current.title}
-              aria-expanded={false}
-              data-dock-ink
-              data-lit
-              onPointerDown={(e) => (start.current = e.clientY)}
-              onPointerUp={(e) => {
-                const dy = start.current === null ? 0 : e.clientY - start.current;
-                start.current = null;
-                if (Math.abs(dy) < 10 || dy < -18) setOpen(true);
-              }}
-              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setOpen(true)}
-              className="grid size-full touch-none place-items-center rounded-full text-ink [&_svg]:size-6"
-            >
-              {current.icon}
-            </button>
-          </LiquidSurface>
-        )}
       </div>
     </div>
   );

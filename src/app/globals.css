@@ -344,7 +344,7 @@
 /*
   The dark colours of the glass (Settings > Navigation). "classic" adds nothing:
   it is the glass as it was. The others give every glass control, the bar, orb,
-  side bar and handle, the search bar, the filters, Nearest and locate, one shared
+  the search bar, the filters, Nearest and locate, one shared
   look: a lighter pill than the dark map behind it, the way the white pill stands
   out on the light theme.
 */
@@ -412,11 +412,6 @@ html[data-nav="orb"] #dock-accessory > div > :last-child {
 }
 html[data-nav="orb"] #dock-accessory > div > :first-child {
   margin-bottom: 0;
-}
-
-/* The side bar floats over the pages, so they keep clear of it. */
-html[data-nav="rail"] .app-content {
-  padding-right: 4.25rem;
 }
 
 /*
