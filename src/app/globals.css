@@ -706,9 +706,9 @@ html[data-theme="dark"] {
 }
 
 /*
-  Orb: the map's own buttons sit beside the orb, not above it. "Nearest" goes to the
-  bottom left on the orb's row, the locate button stays just above the orb. The
-  slot itself lets taps through to the map; only the buttons catch them.
+  Orb: the map's own buttons gather around the orb, inside thumb reach of the hand that holds
+  the phone. "Nearest" sits right beside it on the same row, the locate button just above it.
+  The slot itself lets taps through to the map; only the buttons catch them.
 */
 html[data-nav="orb"] #dock-accessory {
   right: 0;
@@ -717,17 +717,20 @@ html[data-nav="orb"] #dock-accessory {
   pointer-events: none;
 }
 html[data-nav="orb"] #dock-accessory > div {
-  width: calc(100vw - 2.5rem);
-  max-width: none;
+  width: 0;
+  height: 0;
 }
 html[data-nav="orb"] #dock-accessory > div > * {
+  position: absolute;
   pointer-events: auto;
 }
-html[data-nav="orb"] #dock-accessory > div > :last-child {
-  margin-bottom: 4.25rem;
-}
 html[data-nav="orb"] #dock-accessory > div > :first-child {
-  margin-bottom: 0;
+  right: 4.25rem;
+  bottom: 0;
+}
+html[data-nav="orb"] #dock-accessory > div > :last-child {
+  right: 0;
+  bottom: 4.25rem;
 }
 
 /*
