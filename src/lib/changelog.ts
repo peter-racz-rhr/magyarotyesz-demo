@@ -3,6 +3,14 @@ export type Change = { date: string; title: { en: string; hu: string; de: string
 
 export const CHANGELOG: Change[] = [
   {
+    date: "2026-10-30",
+    title: { en: "Catppuccin colours", hu: "Catppuccin színek", de: "Catppuccin-Farben" },
+    items: [
+      { en: "The colours are now Catppuccin: pick one of twelve accents, light is Latte.", hu: "A színek mostantól Catppuccin: válassz a tizenkét kiemelőszín közül, a világos a Latte.", de: "Die Farben sind jetzt Catppuccin: wähle einen von zwölf Akzenten, hell ist Latte." },
+      { en: "Dark has three flavours: Mocha, Macchiato and Frappé.", hu: "A sötétnek három változata van: Mocha, Macchiato és Frappé.", de: "Dunkel gibt es in drei Varianten: Mocha, Macchiato und Frappé." },
+    ],
+  },
+  {
     date: "2026-10-29",
     title: { en: "Find, keep and share", hu: "Keresés, mentés, megosztás", de: "Finden, merken, teilen" },
     items: [

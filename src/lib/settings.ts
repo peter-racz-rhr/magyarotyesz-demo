@@ -1,7 +1,7 @@
 "use client";
 
 import { createLocalStore } from "./local-store";
-import type { PaletteId } from "./palettes";
+import type { Flavour, PaletteId } from "./palettes";
 
 export type Lang = "en" | "hu" | "de";
 
@@ -21,6 +21,8 @@ export type Settings = {
   textSize: "normal" | "large" | "xl";
   /** The app's colours: surfaces, text and accent. Green, amber and red keep their meaning in all of them. */
   palette: PaletteId;
+  /** Which Catppuccin flavour the dark look uses (the light look is always Latte). */
+  flavour: Flavour;
   /** How you move between Map, List and Profile: the bottom bar, or one round button that opens the pages. */
   navStyle: "bar" | "orb";
   /** The material of the bars and buttons: liquid glass, or one flat pastel of the palette with no effects. */
@@ -50,6 +52,7 @@ const store = createLocalStore<Settings>("magyarotyesz:settings", {
   buildings3d: true,
   theme: "system",
   palette: "classic",
+  flavour: "mocha",
   textSize: "normal",
   navStyle: "bar",
   glass: "liquid",

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useSyncExternalStore } from "react";
-import { useSettings, type Settings } from "./settings";
+import { normalizePalette } from "./palettes";
+import { updateSettings, useSettings, type Settings } from "./settings";
 
 export type Look = "dark" | "light";
 
@@ -34,11 +35,17 @@ export const THEME_COLOR: Record<Look, string> = { dark: "#121212", light: "#f6f
 /** Puts the look on the page (<html data-theme>) and the browser bar colour. Renders nothing. */
 export function ThemeRunner() {
   const look = useLook();
-  const { navStyle, glass, palette, textSize, lang } = useSettings();
+  const { navStyle, glass, palette: savedPalette, flavour, textSize, lang } = useSettings();
+  const palette = normalizePalette(savedPalette);
+  // A palette from an earlier version is saved again under the Catppuccin one that replaced it.
+  useEffect(() => {
+    if (palette !== savedPalette) updateSettings({ palette });
+  }, [palette, savedPalette]);
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.theme = look;
     root.dataset.palette = palette;
+    root.dataset.flavour = flavour;
     root.dataset.text = textSize;
     root.lang = lang;
     // The navigation reads these to dress itself (globals.css).
@@ -55,9 +62,9 @@ export function ThemeRunner() {
       meta.content = page;
       document.head.appendChild(meta);
     }
-  }, [look, navStyle, glass, palette, textSize, lang]);
+  }, [look, navStyle, glass, palette, flavour, textSize, lang]);
   return null;
 }
 
 /** Runs before the first paint so a light phone does not flash dark. Kept tiny and defensive. */
-export const THEME_BOOT = `try{var c=JSON.parse(localStorage.getItem("magyarotyesz:settings")||"{}");var s=c.theme||"system";var l=s==="system"?(matchMedia("${QUERY}").matches?"light":"dark"):s;document.documentElement.dataset.theme=l;if(c.palette)document.documentElement.dataset.palette=c.palette;if(c.textSize)document.documentElement.dataset.text=c.textSize}catch(e){document.documentElement.dataset.theme="dark"}`;
+export const THEME_BOOT = `try{var c=JSON.parse(localStorage.getItem("magyarotyesz:settings")||"{}");var s=c.theme||"system";var l=s==="system"?(matchMedia("${QUERY}").matches?"light":"dark"):s;document.documentElement.dataset.theme=l;var P={forest:"green",mint:"teal",ocean:"blue",midnight:"lavender",plum:"mauve",rose:"pink",sand:"rosewater",lime:"green",mono:"classic"};if(c.palette)document.documentElement.dataset.palette=P[c.palette]||c.palette;if(c.flavour)document.documentElement.dataset.flavour=c.flavour;if(c.textSize)document.documentElement.dataset.text=c.textSize}catch(e){document.documentElement.dataset.theme="dark"}`;

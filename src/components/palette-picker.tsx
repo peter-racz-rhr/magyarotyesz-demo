@@ -2,7 +2,7 @@
 
 import { Check } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { PALETTES, type PaletteId, type PaletteLook } from "@/lib/palettes";
+import { PALETTE_IDS, paletteLook, type Flavour, type PaletteId, type PaletteLook } from "@/lib/palettes";
 import { cn } from "@/lib/utils";
 
 /*
@@ -47,12 +47,14 @@ function Preview({ c }: { c: PaletteLook }) {
 export function PalettePicker({
   value,
   look,
+  flavour,
   names,
   label,
   onChange,
 }: {
   value: PaletteId;
   look: "light" | "dark";
+  flavour: Flavour;
   names: Record<string, string>;
   label: string;
   onChange: (id: PaletteId) => void;
@@ -69,27 +71,27 @@ export function PalettePicker({
 
   return (
     <div ref={row} role="radiogroup" aria-label={label} className="relative -mx-5 flex snap-x snap-proximity gap-3 overflow-x-auto px-5 pt-3 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      {PALETTES.map((p) => {
-        const on = value === p.id;
+      {PALETTE_IDS.map((id) => {
+        const on = value === id;
         return (
           <button
-            key={p.id}
+            key={id}
             ref={on ? chosen : undefined}
             type="button"
             role="radio"
             aria-checked={on}
-            onClick={() => onChange(p.id)}
+            onClick={() => onChange(id)}
             className="flex shrink-0 snap-center flex-col items-center gap-2 active:opacity-80"
           >
             <span className={cn("relative rounded-[1.625rem] p-1 transition-shadow", on ? "shadow-[0_0_0_2px_var(--ink)]" : "shadow-[0_0_0_1px_color-mix(in_oklab,var(--fg)_14%,transparent)]")}>
-              <Preview c={p[look]} />
+              <Preview c={paletteLook(id, look, flavour)} />
               {on && (
                 <span className="absolute -top-1.5 -right-1.5 grid size-6 place-items-center rounded-full bg-ink text-night">
                   <Check className="size-3.5" strokeWidth={3} aria-hidden />
                 </span>
               )}
             </span>
-            <span className={cn("text-[0.8125rem] font-semibold", on ? "text-ink" : "text-haze")}>{names[p.id]}</span>
+            <span className={cn("text-[0.8125rem] font-semibold", on ? "text-ink" : "text-haze")}>{names[id]}</span>
           </button>
         );
       })}

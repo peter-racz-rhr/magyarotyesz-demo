@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, CloudDownload, Layers, Megaphone, MessageSquare, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, CloudDownload, Layers, Megaphone, MessageSquare, Moon, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -16,6 +16,7 @@ import { requestLocation } from "@/lib/location";
 import { downloadOfflineMap, removeOfflineMap, useOfflineMap } from "@/lib/offline-map";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
+import { normalizePalette } from "@/lib/palettes";
 import { updateSettings, useSettings, type Lang, type Settings } from "@/lib/settings";
 import { useLook } from "@/lib/theme";
 import { fetchMyData, useUserId } from "@/lib/sync";
@@ -89,7 +90,7 @@ function OfflineMapRow() {
 }
 
 /** A row with a title and a wrapping set of options, for choices with more than three answers. */
-function ChoiceRow<K extends "navStyle" | "glass">({
+function ChoiceRow<K extends "navStyle" | "glass" | "flavour">({
   icon,
   hue,
   title,
@@ -282,10 +283,15 @@ export default function SettingsPage() {
         {notifyBlocked && <p className="mt-2 px-5 text-[0.8125rem] text-stale">{t.profile.notifyBlocked}</p>}
 
         <section className="mt-8" aria-labelledby="palette-heading">
-          <h2 id="palette-heading" className="mb-2 px-5 text-[0.9375rem] font-semibold text-ink/65">
+          <h2 id="palette-heading" className="mb-2 px-5 text-[0.9375rem] font-semibold text-haze">
             {t.settings.paletteGroup}
           </h2>
-          <PalettePicker value={settings.palette} look={look} names={t.settings.paletteNames} label={t.settings.paletteGroup} onChange={(palette) => updateSettings({ palette })} />
+          <PalettePicker value={normalizePalette(settings.palette)} look={look} flavour={settings.flavour} names={t.settings.paletteNames} label={t.settings.paletteGroup} onChange={(palette) => updateSettings({ palette })} />
+          {look === "dark" && (
+            <ul className="mx-5 mt-2 overflow-hidden rounded-2xl bg-dusk">
+              <ChoiceRow icon={<Moon />} hue={250} title={t.settings.flavour} names={t.settings.flavourNames} value={settings.flavour} field="flavour" />
+            </ul>
+          )}
           <p className="mt-2 px-5 text-[0.8125rem] leading-relaxed text-haze">{t.settings.paletteFooter}</p>
         </section>
 
@@ -295,7 +301,7 @@ export default function SettingsPage() {
         </Group>
 
         <section className="mt-8" aria-labelledby="mapstyle-heading">
-          <h2 id="mapstyle-heading" className="mb-2 px-5 text-[0.9375rem] font-semibold text-ink/65">
+          <h2 id="mapstyle-heading" className="mb-2 px-5 text-[0.9375rem] font-semibold text-haze">
             {t.settings.mapStyles}
           </h2>
           <MapStylePicker />

@@ -138,7 +138,7 @@ export default function BackupPage() {
               )}
             </section>
 
-            <h2 className="mt-8 mb-2 px-5 text-[0.9375rem] font-semibold text-ink/65">{t.backup.restoreTitle}</h2>
+            <h2 className="mt-8 mb-2 px-5 text-[0.9375rem] font-semibold text-haze">{t.backup.restoreTitle}</h2>
             <section className={cn(CARD, "p-5")}>
               <p className="text-[0.8125rem] leading-relaxed text-haze">{t.backup.restoreHint}</p>
               <input

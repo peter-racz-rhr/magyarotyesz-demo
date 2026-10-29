@@ -225,7 +225,7 @@ export function ProfileEditor({ onClose }: { onClose: () => void }) {
             <p className="mt-1.5 text-xs text-haze">{t.profile.photoHint}</p>
 
             <label className="mt-8 block w-full">
-              <span className="mb-2 block px-5 text-[0.9375rem] font-semibold text-ink/65">{t.profile.nameLabel}</span>
+              <span className="mb-2 block px-5 text-[0.9375rem] font-semibold text-haze">{t.profile.nameLabel}</span>
               <input
                 value={name}
                 onChange={(e) => {
@@ -242,7 +242,7 @@ export function ProfileEditor({ onClose }: { onClose: () => void }) {
 
             {!photo && (
               <div className="mt-6 w-full">
-                <span className="mb-2 block px-5 text-[0.9375rem] font-semibold text-ink/65">{t.profile.colourLabel}</span>
+                <span className="mb-2 block px-5 text-[0.9375rem] font-semibold text-haze">{t.profile.colourLabel}</span>
                 <div role="radiogroup" aria-label={t.profile.colourLabel} className="flex justify-between px-3">
                   {AVATAR_HUES.map((h, i) => (
                     <button

@@ -44,7 +44,7 @@ export function Group({
     <section aria-labelledby={title ? id : undefined} className="mt-8">
       {title && (
         <div className="mb-2 flex items-center gap-2 px-5">
-          <h2 id={id} className="text-[0.9375rem] font-semibold text-ink/65">
+          <h2 id={id} className="text-[0.9375rem] font-semibold text-haze">
             {title}
           </h2>
           {badge ? <span className="grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full bg-brand px-1 text-[0.6875rem] font-bold text-night">{badge}</span> : null}
@@ -62,7 +62,7 @@ export function Group({
 export function Heading({ id, children, badge, action }: { id: string; children: ReactNode; badge?: number; action?: ReactNode }) {
   return (
     <div className="mb-2 flex items-center gap-2 px-5">
-      <h2 id={id} className="text-[0.9375rem] font-semibold text-ink/65">
+      <h2 id={id} className="text-[0.9375rem] font-semibold text-haze">
         {children}
       </h2>
       {badge ? <span className="grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full bg-brand px-1 text-[0.6875rem] font-bold text-night">{badge}</span> : null}
