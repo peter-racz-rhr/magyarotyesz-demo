@@ -79,6 +79,9 @@ function FilterChip({ on, label, icon, wide, onClick }: { on: boolean; label: st
   );
 }
 
+/** The "tap the map" tip is shown once per visit, briefly, and only while the map has no places. */
+let hintShown = false;
+
 const PRIMARY_FILTERS: (keyof Filters)[] = ["open", "free", "works"];
 const SECONDARY_FILTERS: (keyof Filters)[] = ["accessible", "baby", "neutral"];
 type Filters = { open: boolean; free: boolean; works: boolean; accessible: boolean; baby: boolean; neutral: boolean };
@@ -300,6 +303,13 @@ export default function MapPage() {
   const [filters, setFilters] = useState<Filters>({ open: false, free: false, works: false, accessible: false, baby: false, neutral: false });
   const [focus, setFocus] = useState<Toilet | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [hintOn, setHintOn] = useState(() => !hintShown);
+  useEffect(() => {
+    if (!hintOn) return;
+    hintShown = true;
+    const timer = window.setTimeout(() => setHintOn(false), 6000);
+    return () => window.clearTimeout(timer);
+  }, [hintOn]);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -684,7 +694,7 @@ export default function MapPage() {
               </div>
             </div>
           )}
-            {(notice || justAdded || (filtering && visible.length === 0) || (toilets.length === 0 && !draft)) && (
+            {(notice || justAdded || (filtering && visible.length === 0) || (toilets.length === 0 && !draft && hintOn)) && (
               <div className="pointer-events-none flex justify-center px-2">
                 <LiquidSurface
                   radius={999}
