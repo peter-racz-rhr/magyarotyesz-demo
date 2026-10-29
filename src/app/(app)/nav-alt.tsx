@@ -36,7 +36,7 @@ function NavLink({ item, onGo }: { item: Item; onGo?: () => void }) {
       {item.active && <span aria-hidden className="dock-disc absolute inset-1 rounded-full bg-fg/14" />}
       <span className="relative size-6 [&_svg]:size-full">{item.icon}</span>
       {!!item.badge && (
-        <span aria-hidden className="absolute top-2 right-2 size-2.5 rounded-full bg-good shadow-[0_0_0_2px_var(--dusk),0_0_8px_1px_var(--good)]" />
+        <span aria-hidden className="absolute top-2 right-2 size-2.5 rounded-full bg-brand shadow-[0_0_0_2px_var(--dusk),0_0_8px_1px_var(--brand)]" />
       )}
     </Link>
   );
@@ -94,7 +94,7 @@ export function NavOrb({ items }: { items: Item[] }) {
           >
             <span className={cn("absolute size-6 transition-[opacity,rotate,scale] duration-200 [&_svg]:size-full", open ? "rotate-90 scale-75 opacity-0" : "opacity-100")}>{current.icon}</span>
             <X aria-hidden className={cn("absolute size-6 transition-[opacity,rotate,scale] duration-200", open ? "opacity-100" : "-rotate-90 scale-75 opacity-0")} strokeWidth={1.75} />
-            {unread && !open && <span aria-hidden className="absolute top-2.5 right-2.5 size-2.5 rounded-full bg-good shadow-[0_0_0_2px_var(--dusk),0_0_8px_1px_var(--good)]" />}
+            {unread && !open && <span aria-hidden className="absolute top-2.5 right-2.5 size-2.5 rounded-full bg-brand shadow-[0_0_0_2px_var(--dusk),0_0_8px_1px_var(--brand)]" />}
           </button>
         </LiquidSurface>
       </div>

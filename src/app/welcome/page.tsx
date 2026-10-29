@@ -252,7 +252,7 @@ export default function WelcomePage() {
                   { key: "loc", icon: <MapPin className="size-5" aria-hidden />, title: t.welcome.permsLocation, body: t.welcome.permsLocationWhy },
                 ].map((row) => (
                   <li key={row.key} className="flex gap-4 rounded-[22px] bg-fg/[0.055] p-4">
-                    <span className="grid size-10 shrink-0 place-items-center rounded-full bg-good/15 text-good">{row.icon}</span>
+                    <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand/15 text-brand">{row.icon}</span>
                     <span>
                       <span className="block text-[1.0625rem] font-semibold">{row.title}</span>
                       <span className="mt-0.5 block text-[0.9375rem] leading-snug text-haze">{row.body}</span>

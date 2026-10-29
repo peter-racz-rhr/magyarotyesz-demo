@@ -228,7 +228,7 @@ function IconContainer({
           {!!badge && (
             <span
               aria-hidden
-              className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-good shadow-[0_0_0_2px_var(--dusk),0_0_8px_1px_var(--good)]"
+              className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-brand shadow-[0_0_0_2px_var(--dusk),0_0_8px_1px_var(--brand)]"
             />
           )}
         </motion.div>

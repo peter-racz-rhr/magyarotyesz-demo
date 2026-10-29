@@ -11,7 +11,7 @@ export function Wordmark({ className }: { className?: string }) {
     >
       <span
         aria-hidden
-        className="inline-block size-[0.42em] rounded-full bg-good shadow-[0_0_0.45em_0.05em_var(--good)]"
+        className="inline-block size-[0.42em] rounded-full bg-brand shadow-[0_0_0.45em_0.05em_var(--brand)]"
       />
       magyarotyesz
     </span>

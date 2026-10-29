@@ -113,7 +113,7 @@ function Choice<T extends string>({
           onClick={() => onChange(key)}
           className={cn(
             "h-9 rounded-full border px-3.5 text-sm font-semibold transition-colors",
-            value === key ? "border-good bg-good/15 text-ink" : "border-dusk-edge bg-night text-haze",
+            value === key ? "border-brand bg-brand/15 text-ink" : "border-dusk-edge bg-night text-haze",
           )}
         >
           {labels[key]}
@@ -132,7 +132,7 @@ function Toggle({ on, onChange, icon, children }: { on: boolean; onChange: (on: 
       onClick={() => onChange(!on)}
       className={cn(
         "inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-semibold transition-colors",
-        on ? "border-good bg-good/15 text-good" : "border-dusk-edge bg-night text-haze",
+        on ? "border-brand bg-brand/15 text-brand" : "border-dusk-edge bg-night text-haze",
       )}
     >
       {icon}
@@ -472,7 +472,7 @@ export default function MapPage() {
   };
 
   const field =
-    "h-12 rounded-2xl border border-dusk-edge bg-night px-4 outline-none placeholder:text-haze/60 focus:border-good";
+    "h-12 rounded-2xl border border-dusk-edge bg-night px-4 outline-none placeholder:text-haze/60 focus:border-brand";
 
   return (
     <PageTransition>
@@ -598,7 +598,7 @@ export default function MapPage() {
                   onClick={nearest}
                   className="inline-flex h-14 items-center gap-2 px-5 text-[0.9375rem] font-bold [text-shadow:0_1px_8px_rgb(0_0_0/0.5)]"
                 >
-                  <Zap className="size-4 fill-good text-good" aria-hidden />
+                  <Zap className="size-4 fill-brand text-brand" aria-hidden />
                   {t.map.nearest}
                 </button>
               </LiquidSurface>

@@ -14,7 +14,9 @@ import { LEGAL } from "@/lib/legal-text";
 import { requestLocation } from "@/lib/location";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
+import { PALETTES } from "@/lib/palettes";
 import { updateSettings, useSettings, type Lang, type Settings } from "@/lib/settings";
+import { useLook } from "@/lib/theme";
 import { fetchMyData, useUserId } from "@/lib/sync";
 import { addDemoToilets, clearAlerts, clearToilets, simulateActivity, useToilets } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
@@ -67,6 +69,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const { t, lang } = useT();
   const settings = useSettings();
+  const look = useLook();
   const toilets = useToilets();
   const userId = useUserId();
   const [confirmClear, setConfirmClear] = useState(false);
@@ -140,7 +143,7 @@ export default function SettingsPage() {
     <PageTransition>
       <main className="mx-auto w-full max-w-md px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-16">
         <div className="flex h-11 items-center">
-          <Link href="/profile" transitionTypes={BACK} className="-ml-2 inline-flex h-11 items-center gap-1 rounded-full pr-3 pl-1.5 text-[0.9375rem] text-good active:opacity-60">
+          <Link href="/profile" transitionTypes={BACK} className="-ml-2 inline-flex h-11 items-center gap-1 rounded-full pr-3 pl-1.5 text-[0.9375rem] text-brand active:opacity-60">
             <ArrowLeft className="size-[1.125rem]" strokeWidth={2} aria-hidden /> {t.settings.back}
           </Link>
         </div>
@@ -191,6 +194,39 @@ export default function SettingsPage() {
           <LinkRow icon={<RotateCcw />} hue={268} title={t.profile.intro} onClick={showIntro} />
         </Group>
         {notifyBlocked && <p className="mt-2 px-5 text-[0.8125rem] text-stale">{t.profile.notifyBlocked}</p>}
+
+        <section className="mt-8" aria-labelledby="palette-heading">
+          <h2 id="palette-heading" className="mb-2 px-5 text-[0.9375rem] font-semibold text-ink/65">
+            {t.settings.paletteGroup}
+          </h2>
+          <div role="radiogroup" aria-label={t.settings.paletteGroup} className="grid grid-cols-4 gap-2.5 rounded-[1.25rem] bg-dusk p-3">
+            {PALETTES.map((p) => {
+              const [page, card, accent] = p[look];
+              const on = settings.palette === p.id;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => updateSettings({ palette: p.id })}
+                  className="flex flex-col items-center gap-1.5 rounded-2xl py-1 active:opacity-70"
+                >
+                  <span
+                    aria-hidden
+                    className={cn("relative grid size-14 place-items-center overflow-hidden rounded-2xl ring-offset-2 ring-offset-dusk", on ? "ring-2 ring-ink" : "ring-1 ring-fg/15")}
+                    style={{ backgroundColor: page }}
+                  >
+                    <span className="absolute bottom-1.5 left-1.5 h-5 w-7 rounded-lg" style={{ backgroundColor: card }} />
+                    <span className="absolute top-2 right-2 size-4 rounded-full" style={{ backgroundColor: accent }} />
+                  </span>
+                  <span className={cn("text-[0.75rem] leading-none font-semibold", on ? "text-ink" : "text-haze")}>{t.settings.paletteNames[p.id]}</span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 px-5 text-[0.8125rem] leading-relaxed text-haze">{t.settings.paletteFooter}</p>
+        </section>
 
         <Group id="nav-heading" title={t.settings.navGroup} footer={t.settings.footerNav}>
           <ChoiceRow icon={<PanelBottom />} hue={162} title={t.settings.navStyle} names={t.settings.navNames} value={settings.navStyle} field="navStyle" />

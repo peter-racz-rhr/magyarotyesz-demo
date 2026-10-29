@@ -18,7 +18,7 @@ function fill(text: string, missing: string) {
     const key = part.match(/^\{(operator|email|address|phone)\}$/)?.[1] as keyof typeof values | undefined;
     if (!key) return part;
     const value = values[key];
-    if (value) return key === "email" ? <a key={i} href={`mailto:${value}`} className="text-good underline">{value}</a> : value;
+    if (value) return key === "email" ? <a key={i} href={`mailto:${value}`} className="text-brand underline">{value}</a> : value;
     return <mark key={i} className="rounded bg-stale/25 px-1 text-ink">[{missing}: {key}]</mark>;
   });
 }
@@ -72,7 +72,7 @@ export function LegalPage({ doc }: { doc: DocKey }) {
         ))}
         <nav aria-label={t.legal.more} className="mt-10 flex flex-wrap gap-x-5 gap-y-2 border-t border-dusk-edge pt-5 text-sm">
           {LINKS.filter((k) => k !== doc).map((k) => (
-            <Link key={k} href={`/${k}`} className="text-good underline">
+            <Link key={k} href={`/${k}`} className="text-brand underline">
               {LEGAL[lang][k].title}
             </Link>
           ))}

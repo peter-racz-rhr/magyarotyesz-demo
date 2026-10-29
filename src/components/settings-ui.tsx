@@ -47,7 +47,7 @@ export function Group({
           <h2 id={id} className="text-[0.9375rem] font-semibold text-ink/65">
             {title}
           </h2>
-          {badge ? <span className="grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full bg-good px-1 text-[0.6875rem] font-bold text-night">{badge}</span> : null}
+          {badge ? <span className="grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full bg-brand px-1 text-[0.6875rem] font-bold text-night">{badge}</span> : null}
           <span className="flex-1" />
           {action}
         </div>
@@ -65,7 +65,7 @@ export function Heading({ id, children, badge, action }: { id: string; children:
       <h2 id={id} className="text-[0.9375rem] font-semibold text-ink/65">
         {children}
       </h2>
-      {badge ? <span className="grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full bg-good px-1 text-[0.6875rem] font-bold text-night">{badge}</span> : null}
+      {badge ? <span className="grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full bg-brand px-1 text-[0.6875rem] font-bold text-night">{badge}</span> : null}
       <span className="flex-1" />
       {action}
     </div>
@@ -89,7 +89,7 @@ export function SwitchRow({ icon, hue, title, on, onChange }: { icon: ReactNode;
       <button type="button" role="switch" aria-checked={on} onClick={() => onChange(!on)} className={ROW}>
         <Tile hue={hue}>{icon}</Tile>
         <span className="min-w-0 flex-1 truncate">{title}</span>
-        <span className={cn("relative h-[1.75rem] w-[3rem] shrink-0 rounded-full transition-colors duration-200", on ? "bg-good" : "bg-fg/[0.16]")}>
+        <span className={cn("relative h-[1.75rem] w-[3rem] shrink-0 rounded-full transition-colors duration-200", on ? "bg-brand" : "bg-fg/[0.16]")}>
           <span className={cn("absolute top-[0.125rem] left-[0.125rem] size-[1.5rem] rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.4)] transition-transform duration-200", on && "translate-x-[1.25rem]")} />
         </span>
       </button>

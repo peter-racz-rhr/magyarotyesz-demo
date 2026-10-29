@@ -1,6 +1,7 @@
 "use client";
 
 import { createLocalStore } from "./local-store";
+import type { PaletteId } from "./palettes";
 
 export type Lang = "en" | "hu";
 
@@ -16,6 +17,8 @@ export type Settings = {
   buildings3d: boolean;
   /** The app's look: follow the phone, or always dark or light. */
   theme: "system" | "dark" | "light";
+  /** The app's colours: surfaces, text and accent. Green, amber and red keep their meaning in all of them. */
+  palette: PaletteId;
   /** How you move between Map, List and Profile: the bottom bar, or one round button that opens the pages. */
   navStyle: "bar" | "orb";
   /** The material of the bars and buttons: liquid glass, or one flat pastel colour with no effects. */
@@ -48,6 +51,7 @@ const store = createLocalStore<Settings>("magyarotyesz:settings", {
   location: true,
   buildings3d: true,
   theme: "system",
+  palette: "classic",
   navStyle: "bar",
   darkBar: "graphite",
   glass: "liquid",

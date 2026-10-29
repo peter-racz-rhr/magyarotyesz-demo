@@ -110,7 +110,7 @@ export function PullToRefresh() {
       <div
         aria-hidden
         className={cn(
-          "mt-2 grid size-10 place-items-center rounded-full border border-fg/10 bg-night/85 text-good shadow-[0_6px_20px_rgb(0_0_0/0.5)] backdrop-blur-md",
+          "mt-2 grid size-10 place-items-center rounded-full border border-fg/10 bg-night/85 text-brand shadow-[0_6px_20px_rgb(0_0_0/0.5)] backdrop-blur-md",
           pull === 0 && "transition-[transform,opacity] duration-300",
         )}
         style={{

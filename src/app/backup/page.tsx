@@ -76,7 +76,7 @@ export default function BackupPage() {
     <PageTransition>
       <main className="mx-auto w-full max-w-md px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-16">
         <div className="flex h-11 items-center">
-          <Link href="/settings" transitionTypes={BACK} className="-ml-2 inline-flex h-11 items-center gap-1 rounded-full pr-3 pl-1.5 text-[0.9375rem] text-good active:opacity-60">
+          <Link href="/settings" transitionTypes={BACK} className="-ml-2 inline-flex h-11 items-center gap-1 rounded-full pr-3 pl-1.5 text-[0.9375rem] text-brand active:opacity-60">
             <ArrowLeft className="size-[1.125rem]" strokeWidth={2} aria-hidden /> {t.backup.back}
           </Link>
         </div>

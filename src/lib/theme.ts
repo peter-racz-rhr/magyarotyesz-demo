@@ -34,27 +34,31 @@ export const THEME_COLOR: Record<Look, string> = { dark: "#121212", light: "#f6f
 /** Puts the look on the page (<html data-theme>) and the browser bar colour. Renders nothing. */
 export function ThemeRunner() {
   const look = useLook();
-  const { navStyle, darkBar, glass, solidColor } = useSettings();
+  const { navStyle, darkBar, glass, solidColor, palette } = useSettings();
   useEffect(() => {
-    document.documentElement.dataset.theme = look;
-    // The navigation reads these two to dress itself (globals.css).
-    document.documentElement.dataset.nav = navStyle;
+    const root = document.documentElement;
+    root.dataset.theme = look;
+    root.dataset.palette = palette;
+    // The navigation reads these to dress itself (globals.css).
+    root.dataset.nav = navStyle;
     // The solid look has its own colours, so the dark glass colours step aside.
-    document.documentElement.dataset.darkBar = glass === "solid" ? "classic" : darkBar;
-    document.documentElement.dataset.glass = glass;
-    document.documentElement.dataset.solid = solidColor;
-    // Next draws its own theme-color tag: change it in place (removing it breaks React's bookkeeping).
+    root.dataset.darkBar = glass === "solid" ? "classic" : darkBar;
+    root.dataset.glass = glass;
+    root.dataset.solid = solidColor;
+    // The browser bar takes the page colour of the palette in use. Next draws its own
+    // theme-color tag: change it in place (removing it breaks React's bookkeeping).
+    const page = getComputedStyle(root).getPropertyValue("--night").trim() || THEME_COLOR[look];
     const metas = document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]');
-    if (metas.length) metas.forEach((m) => (m.content = THEME_COLOR[look]));
+    if (metas.length) metas.forEach((m) => (m.content = page));
     else {
       const meta = document.createElement("meta");
       meta.name = "theme-color";
-      meta.content = THEME_COLOR[look];
+      meta.content = page;
       document.head.appendChild(meta);
     }
-  }, [look, navStyle, darkBar, glass, solidColor]);
+  }, [look, navStyle, darkBar, glass, solidColor, palette]);
   return null;
 }
 
 /** Runs before the first paint so a light phone does not flash dark. Kept tiny and defensive. */
-export const THEME_BOOT = `try{var s=JSON.parse(localStorage.getItem("magyarotyesz:settings")||"{}").theme||"system";var l=s==="system"?(matchMedia("${QUERY}").matches?"light":"dark"):s;document.documentElement.dataset.theme=l}catch(e){document.documentElement.dataset.theme="dark"}`;
+export const THEME_BOOT = `try{var c=JSON.parse(localStorage.getItem("magyarotyesz:settings")||"{}");var s=c.theme||"system";var l=s==="system"?(matchMedia("${QUERY}").matches?"light":"dark"):s;document.documentElement.dataset.theme=l;if(c.palette)document.documentElement.dataset.palette=c.palette}catch(e){document.documentElement.dataset.theme="dark"}`;

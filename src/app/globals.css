@@ -26,6 +26,7 @@
   --rose: #f0648c;
   --ok: #7fd6a4;
   --good: #4fe08a; /* code works */
+  --brand: var(--good); /* the app's accent for links, switches and selections; palettes change it, status colours never change */
   --me: #1a6fe6; /* the dot that is you on the map: blue on both themes, so it never looks like a place */
   --me-ring: rgb(26 111 230 / 0.28);
   --me-edge: #ffffff;
@@ -52,6 +53,7 @@
   --rose: #c02e63;
   --ok: #176B3C;
   --good: #0B6D33;
+  --brand: var(--good);
   --me: #1a6fe6;
   --me-ring: rgb(26 111 230 / 0.28);
   --me-edge: #ffffff;
@@ -67,7 +69,7 @@
   --muted-foreground: var(--haze);
   --border: var(--dusk-edge);
   --input: var(--dusk-edge);
-  --ring: var(--good);
+  --ring: var(--brand);
   --radius: 1rem;
   --popover: var(--dusk);
   --popover-foreground: var(--ink);
@@ -98,6 +100,7 @@
   --color-rose: var(--rose);
   --color-ok: var(--ok);
   --color-good: var(--good);
+  --color-brand: var(--brand);
   --color-me: var(--me);
   --color-me-ring: var(--me-ring);
   --color-me-edge: var(--me-edge);
@@ -261,6 +264,233 @@
     animation-duration: 0s !important;
     animation-delay: 0s !important;
   }
+}
+
+/*
+  Colour palettes (Settings > Colours). "classic" is the tokens above. The others change
+  the surfaces, text and accent only: green, amber and red keep their meaning (works,
+  stale, reported) in every palette. Each pair was checked for contrast: text 10:1,
+  secondary text and the accent 4.5:1 or more on the page and on cards.
+*/
+html[data-theme="light"][data-palette="forest"] {
+  --night: #eef1e9;
+  --dusk: #fbfcf8;
+  --dusk-edge: #d3dacb;
+  --ink: #18231b;
+  --haze: #56635a;
+  --brand: #2f6b4f;
+  --glass-fill: rgb(248 249 246 / 0.72);
+  --glass-solid: #eef1e9;
+}
+html[data-theme="dark"][data-palette="forest"] {
+  --night: #0f1511;
+  --dusk: #17201a;
+  --dusk-edge: #2a372e;
+  --ink: #e8efe8;
+  --haze: #93a496;
+  --brand: #6fcf97;
+  --glass-fill: rgb(7 9 8 / 0.62);
+  --glass-solid: #0f1511;
+}
+html[data-theme="light"][data-palette="mint"] {
+  --night: #e9f5ef;
+  --dusk: #fafffc;
+  --dusk-edge: #c8e2d6;
+  --ink: #10271f;
+  --haze: #4f6a5f;
+  --brand: #0b7a5c;
+  --glass-fill: rgb(246 251 249 / 0.72);
+  --glass-solid: #e9f5ef;
+}
+html[data-theme="dark"][data-palette="mint"] {
+  --night: #0c1613;
+  --dusk: #13211c;
+  --dusk-edge: #233a31;
+  --ink: #e3f4ec;
+  --haze: #8fb0a2;
+  --brand: #4fe0b0;
+  --glass-fill: rgb(5 10 9 / 0.62);
+  --glass-solid: #0c1613;
+}
+html[data-theme="light"][data-palette="teal"] {
+  --night: #e8f3f3;
+  --dusk: #fafdfd;
+  --dusk-edge: #c4dede;
+  --ink: #0e2a2c;
+  --haze: #4a6a6c;
+  --brand: #0a7378;
+  --glass-fill: rgb(246 250 250 / 0.72);
+  --glass-solid: #e8f3f3;
+}
+html[data-theme="dark"][data-palette="teal"] {
+  --night: #0b1516;
+  --dusk: #122022;
+  --dusk-edge: #213a3d;
+  --ink: #e2f2f2;
+  --haze: #8cb1b3;
+  --brand: #4fd6dc;
+  --glass-fill: rgb(5 9 10 / 0.62);
+  --glass-solid: #0b1516;
+}
+html[data-theme="light"][data-palette="ocean"] {
+  --night: #edf2f7;
+  --dusk: #fbfdff;
+  --dusk-edge: #d0dbe6;
+  --ink: #13202b;
+  --haze: #52626f;
+  --brand: #1a64a0;
+  --glass-fill: rgb(248 250 252 / 0.72);
+  --glass-solid: #edf2f7;
+}
+html[data-theme="dark"][data-palette="ocean"] {
+  --night: #0d131a;
+  --dusk: #141d27;
+  --dusk-edge: #263441;
+  --ink: #e5edf5;
+  --haze: #8fa3b5;
+  --brand: #5db4f0;
+  --glass-fill: rgb(6 9 12 / 0.62);
+  --glass-solid: #0d131a;
+}
+html[data-theme="light"][data-palette="midnight"] {
+  --night: #eceef8;
+  --dusk: #fbfbff;
+  --dusk-edge: #d0d4ec;
+  --ink: #161a2e;
+  --haze: #555b78;
+  --brand: #3b46c4;
+  --glass-fill: rgb(247 248 252 / 0.72);
+  --glass-solid: #eceef8;
+}
+html[data-theme="dark"][data-palette="midnight"] {
+  --night: #0a0d19;
+  --dusk: #121730;
+  --dusk-edge: #242b4d;
+  --ink: #e7eaf9;
+  --haze: #939ac0;
+  --brand: #93a0ff;
+  --glass-fill: rgb(5 6 11 / 0.62);
+  --glass-solid: #0a0d19;
+}
+html[data-theme="light"][data-palette="plum"] {
+  --night: #f4eef5;
+  --dusk: #fdfbfe;
+  --dusk-edge: #e1d4e4;
+  --ink: #251a29;
+  --haze: #675a6c;
+  --brand: #7a3790;
+  --glass-fill: rgb(251 248 251 / 0.72);
+  --glass-solid: #f4eef5;
+}
+html[data-theme="dark"][data-palette="plum"] {
+  --night: #150f19;
+  --dusk: #1e1625;
+  --dusk-edge: #342a3e;
+  --ink: #f0e9f4;
+  --haze: #a597ad;
+  --brand: #c995e6;
+  --glass-fill: rgb(9 7 11 / 0.62);
+  --glass-solid: #150f19;
+}
+html[data-theme="light"][data-palette="rose"] {
+  --night: #f9eff1;
+  --dusk: #fffbfc;
+  --dusk-edge: #ead3d8;
+  --ink: #2a1a1f;
+  --haze: #6c585d;
+  --brand: #ae2f58;
+  --glass-fill: rgb(253 249 249 / 0.72);
+  --glass-solid: #f9eff1;
+}
+html[data-theme="dark"][data-palette="rose"] {
+  --night: #170f12;
+  --dusk: #21161a;
+  --dusk-edge: #3b2a30;
+  --ink: #f6eaed;
+  --haze: #ae98a0;
+  --brand: #f27aa0;
+  --glass-fill: rgb(10 7 8 / 0.62);
+  --glass-solid: #170f12;
+}
+html[data-theme="light"][data-palette="peach"] {
+  --night: #fbefe7;
+  --dusk: #fffcfa;
+  --dusk-edge: #ecd5c6;
+  --ink: #2d1c14;
+  --haze: #6e5a4e;
+  --brand: #b8461c;
+  --glass-fill: rgb(253 249 245 / 0.72);
+  --glass-solid: #fbefe7;
+}
+html[data-theme="dark"][data-palette="peach"] {
+  --night: #171110;
+  --dusk: #221916;
+  --dusk-edge: #3b2d28;
+  --ink: #f6ebe5;
+  --haze: #b09c92;
+  --brand: #f59a74;
+  --glass-fill: rgb(10 8 7 / 0.62);
+  --glass-solid: #171110;
+}
+html[data-theme="light"][data-palette="sand"] {
+  --night: #f3ecdf;
+  --dusk: #fdfaf4;
+  --dusk-edge: #ded2bd;
+  --ink: #2a2116;
+  --haze: #675a47;
+  --brand: #8a5a12;
+  --glass-fill: rgb(250 247 242 / 0.72);
+  --glass-solid: #f3ecdf;
+}
+html[data-theme="dark"][data-palette="sand"] {
+  --night: #14110c;
+  --dusk: #1e1a13;
+  --dusk-edge: #373021;
+  --ink: #f2eadb;
+  --haze: #a89c82;
+  --brand: #d9b06a;
+  --glass-fill: rgb(9 8 5 / 0.62);
+  --glass-solid: #14110c;
+}
+html[data-theme="light"][data-palette="lime"] {
+  --night: #f1f4e3;
+  --dusk: #fcfdf6;
+  --dusk-edge: #d9e0bd;
+  --ink: #1d2410;
+  --haze: #5a6340;
+  --brand: #476f0e;
+  --glass-fill: rgb(249 251 244 / 0.72);
+  --glass-solid: #f1f4e3;
+}
+html[data-theme="dark"][data-palette="lime"] {
+  --night: #10140a;
+  --dusk: #181d0f;
+  --dusk-edge: #2e3720;
+  --ink: #eef3df;
+  --haze: #a0ab82;
+  --brand: #b8e24c;
+  --glass-fill: rgb(7 9 5 / 0.62);
+  --glass-solid: #10140a;
+}
+html[data-theme="light"][data-palette="mono"] {
+  --night: #f3f3f3;
+  --dusk: #ffffff;
+  --dusk-edge: #d9d9d9;
+  --ink: #111111;
+  --haze: #5c5c5c;
+  --brand: #2b2b2b;
+  --glass-fill: rgb(250 250 250 / 0.72);
+  --glass-solid: #f3f3f3;
+}
+html[data-theme="dark"][data-palette="mono"] {
+  --night: #0e0e0e;
+  --dusk: #181818;
+  --dusk-edge: #2c2c2c;
+  --ink: #f2f2f2;
+  --haze: #9a9a9a;
+  --brand: #dcdcdc;
+  --glass-fill: rgb(6 6 6 / 0.62);
+  --glass-solid: #0e0e0e;
 }
 
 /*

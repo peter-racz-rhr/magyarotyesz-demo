@@ -132,7 +132,7 @@ function PhotoCrop({ file, onDone, onCancel }: { file: File; onDone: (dataUrl: s
       </div>
       <label className="mx-auto flex w-full max-w-[22rem] items-center gap-3 text-sm text-haze">
         <span className="shrink-0">{t.profile.photoZoom}</span>
-        <input type="range" min={1} max={4} step={0.01} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} className="h-8 w-full accent-[var(--good)]" />
+        <input type="range" min={1} max={4} step={0.01} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} className="h-8 w-full accent-[var(--brand)]" />
       </label>
       <div className="mx-auto flex w-full max-w-[22rem] gap-2">
         <button type="button" onClick={onCancel} className={cn(btn.quiet, btn.md, "flex-1")}>
@@ -213,7 +213,7 @@ export function ProfileEditor({ onClose }: { onClose: () => void }) {
             </button>
             <input ref={input} type="file" accept="image/*" hidden onChange={(e) => { pick(e.target.files?.[0]); e.target.value = ""; }} />
             <div className="mt-4 flex items-center gap-5 text-[0.9375rem]">
-              <button type="button" onClick={() => input.current?.click()} className="font-semibold text-good">
+              <button type="button" onClick={() => input.current?.click()} className="font-semibold text-brand">
                 {photo ? t.profile.changePhoto : t.profile.addPhoto}
               </button>
               {photo && (

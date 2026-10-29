@@ -32,7 +32,7 @@ export function TermsStep({ onAgree }: { onAgree: () => void }) {
     <div className="flex h-dvh flex-col px-6 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1.25rem)]">
       <h1 className="pt-3 text-[1.75rem] leading-tight font-bold tracking-tight">{t.welcome.termsTitle}</h1>
       <div className="mt-3 h-1 overflow-hidden rounded-full bg-fg/10" aria-hidden>
-        <div className="h-full rounded-full bg-good transition-[width] duration-150" style={{ width: `${Math.round(progress * 100)}%` }} />
+        <div className="h-full rounded-full bg-brand transition-[width] duration-150" style={{ width: `${Math.round(progress * 100)}%` }} />
       </div>
       <div
         ref={box}
