@@ -49,6 +49,8 @@ type Me = {
   /** Running total of people who got in with this phone's codes; kept by the server across code changes. */
   gotIn?: number;
   displayName?: string;
+  /** Whether a Google account and/or an email address is linked to this profile. */
+  account?: { google: boolean; email: boolean };
 };
 export type Location = { latitude: number; longitude: number; accuracy: number };
 export type OutAction = {
@@ -67,6 +69,7 @@ const cache = createLocalStore<Cache>("magyarotyesz:server", { seq: null, toilet
 const identity = createLocalStore<{ userId: string; token: string } | null>("magyarotyesz:identity", null);
 const meStore = createLocalStore<Me>("magyarotyesz:me", { owns: [], votes: {}, suggestions: {}, alerts: [], addsLeftToday: 10, gotIn: 0 });
 export const useUserId = () => identity.useValue()?.userId ?? null;
+export const useAccount = () => meStore.useValue().account ?? { google: false, email: false };
 export const useGotInTotal = () => meStore.useValue().gotIn ?? 0;
 const outbox = createLocalStore<OutAction[]>("magyarotyesz:outbox", []);
 /** The name we last tried to send, so a name the server turned down is not sent over and over. */
@@ -378,6 +381,72 @@ export async function rotateBackup(): Promise<"ok" | "unknown" | "offline"> {
   }
 }
 
+/* ------------------------- accounts: Google and email ------------------------- */
+
+export type AuthOptions = { google: string | null; email: boolean };
+const authOptionsStore = createLocalStore<AuthOptions | null>("magyarotyesz:auth-options", null);
+/** Which sign-in methods the server offers (null until it answered once). */
+export const useAuthOptions = authOptionsStore.useValue;
+export async function loadAuthOptions(): Promise<AuthOptions | null> {
+  if (!REMOTE) return null;
+  try {
+    const res = await api<AuthOptions>("/v1/auth/config");
+    if (!res.notModified) authOptionsStore.set(res.data);
+    return authOptionsStore.get();
+  } catch {
+    return authOptionsStore.get();
+  }
+}
+
+type SignInResult = { userId: string; token: string | null; created: boolean; linked: boolean };
+export type SignInOutcome = "ok" | "bad_code" | "banned" | "conflict" | "offline" | "failed";
+
+/** Takes the server's answer to a sign-in: a new token for another profile signs this browser into it; a link keeps ours. */
+function takeSignIn(result: SignInResult) {
+  if (result.token) identity.set({ userId: result.userId, token: result.token });
+  scheduleSync(100);
+}
+function outcomeOf(e: unknown): SignInOutcome {
+  if (e instanceof Offline) return "offline";
+  if (e instanceof ApiFailure) return e.code === "bad_code" ? "bad_code" : e.code === "banned" ? "banned" : e.code === "already_linked" ? "conflict" : "failed";
+  return "failed";
+}
+
+/** With a Google ID token (from the Google button). Links to this profile if it has one and the Google account is new. */
+export async function signInWithGoogle(idToken: string): Promise<SignInOutcome> {
+  try {
+    const res = await api<SignInResult>("/v1/auth/google", { method: "POST", token: identity.get()?.token, body: { idToken } });
+    if (res.notModified) return "offline";
+    takeSignIn(res.data);
+    return "ok";
+  } catch (e) {
+    return outcomeOf(e);
+  }
+}
+
+/** Step one of email sign-in: the server mails a six-digit code. */
+export async function startEmailSignIn(email: string): Promise<"ok" | "offline" | "failed" | "limited"> {
+  try {
+    await api("/v1/auth/email/start", { method: "POST", body: { email } });
+    return "ok";
+  } catch (e) {
+    if (e instanceof Offline) return "offline";
+    return e instanceof ApiFailure && e.status === 429 ? "limited" : "failed";
+  }
+}
+
+/** Step two: the code. */
+export async function finishEmailSignIn(email: string, code: string): Promise<SignInOutcome> {
+  try {
+    const res = await api<SignInResult>("/v1/auth/email/verify", { method: "POST", token: identity.get()?.token, body: { email, code } });
+    if (res.notModified) return "offline";
+    takeSignIn(res.data);
+    return "ok";
+  } catch (e) {
+    return outcomeOf(e);
+  }
+}
+
 /** Everything the server holds for this profile (for "Download my data"). Null when there is none yet or no answer. */
 export async function fetchMyData(): Promise<unknown | null> {
   const me = identity.get();
@@ -532,10 +601,10 @@ async function refreshMe() {
     throw e;
   }
   if (res.notModified) return;
-  const { owns, votes, suggestions, alerts: list, addsLeftToday, gotIn, displayName } = res.data;
+  const { owns, votes, suggestions, alerts: list, addsLeftToday, gotIn, displayName, account } = res.data;
   // A name chosen on another visit (same id) shows up here too; one typed on this phone wins.
   if (displayName && !getSettings().name) updateSettings({ name: displayName });
-  meStore.set({ owns, votes, suggestions, alerts: list, addsLeftToday, gotIn: gotIn ?? 0 });
+  meStore.set({ owns, votes, suggestions, alerts: list, addsLeftToday, gotIn: gotIn ?? 0, account });
   // The server knows about names (it sent the field) but not ours: send it once.
   const mine = getSettings().name;
   if (displayName !== undefined && mine && mine !== displayName && profileTried.get() !== mine && !outbox.get().some((a) => a.type === "set_profile")) {

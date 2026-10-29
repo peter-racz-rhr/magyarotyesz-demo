@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, CloudDownload, Layers, Megaphone, MessageSquare, Moon, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, CloudDownload, Layers, Megaphone, MessageSquare, Moon, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, UserRound, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -19,7 +19,8 @@ import { replayIntro } from "@/lib/onboarding";
 import { normalizePalette } from "@/lib/palettes";
 import { updateSettings, useSettings, type Lang, type Settings } from "@/lib/settings";
 import { useLook } from "@/lib/theme";
-import { deleteMyData, fetchMyData, hasIdentity, useUserId, verifyCode } from "@/lib/sync";
+import { AccountSignIn } from "@/components/account-sign-in";
+import { deleteMyData, fetchMyData, loadAuthOptions, useAccount, useAuthOptions, useUserId, verifyCode } from "@/lib/sync";
 import { addDemoToilets, clearAlerts, clearToilets, simulateActivity, useToilets } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
 
@@ -141,6 +142,12 @@ export default function SettingsPage() {
   const [locationBlocked, setLocationBlocked] = useState(false);
   const [exported, setExported] = useState(false);
   const [code, setCode] = useState<string | null>(null);
+  const account = useAccount();
+  const authOptions = useAuthOptions();
+  const [signing, setSigning] = useState(false);
+  useEffect(() => {
+    if (REMOTE) void loadAuthOptions();
+  }, []);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState<"idle" | "busy" | "failed">("idle");
   useEffect(() => {
@@ -332,19 +339,33 @@ export default function SettingsPage() {
           <LinkRow icon={<Megaphone />} hue={42} title={t.settings.whatsNew} href="/changelog" />
         </Group>
 
+        {REMOTE && authOptions && (authOptions.google || authOptions.email) && (
+          <Group id="account-heading" title={t.account.group} footer={t.account.footer}>
+            {account.google || account.email ? (
+              <LinkRow icon={<ShieldCheck />} hue={150} title={account.google ? t.account.signedGoogle : t.account.signedEmail} chevron={false} />
+            ) : signing ? (
+              <li className="px-4 py-4">
+                <AccountSignIn onDone={() => setSigning(false)} />
+              </li>
+            ) : (
+              <LinkRow icon={<UserRound />} hue={150} title={t.account.connect} onClick={() => setSigning(true)} chevron={false} />
+            )}
+          </Group>
+        )}
+
         <Group id="data-heading" title={t.settings.dataGroup} footer={exported ? t.settings.exported : t.settings.footerData}>
           <LinkRow icon={<Download />} hue={212} title={t.settings.export} onClick={() => void exportData()} chevron={false} />
           {REMOTE && <LinkRow icon={<KeyRound />} hue={268} title={t.settings.backup} href="/backup" />}
           {REMOTE && code && (
-            <li className="flex min-h-[3.25rem] items-center gap-3.5 px-4 py-2 text-[1rem]">
+            <li className="flex min-h-[3.25rem] items-start gap-3.5 px-4 py-2.5 text-[1rem]">
               <Tile hue={150}>
                 <ShieldCheck />
               </Tile>
               <span className="min-w-0 flex-1">
                 {t.settings.verifyCode}
                 <span className="block text-[0.8125rem] leading-snug text-haze">{t.settings.verifyCodeSub}</span>
+                <span className="mt-1 block font-mono text-[1.125rem] font-semibold tracking-widest select-all">{code}</span>
               </span>
-              <span className="font-mono text-[1.0625rem] font-semibold tracking-widest select-all">{code}</span>
             </li>
           )}
           <LinkRow icon={<FileText />} tone="grey" title={docs.terms.title} href="/terms" />
@@ -352,7 +373,7 @@ export default function SettingsPage() {
           <LinkRow icon={<Landmark />} tone="grey" title={docs.imprint.title} href="/imprint" />
         </Group>
 
-        {REMOTE && hasIdentity() && (
+        {REMOTE && userId && (
           <Group id="delete-data" plain>
             {confirmDelete ? (
               <li className="flex flex-col gap-3 px-4 py-3">
