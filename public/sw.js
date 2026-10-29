@@ -5,7 +5,7 @@
   names change with every build). The codes themselves already live on the
   phone. Map pieces you have already seen are kept too (MAP_CACHE); new areas and address search need the internet.
 */
-const CACHE = "magyarotyesz-v2";
+const CACHE = "magyarotyesz-v3";
 // Map pieces from other servers (vector tiles, fonts, satellite). Seen once, they stay on the phone, so
 // the places you have looked at still show up with no signal. Capped so it never fills the storage.
 const MAP_CACHE = "magyarotyesz-map-v1";
@@ -20,7 +20,25 @@ const trimMap = async () => {
   await Promise.all(keys.slice(0, Math.max(0, keys.length - MAP_LIMIT)).map((key) => cache.delete(key)));
 };
 
-const PAGES = ["/", "/welcome", "/map", "/nearby", "/profile", "/manifest.webmanifest", "/icons/icon-192.png"];
+const PAGES = ["/", "/welcome", "/map", "/nearby", "/profile", "/urgent", "/settings", "/terms", "/privacy", "/imprint", "/manifest.webmanifest", "/icons/icon-192.png"];
+
+// Fetches the pages again, skipping the browser's own cache, and saves them. The app asks for this every time it
+// opens with a connection, because moving between pages inside the app never fetches the page itself: without it
+// a phone offline would start from a copy as old as the install, with the old version of the app in it.
+const refreshPages = () =>
+  caches.open(CACHE).then((cache) =>
+    Promise.all(
+      PAGES.map((url) =>
+        fetch(url, { cache: "reload" })
+          .then((response) => (response.ok ? cache.put(url, response) : undefined))
+          .catch(() => {}),
+      ),
+    ),
+  );
+
+self.addEventListener("message", (event) => {
+  if (event.data === "refresh-pages") event.waitUntil(refreshPages());
+});
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

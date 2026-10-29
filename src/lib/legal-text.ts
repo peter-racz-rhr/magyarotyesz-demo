@@ -185,7 +185,6 @@ const en: Record<DocKey, Doc> = {
         p: [
           "Map © OpenFreeMap, © OpenMapTiles, data © OpenStreetMap contributors. Style based on the CartoDB basemaps (CC BY 3.0).",
           "Satellite: Powered by Esri. Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community.",
-          "---",
         ],
       },
     ],
@@ -366,7 +365,6 @@ const hu: Record<DocKey, Doc> = {
         p: [
           "Térkép © OpenFreeMap, © OpenMapTiles, adatok © OpenStreetMap közreműködők. A stílus a CartoDB alaptérképeken alapul (CC BY 3.0).",
           "Műholdkép: Powered by Esri. Forrás: Esri, Vantor, Earthstar Geographics és a GIS User Community.",
-          "---",
         ],
       },
     ],

@@ -32,7 +32,8 @@ export const acceptedTerms = (): { v: string; at: string } | null => {
 };
 export const hasAcceptedTerms = () => {
   try {
-    return (JSON.parse(read(TERMS_KEY) ?? "null") as { v?: string } | null)?.v === TERMS_VERSION;
+    // The same version or a newer one (version names sort by date), so a page left over from an older build never asks again.
+    return ((JSON.parse(read(TERMS_KEY) ?? "null") as { v?: string } | null)?.v ?? "") >= TERMS_VERSION;
   } catch {
     return false;
   }
