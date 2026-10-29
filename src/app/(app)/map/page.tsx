@@ -324,6 +324,10 @@ export default function MapPage() {
   const [baby, setBaby] = useState(false);
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
+  // A warning buzz when the add form says something is wrong.
+  useEffect(() => {
+    if (error) buzz("warn");
+  }, [error]);
   const [busy, setBusy] = useState(false);
   const [justAdded, setJustAdded] = useState<{ id: string; name: string } | null>(null);
 

@@ -12,8 +12,14 @@ const PATTERNS = {
   tick: 16,
   /** A toilet was added, a switch turned on. */
   success: [35, 45, 80],
-  /** Something that needs a second look. */
+  /** Something that needs a second look: an error, "too far away". */
   warn: [70, 50, 70],
+  /** "No, it did not work". */
+  no: 110,
+  /** A code appeared. */
+  reveal: [14, 40, 14],
+  /** A report was sent, data was deleted: done and final. */
+  done: [45, 35, 45],
 } as const;
 
 export type Buzz = keyof typeof PATTERNS;

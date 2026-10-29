@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { api, ApiFailure, Offline, REMOTE } from "./api";
 import { createLocalStore } from "./local-store";
+import { buzz } from "./haptics";
 import { acceptedTerms } from "./onboarding";
 import { getSettings, updateSettings } from "./settings";
 import type { Alert, Toilet } from "./toilets";
@@ -492,6 +493,7 @@ export async function deleteMyData(): Promise<"ok" | "offline" | "failed"> {
       if (!(e instanceof ApiFailure && e.status === 401)) return e instanceof Offline ? "offline" : "failed";
     }
   }
+  buzz("done");
   try {
     for (const key of Object.keys(window.localStorage)) if (key.startsWith("magyarotyesz:")) window.localStorage.removeItem(key);
   } catch {

@@ -2,6 +2,7 @@
 
 import { Accessibility, Baby, Bookmark, Check, Coins, Eye, Flag, Navigation, Pencil, Share2, Signpost, ThumbsDown, ThumbsUp, Users } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { buzz } from "@/lib/haptics";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { HintChips } from "@/components/hint-chips";
 import { LimitedInput } from "@/components/limited-input";
@@ -184,6 +185,15 @@ export function ToiletCard({
   const saved = useSaved().includes(toilet.id);
   const walk = from ? walkIfNear(distance(from, toilet)) : null;
   const [shown, setShown] = useState(showCodes);
+  // A short buzz when the code appears (not on first load, and not when it was already showing).
+  const firstShown = useRef(true);
+  useEffect(() => {
+    if (firstShown.current) {
+      firstShown.current = false;
+      return;
+    }
+    if (shown) buzz("reveal");
+  }, [shown]);
   // A code that was tapped open hides itself again after a minute (unless "show codes right away" is on).
   useEffect(() => {
     if (!shown || showCodes) return;
@@ -242,14 +252,17 @@ export function ToiletCard({
     setChecking(false);
     if (!spot.ok) {
       setBlocked(spotMessage(t, spot));
+      buzz("warn");
       return;
     }
     if (works) {
       confirmCode(toilet.id, spot.location);
       setStep("thanks");
+      buzz("success");
     } else {
       reportCode(toilet.id, spot.location);
       setStep("new-code");
+      buzz("no");
     }
   };
 
@@ -267,6 +280,7 @@ export function ToiletCard({
       const spot = await checkOnTheSpot(toilet);
       if (!spot.ok) {
         setBlocked(spotMessage(t, spot));
+        buzz("warn");
         return;
       }
       suggestCode(toilet.id, code, spot.location);
@@ -296,6 +310,7 @@ export function ToiletCard({
       // Near the place the report counts at once; from afar it is kept for a person to look at.
       const spot = await checkOnTheSpot(toilet);
       reportToilet(toilet.id, reportReason, spot.ok ? spot.location : undefined, reportNote);
+      buzz("done");
       setReportedFar(!spot.ok);
       setReportBusy(false);
       setReporting("sent");

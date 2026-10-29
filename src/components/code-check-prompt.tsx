@@ -7,6 +7,7 @@ import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { clearCheck, usePendingCheck } from "@/lib/code-check";
 import { spotMessage, useT } from "@/lib/i18n";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
+import { buzz } from "@/lib/haptics";
 import { confirmCode, reportCode, useToilets } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
 
@@ -55,9 +56,13 @@ export function CodeCheckPrompt() {
     setMessage("");
     const spot = await checkOnTheSpot(toilet);
     setBusy(false);
-    if (!spot.ok) return setMessage(spotMessage(t, spot));
+    if (!spot.ok) {
+      buzz("warn");
+      return setMessage(spotMessage(t, spot));
+    }
     if (works) confirmCode(toilet.id, spot.location);
     else reportCode(toilet.id, spot.location);
+    buzz(works ? "success" : "no");
     clearCheck();
   };
 
