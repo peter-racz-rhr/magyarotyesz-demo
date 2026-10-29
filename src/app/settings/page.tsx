@@ -1,11 +1,12 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, Droplet, Layers, Palette, PanelBottom, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, Layers, PanelBottom, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BACK, PageTransition } from "@/components/page-transition";
 import { MapStylePicker } from "@/components/map-style-picker";
+import { PalettePicker } from "@/components/palette-picker";
 import { Group, LinkRow, SwitchRow, Tile } from "@/components/settings-ui";
 import { btn } from "@/components/ui/buttons";
 import { REMOTE } from "@/lib/api";
@@ -14,7 +15,6 @@ import { LEGAL } from "@/lib/legal-text";
 import { requestLocation } from "@/lib/location";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
-import { PALETTES } from "@/lib/palettes";
 import { updateSettings, useSettings, type Lang, type Settings } from "@/lib/settings";
 import { useLook } from "@/lib/theme";
 import { fetchMyData, useUserId } from "@/lib/sync";
@@ -22,11 +22,9 @@ import { addDemoToilets, clearAlerts, clearToilets, simulateActivity, useToilets
 import { cn } from "@/lib/utils";
 
 /** Everything you can change, in groups. Reached from the gear on the Profile page. */
-/** The pastels as they look in the light theme, for the colour picker. */
-const SWATCH = { mint: "#cfeadb", sky: "#cfe3f4", lavender: "#dcd6f2", peach: "#f6dccb", rose: "#f4d3dc" } as const;
 
 /** A row with a title and a wrapping set of options, for choices with more than three answers. */
-function ChoiceRow<K extends "navStyle" | "darkBar" | "glass">({
+function ChoiceRow<K extends "navStyle" | "glass">({
   icon,
   hue,
   title,
@@ -199,63 +197,13 @@ export default function SettingsPage() {
           <h2 id="palette-heading" className="mb-2 px-5 text-[0.9375rem] font-semibold text-ink/65">
             {t.settings.paletteGroup}
           </h2>
-          <div role="radiogroup" aria-label={t.settings.paletteGroup} className="grid grid-cols-4 gap-2.5 rounded-[1.25rem] bg-dusk p-3">
-            {PALETTES.map((p) => {
-              const [page, card, accent] = p[look];
-              const on = settings.palette === p.id;
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={on}
-                  onClick={() => updateSettings({ palette: p.id })}
-                  className="flex flex-col items-center gap-1.5 rounded-2xl py-1 active:opacity-70"
-                >
-                  <span
-                    aria-hidden
-                    className={cn("relative grid size-14 place-items-center overflow-hidden rounded-2xl ring-offset-2 ring-offset-dusk", on ? "ring-2 ring-ink" : "ring-1 ring-fg/15")}
-                    style={{ backgroundColor: page }}
-                  >
-                    <span className="absolute bottom-1.5 left-1.5 h-5 w-7 rounded-lg" style={{ backgroundColor: card }} />
-                    <span className="absolute top-2 right-2 size-4 rounded-full" style={{ backgroundColor: accent }} />
-                  </span>
-                  <span className={cn("text-[0.75rem] leading-none font-semibold", on ? "text-ink" : "text-haze")}>{t.settings.paletteNames[p.id]}</span>
-                </button>
-              );
-            })}
-          </div>
+          <PalettePicker value={settings.palette} look={look} names={t.settings.paletteNames} label={t.settings.paletteGroup} onChange={(palette) => updateSettings({ palette })} />
           <p className="mt-2 px-5 text-[0.8125rem] leading-relaxed text-haze">{t.settings.paletteFooter}</p>
         </section>
 
         <Group id="nav-heading" title={t.settings.navGroup} footer={t.settings.footerNav}>
           <ChoiceRow icon={<PanelBottom />} hue={162} title={t.settings.navStyle} names={t.settings.navNames} value={settings.navStyle} field="navStyle" />
           <ChoiceRow icon={<Layers />} hue={24} title={t.settings.glass} names={t.settings.glassNames} value={settings.glass} field="glass" />
-          {settings.glass === "solid" && (
-            <li className="flex flex-col gap-2.5 px-4 py-3 text-[1rem]">
-              <span className="flex items-center gap-3.5">
-                <Tile hue={340}>
-                  <Droplet />
-                </Tile>
-                <span className="flex-1">{t.settings.solidColor}</span>
-              </span>
-              <div role="radiogroup" aria-label={t.settings.solidColor} className="flex justify-between px-1">
-                {(["mint", "sky", "lavender", "peach", "rose"] as const).map((key) => (
-                  <button
-                    key={key}
-                    type="button"
-                    role="radio"
-                    aria-checked={settings.solidColor === key}
-                    aria-label={t.settings.solidNames[key]}
-                    onClick={() => updateSettings({ solidColor: key })}
-                    style={{ backgroundColor: SWATCH[key] }}
-                    className={cn("size-10 rounded-full ring-offset-2 ring-offset-dusk transition-shadow", settings.solidColor === key ? "ring-2 ring-ink" : "ring-1 ring-fg/15")}
-                  />
-                ))}
-              </div>
-            </li>
-          )}
-          <ChoiceRow icon={<Palette />} hue={300} title={t.settings.darkBar} names={t.settings.darkBarNames} value={settings.darkBar} field="darkBar" />
         </Group>
 
         <section className="mt-8" aria-labelledby="mapstyle-heading">
