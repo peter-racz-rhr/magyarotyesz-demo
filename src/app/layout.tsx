@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/instrument-sans/wdth.css";
 import "./globals.css";
 import { BackSwipe } from "@/components/back-swipe";
+import { HapticsRunner } from "@/components/haptics-runner";
 import { ServiceWorker } from "@/components/service-worker";
 import { SyncRunner } from "@/components/sync-runner";
 import { THEME_BOOT, ThemeRunner } from "@/lib/theme";
@@ -39,6 +40,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full">
         <ThemeRunner />
+        <HapticsRunner />
         {children}
         <BackSwipe />
         <ServiceWorker />

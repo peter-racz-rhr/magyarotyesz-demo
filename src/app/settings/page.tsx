@@ -16,6 +16,7 @@ import { requestLocation } from "@/lib/location";
 import { downloadOfflineMap, removeOfflineMap, useOfflineMap } from "@/lib/offline-map";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
+import { buzz } from "@/lib/haptics";
 import { normalizePalette } from "@/lib/palettes";
 import { updateSettings, useSettings, type Lang, type Settings } from "@/lib/settings";
 import { useLook } from "@/lib/theme";
@@ -331,7 +332,11 @@ export default function SettingsPage() {
         <Group id="codes-heading" title={t.settings.codesGroup} footer={t.settings.footerCodes}>
           <SwitchRow icon={<Eye />} hue={46} title={t.settings.showCodes} on={settings.showCodes} onChange={(on) => updateSettings({ showCodes: on })} />
           <SwitchRow icon={<Sparkles />} hue={282} title={t.settings.animations} on={settings.animations} onChange={(on) => updateSettings({ animations: on })} />
-          <SwitchRow icon={<Vibrate />} hue={330} title={t.settings.haptics} on={settings.haptics} onChange={(on) => updateSettings({ haptics: on })} />
+          <SwitchRow icon={<Vibrate />} hue={330} title={t.settings.haptics} on={settings.haptics} onChange={(on) => {
+              updateSettings({ haptics: on });
+              // Turning it on shows what it feels like.
+              if (on) buzz("success");
+            }} />
         </Group>
 
         <Group id="help-heading" title={t.settings.helpGroup}>

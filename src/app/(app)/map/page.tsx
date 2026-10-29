@@ -17,7 +17,8 @@ import { spotMessage, useT } from "@/lib/i18n";
 import { requestLocation } from "@/lib/location";
 import { Buildings3D } from "@/components/buildings-3d";
 import { checkFields } from "@/lib/moderation";
-import { getSettings, useSettings } from "@/lib/settings";
+import { buzz } from "@/lib/haptics";
+import { useSettings } from "@/lib/settings";
 import { LIMITS, cleanCode, cleanText, tidy, validCode, validName } from "@/lib/limits";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
 import {
@@ -539,12 +540,8 @@ export default function MapPage() {
     }, spot.location);
     closeSheet();
     setJustAdded({ id: toilet.id, name: toilet.name });
-    // A tiny tap on phones that allow it (not iPhones).
-    try {
-      if (getSettings().haptics) navigator.vibrate?.(18);
-    } catch {
-      // No haptics: the animation is enough.
-    }
+    // A little celebration buzz on phones that allow it (not iPhones).
+    buzz("success");
     window.setTimeout(() => setJustAdded(null), 2600);
   };
 
