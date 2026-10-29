@@ -75,7 +75,7 @@ export default function ProfilePage() {
         {/* One slim line on top: sync state on the left, the gear on the right edge */}
         <div className="flex h-11 items-center">
           {REMOTE && (
-            <span data-testid="sync-status" className="inline-flex max-w-[14rem] items-center gap-2 text-[0.8125rem] text-haze">
+            <span data-testid="sync-status" className="inline-flex max-w-[16rem] items-center gap-2 text-[0.8125rem] leading-snug text-haze">
               <span
                 aria-hidden
                 className={cn(
@@ -83,7 +83,7 @@ export default function ProfilePage() {
                   sync.syncing ? "animate-pulse bg-stale" : sync.online === false ? "bg-bad" : pending > 0 ? "bg-stale" : "bg-good",
                 )}
               />
-              <span className="truncate">{statusText}</span>
+              <span>{statusText}</span>
             </span>
           )}
           <span className="flex-1" />
