@@ -370,8 +370,8 @@ export const formatDistance = (m: number) =>
   m < 1000 ? `${Math.max(10, Math.round(m / 10) * 10)} m` : `${(m / 1000).toFixed(m < 10000 ? 1 : 0)} km`;
 
 /** "just now", "5 minutes ago", "yesterday", "3 weeks ago" (or in Hungarian). */
-export function ago(iso: string, lang: "en" | "hu" = "en", now = Date.now()) {
-  const relative = new Intl.RelativeTimeFormat(lang === "hu" ? "hu" : "en-GB", { numeric: "auto" });
+export function ago(iso: string, lang: "en" | "hu" | "de" = "en", now = Date.now()) {
+  const relative = new Intl.RelativeTimeFormat(lang === "hu" ? "hu" : lang === "de" ? "de" : "en-GB", { numeric: "auto" });
   const s = (new Date(iso).getTime() - now) / 1000;
   const steps: [Intl.RelativeTimeFormatUnit, number][] = [
     ["year", 31536000],
@@ -384,7 +384,7 @@ export function ago(iso: string, lang: "en" | "hu" = "en", now = Date.now()) {
   for (const [unit, size] of steps) {
     if (Math.abs(s) >= size) return relative.format(Math.round(s / size), unit);
   }
-  return lang === "hu" ? "épp most" : "just now";
+  return lang === "hu" ? "épp most" : lang === "de" ? "gerade eben" : "just now";
 }
 
 /** Walking directions in Google Maps (opens the app on phones that have it). */

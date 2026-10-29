@@ -242,4 +242,6 @@ const hu: Record<DocKey, Doc> = {
   },
 };
 
-export const LEGAL: Record<Lang, Record<DocKey, Doc>> = { en, hu };
+const LEGAL_BY_LANG: Record<"en" | "hu", Record<DocKey, Doc>> = { en, hu };
+/** The terms, privacy policy and imprint exist in English and Hungarian only; German shows the English ones. */
+export const legalFor = (lang: Lang) => LEGAL_BY_LANG[lang === "hu" ? "hu" : "en"];

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { BACK, PageTransition } from "@/components/page-transition";
 import { useT } from "@/lib/i18n";
 import { LEGAL_REVIEWED, OPERATOR, type DocKey } from "@/lib/legal";
-import { LEGAL } from "@/lib/legal-text";
+import { legalFor } from "@/lib/legal-text";
 import { useSettings } from "@/lib/settings";
 
 const LINKS: DocKey[] = ["terms", "privacy", "imprint"];
@@ -27,7 +27,7 @@ function fill(text: string, missing: string) {
 export function LegalBody({ doc }: { doc: DocKey }) {
   const { t } = useT();
   const { lang } = useSettings();
-  const d = LEGAL[lang][doc];
+  const d = legalFor(lang)[doc];
   return (
     <article>
       <h2 className="text-[1.375rem] leading-tight font-bold">{d.title}</h2>
@@ -50,7 +50,7 @@ export function LegalBody({ doc }: { doc: DocKey }) {
 export function LegalPage({ doc }: { doc: DocKey }) {
   const { t } = useT();
   const { lang } = useSettings();
-  const d = LEGAL[lang][doc];
+  const d = legalFor(lang)[doc];
   return (
     <PageTransition>
       <main className="mx-auto max-w-2xl px-5 pt-[max(1.5rem,env(safe-area-inset-top))] pb-16">
@@ -73,7 +73,7 @@ export function LegalPage({ doc }: { doc: DocKey }) {
         <nav aria-label={t.legal.more} className="mt-10 flex flex-wrap gap-x-5 gap-y-2 border-t border-dusk-edge pt-5 text-sm">
           {LINKS.filter((k) => k !== doc).map((k) => (
             <Link key={k} href={`/${k}`} className="text-brand underline">
-              {LEGAL[lang][k].title}
+              {legalFor(lang)[k].title}
             </Link>
           ))}
         </nav>
@@ -101,7 +101,7 @@ export function LegalLinks({ className }: { className?: string }) {
         <span key={k}>
           {i > 0 && " · "}
           <Link href={`/${k}`} className="underline underline-offset-2">
-            {LEGAL[lang][k].title}
+            {legalFor(lang)[k].title}
           </Link>
         </span>
       ))}

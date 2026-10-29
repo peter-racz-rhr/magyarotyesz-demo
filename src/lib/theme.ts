@@ -34,12 +34,13 @@ export const THEME_COLOR: Record<Look, string> = { dark: "#121212", light: "#f6f
 /** Puts the look on the page (<html data-theme>) and the browser bar colour. Renders nothing. */
 export function ThemeRunner() {
   const look = useLook();
-  const { navStyle, glass, palette, textSize } = useSettings();
+  const { navStyle, glass, palette, textSize, lang } = useSettings();
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.theme = look;
     root.dataset.palette = palette;
     root.dataset.text = textSize;
+    root.lang = lang;
     // The navigation reads these to dress itself (globals.css).
     root.dataset.nav = navStyle;
     root.dataset.glass = glass;
@@ -54,7 +55,7 @@ export function ThemeRunner() {
       meta.content = page;
       document.head.appendChild(meta);
     }
-  }, [look, navStyle, glass, palette, textSize]);
+  }, [look, navStyle, glass, palette, textSize, lang]);
   return null;
 }
 

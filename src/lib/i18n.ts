@@ -1,10 +1,11 @@
 "use client";
 
+import { de } from "./i18n-de";
 import type { SpotCheck } from "./on-the-spot";
 import { useSettings, type Lang } from "./settings";
 import { formatDistance, type Access, type Kind } from "./toilets";
 
-/* Every word on screen, in English and Hungarian. */
+/* Every word on screen, in English, Hungarian and German (i18n-de.ts). */
 
 const en = {
   kinds: { cafe: "Café", restaurant: "Restaurant", fastfood: "Fast food", bar: "Bar", mall: "Mall", station: "Station", public: "Public toilet", other: "Other" } as Record<Kind, string>,
@@ -49,6 +50,14 @@ const en = {
     themeNames: { system: "Auto", dark: "Dark", light: "Light" } as Record<string, string>,
     mapStyleNames: { auto: "Auto", dark: "Dark", light: "Light", satellite: "Satellite" } as Record<string, string>,
     mapStyleHint: "Pick how the map looks. Auto follows the app's dark or light look.",
+    offlineTitle: "Offline map",
+    offlineSub: "Save Budapest on this phone so the map works with no signal. Roughly 50 MB: best on Wi-Fi. Satellite pictures are not saved.",
+    offlineDownload: "Save Budapest",
+    offlineProgress: (pct: number) => `Saving… ${pct}%`,
+    offlineSaved: (when: string, mb: number) => `Saved ${when} · ${mb}\u00A0MB`,
+    offlineRemove: "Remove",
+    offlineCancel: "Cancel",
+    offlineFailed: "That did not finish. Check your connection and try again.",
     paletteGroup: "Colours",
     paletteNames: { classic: "Classic", forest: "Forest", mint: "Mint", teal: "Teal", ocean: "Ocean", midnight: "Midnight", plum: "Plum", rose: "Rose", peach: "Peach", sand: "Sand", lime: "Lime", mono: "Mono" } as Record<string, string>,
     paletteFooter: "Changes the page, cards, text and accent, and the colours of the glass bars and the solid look. Green, amber and red always keep their meaning: works, not checked lately, reported.",
@@ -478,6 +487,14 @@ const hu: Dict = {
     themeNames: { system: "Auto", dark: "Sötét", light: "Világos" } as Record<string, string>,
     mapStyleNames: { auto: "Auto", dark: "Sötét", light: "Világos", satellite: "Műholdas" } as Record<string, string>,
     mapStyleHint: "Válaszd ki, hogyan nézzen ki a térkép. Az Auto az app sötét vagy világos megjelenését követi.",
+    offlineTitle: "Offline térkép",
+    offlineSub: "Mentsd el Budapestet a telefonra, hogy a térkép jel nélkül is működjön. Nagyjából 50 MB: wifin érdemes. A műholdképeket nem menti.",
+    offlineDownload: "Budapest mentése",
+    offlineProgress: (pct: number) => `Mentés… ${pct}%`,
+    offlineSaved: (when: string, mb: number) => `Elmentve ${when} · ${mb}\u00A0MB`,
+    offlineRemove: "Törlés",
+    offlineCancel: "Mégse",
+    offlineFailed: "Ez nem fejeződött be. Nézd meg a kapcsolatot, és próbáld újra.",
     paletteGroup: "Színek",
     paletteNames: { classic: "Klasszikus", forest: "Erdő", mint: "Menta", teal: "Pávakék", ocean: "Óceán", midnight: "Éjfél", plum: "Szilva", rose: "Rózsa", peach: "Barack", sand: "Homok", lime: "Lime", mono: "Mono" } as Record<string, string>,
     paletteFooter: "Az oldal, a kártyák, a szöveg és a kiemelés színét változtatja, valamint az üveg sávokét és az egyszínű megjelenését. A zöld, a borostyán és a piros mindig ugyanazt jelenti: működik, rég nem ellenőrizték, jelentették.",
@@ -876,7 +893,7 @@ export function spotMessage(t: Dict, spot: SpotCheck & { ok: false }) {
   return t.spot.location;
 }
 
-const DICTS: Record<Lang, Dict> = { en, hu };
+const DICTS: Record<Lang, Dict> = { en, hu, de };
 
 /** The words for the language picked in Profile. */
 export function useT() {

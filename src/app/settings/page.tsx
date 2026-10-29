@@ -1,9 +1,9 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, Layers, Megaphone, MessageSquare, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, CloudDownload, Layers, Megaphone, MessageSquare, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { BACK, PageTransition } from "@/components/page-transition";
 import { MapStylePicker } from "@/components/map-style-picker";
 import { PalettePicker } from "@/components/palette-picker";
@@ -11,8 +11,9 @@ import { Group, LinkRow, SwitchRow, Tile } from "@/components/settings-ui";
 import { btn } from "@/components/ui/buttons";
 import { REMOTE } from "@/lib/api";
 import { alertLine, useT } from "@/lib/i18n";
-import { LEGAL } from "@/lib/legal-text";
+import { legalFor } from "@/lib/legal-text";
 import { requestLocation } from "@/lib/location";
+import { downloadOfflineMap, removeOfflineMap, useOfflineMap } from "@/lib/offline-map";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
 import { updateSettings, useSettings, type Lang, type Settings } from "@/lib/settings";
@@ -22,6 +23,70 @@ import { addDemoToilets, clearAlerts, clearToilets, simulateActivity, useToilets
 import { cn } from "@/lib/utils";
 
 /** Everything you can change, in groups. Reached from the gear on the Profile page. */
+
+/** Save Budapest for offline use: a button, a progress line, and what is saved. */
+function OfflineMapRow() {
+  const { t, lang } = useT();
+  const saved = useOfflineMap();
+  const [progress, setProgress] = useState<number | null>(null);
+  const [failed, setFailed] = useState(false);
+  const controller = useRef<AbortController | null>(null);
+
+  const start = async () => {
+    setFailed(false);
+    setProgress(0);
+    const abort = new AbortController();
+    controller.current = abort;
+    try {
+      await downloadOfflineMap(setProgress, abort.signal);
+    } catch (e) {
+      if (!(e instanceof DOMException && e.name === "AbortError")) setFailed(true);
+    } finally {
+      controller.current = null;
+      setProgress(null);
+    }
+  };
+  const when = saved ? new Date(saved.savedAt).toLocaleDateString(lang === "hu" ? "hu-HU" : lang === "de" ? "de-DE" : "en-GB", { dateStyle: "medium" }) : "";
+
+  return (
+    <li className="flex flex-col gap-2.5 px-4 py-3 text-[1rem]">
+      <div className="flex items-center gap-3.5">
+        <Tile hue={212}>
+          <CloudDownload />
+        </Tile>
+        <span className="min-w-0 flex-1">
+          {t.settings.offlineTitle}
+          <span className="block text-[0.8125rem] leading-snug text-haze">
+            {progress !== null ? t.settings.offlineProgress(Math.round(progress * 100)) : saved ? t.settings.offlineSaved(when, Math.max(1, Math.round(saved.bytes / 1_000_000))) : t.settings.offlineSub}
+          </span>
+        </span>
+        {progress !== null ? (
+          <button type="button" onClick={() => controller.current?.abort()} className={cn(btn.quiet, btn.sm, "px-3")}>
+            {t.settings.offlineCancel}
+          </button>
+        ) : saved ? (
+          <button type="button" onClick={() => void removeOfflineMap()} className={cn(btn.secondary, btn.sm, "px-3.5")}>
+            {t.settings.offlineRemove}
+          </button>
+        ) : (
+          <button type="button" onClick={() => void start()} className={cn(btn.primary, btn.sm, "px-3.5")}>
+            {t.settings.offlineDownload}
+          </button>
+        )}
+      </div>
+      {progress !== null && (
+        <div role="progressbar" aria-label={t.settings.offlineTitle} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)} className="h-1.5 overflow-hidden rounded-full bg-fg/[0.1]">
+          <div className="h-full rounded-full bg-brand transition-[width] duration-200" style={{ width: `${Math.round(progress * 100)}%` }} />
+        </div>
+      )}
+      {failed && (
+        <p role="alert" className="text-[0.8125rem] text-stale">
+          {t.settings.offlineFailed}
+        </p>
+      )}
+    </li>
+  );
+}
 
 /** A row with a title and a wrapping set of options, for choices with more than three answers. */
 function ChoiceRow<K extends "navStyle" | "glass">({
@@ -75,7 +140,7 @@ export default function SettingsPage() {
   const [locationBlocked, setLocationBlocked] = useState(false);
   const [exported, setExported] = useState(false);
   const mine = toilets.filter((x) => x.mine);
-  const docs = LEGAL[lang];
+  const docs = legalFor(lang);
 
   const showIntro = () => {
     replayIntro();
@@ -154,7 +219,7 @@ export default function SettingsPage() {
             </Tile>
             <span className="flex-1">{t.profile.language}</span>
             <div role="radiogroup" aria-label={t.profile.language} className="flex rounded-full bg-well p-0.5">
-              {(["en", "hu"] as Lang[]).map((key) => (
+              {(["en", "hu", "de"] as Lang[]).map((key) => (
                 <button
                   key={key}
                   type="button"
@@ -163,7 +228,7 @@ export default function SettingsPage() {
                   onClick={() => updateSettings({ lang: key })}
                   className={cn("h-7 min-w-11 rounded-full px-3 text-[0.8125rem] font-semibold transition-colors", settings.lang === key ? "bg-ink text-night" : "text-haze")}
                 >
-                  {key === "en" ? "EN" : "HU"}
+                  {key.toUpperCase()}
                 </button>
               ))}
             </div>
@@ -238,6 +303,7 @@ export default function SettingsPage() {
         </section>
 
         <Group id="map-heading" title={t.settings.mapGroup} footer={locationBlocked ? t.profile.locationBlocked : t.settings.footerMap} tone={locationBlocked ? "warn" : undefined}>
+          <OfflineMapRow />
           <SwitchRow icon={<LocateFixed />} hue={212} title={t.profile.location} on={settings.location} onChange={toggleLocation} />
           <SwitchRow icon={<Box />} hue={150} title={t.profile.buildings3d} on={settings.buildings3d} onChange={(on) => updateSettings({ buildings3d: on })} />
           {!REMOTE && <SwitchRow icon={<MapPinCheck />} hue={32} title={t.profile.onTheSpot} on={settings.nearbyCheck} onChange={(on) => updateSettings({ nearbyCheck: on })} />}

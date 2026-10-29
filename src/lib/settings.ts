@@ -3,7 +3,7 @@
 import { createLocalStore } from "./local-store";
 import type { PaletteId } from "./palettes";
 
-export type Lang = "en" | "hu";
+export type Lang = "en" | "hu" | "de";
 
 export type Settings = {
   lang: Lang;

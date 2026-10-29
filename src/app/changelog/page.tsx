@@ -8,7 +8,7 @@ import { useT } from "@/lib/i18n";
 
 export default function ChangelogPage() {
   const { t, lang } = useT();
-  const day = (iso: string) => new Date(iso).toLocaleDateString(lang === "hu" ? "hu-HU" : "en-GB", { dateStyle: "long" });
+  const day = (iso: string) => new Date(iso).toLocaleDateString(lang === "hu" ? "hu-HU" : lang === "de" ? "de-DE" : "en-GB", { dateStyle: "long" });
   return (
     <PageTransition>
       <main className="mx-auto w-full max-w-md px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-16">

@@ -11,7 +11,8 @@ const CACHE = "magyarotyesz-v2";
 const MAP_CACHE = "magyarotyesz-map-v1";
 // Satellite pictures (Esri) are left out on purpose: its licence does not allow copying them for offline use.
 const MAP_HOSTS = ["tiles.openfreemap.org", "basemaps.cartocdn.com"];
-const MAP_LIMIT = 4000;
+// Budapest saved for offline use (Settings) is about 700 pieces; the rest is room for browsing.
+const MAP_LIMIT = 12000;
 
 const trimMap = async () => {
   const cache = await caches.open(MAP_CACHE);
