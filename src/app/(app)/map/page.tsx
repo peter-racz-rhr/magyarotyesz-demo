@@ -734,7 +734,7 @@ export default function MapPage() {
                 <X className="size-5" />
               </button>
               <h2 className="t-section min-w-0 flex-1 truncate">{t.add.title}</h2>
-              <button type="submit" disabled={busy || !ready} className={cn(btn.primary, "h-10 px-5 text-[0.9375rem]")}>
+              <button type="submit" disabled={busy} aria-disabled={!ready} className={cn(btn.primary, "h-10 px-5 text-[0.9375rem]", !ready && "opacity-40")}>
                 {busy ? "…" : t.add.add}
               </button>
             </div>
@@ -763,7 +763,7 @@ export default function MapPage() {
                   className={cn(field, "w-full")}
                 />
                 <div className="flex flex-col gap-2">
-                  <p className="px-1 text-xs text-haze">{t.add.kind}</p>
+                  <p className={cn("px-1 text-xs", error === t.add.errKind ? "font-semibold text-bad" : "text-haze")}>{t.add.kind}</p>
                   <Choice label={t.add.kind} keys={KIND_KEYS} labels={t.kinds} value={kind as Kind} onChange={(v) => { setKind(v); setError(null); }} />
                 </div>
               </section>
