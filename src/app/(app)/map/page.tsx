@@ -49,6 +49,33 @@ const BUDAPEST: [number, number] = [19.0402, 47.4979];
 const TRUSTED = 0.6;
 
 type Draft = { latitude: number; longitude: number };
+const FILTER_ICONS: Partial<Record<keyof Filters, ReactNode>> = {
+  accessible: <Accessibility className="size-4" aria-hidden />,
+  baby: <Baby className="size-4" aria-hidden />,
+  neutral: <Users className="size-4" aria-hidden />,
+};
+
+/** One filter: a chip in the pill, or a full row (with its icon) in the extra-filters card. */
+function FilterChip({ on, label, icon, wide, onClick }: { on: boolean; label: string; icon?: ReactNode; wide?: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={onClick}
+      className={cn(
+        "inline-flex min-h-9 shrink-0 items-center rounded-full text-[0.8125rem] font-medium whitespace-nowrap transition-colors duration-200",
+        wide ? "w-full gap-2.5 px-3.5" : "px-3",
+        on ? "bg-fg/14 text-ink" : "text-ink/60 active:bg-fg/8",
+      )}
+    >
+      {icon}
+      <span className="flex-1 text-left">{label}</span>
+      {/* A small light when the filter is on: green, like "this one works" */}
+      <span aria-hidden className={cn("h-1.5 rounded-full bg-good transition-all duration-200", on ? "ml-2 w-1.5 opacity-100 shadow-[0_0_8px_1px_var(--good)]" : "ml-0 w-0 opacity-0")} />
+    </button>
+  );
+}
+
 const PRIMARY_FILTERS: (keyof Filters)[] = ["open", "free", "works"];
 const SECONDARY_FILTERS: (keyof Filters)[] = ["accessible", "baby", "neutral"];
 type Filters = { open: boolean; free: boolean; works: boolean; accessible: boolean; baby: boolean; neutral: boolean };
@@ -257,6 +284,16 @@ export default function MapPage() {
     () => null,
   );
   const [moreFilters, setMoreFilters] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
+  // The extra-filters card closes when you tap anywhere else.
+  useEffect(() => {
+    if (!moreFilters) return;
+    const close = (e: PointerEvent) => {
+      if (!moreRef.current?.contains(e.target as Node)) setMoreFilters(false);
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [moreFilters]);
   const [filters, setFilters] = useState<Filters>({ open: false, free: false, works: false, accessible: false, baby: false, neutral: false });
   const [focus, setFocus] = useState<Toilet | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -586,53 +623,36 @@ export default function MapPage() {
           )}
         </Map>
 
-        {/* Filters: one glass bar, the same material as the dock. It sits in
-            the middle when it fits and scrolls sideways when it doesn't. */}
-        {/* Top of the map: the filter pill, and under it any notice, so the two never overlap
-            when the pill grows to a second row. */}
+        {/* Top of the map: the filter pill (glass, like the dock), and under it any notice. */}
         <div data-pull-zone className="pointer-events-none absolute inset-x-0 top-[max(env(safe-area-inset-top),0.75rem)] z-10 flex flex-col gap-2 px-4">
           {!draft && (
             <div className="pointer-events-auto flex justify-center">
-              {/* The three you reach for most sit in the pill; the others open from the sliders button
-                  (and stay open while one of them is on). The pill is round at both ends and wraps
-                  to a second row rather than running off the screen. */}
-              <LiquidSurface radius={999} className="mx-auto flex w-max max-w-full flex-wrap justify-center gap-0.5 p-1">
-                {(Object.keys(t.map.filters) as (keyof Filters)[])
-                  .filter((key) => PRIMARY_FILTERS.includes(key) || moreFilters || filters[key])
-                  .map((key) => (
-                    <button
-                      key={key}
-                      type="button"
-                      aria-pressed={filters[key]}
-                      onClick={() => setFilters((f) => ({ ...f, [key]: !f[key] }))}
-                      className={cn(
-                        "inline-flex min-h-9 shrink-0 items-center rounded-full px-3.5 text-[0.8125rem] font-medium whitespace-nowrap transition-colors duration-200",
-                        filters[key] ? "bg-fg/14 text-ink" : "text-ink/60 active:bg-fg/8",
-                      )}
-                    >
-                      {/* A small light when the filter is on: green, like "this one works" */}
-                      <span
-                        aria-hidden
-                        className={cn(
-                          "h-1.5 rounded-full bg-good transition-all duration-200",
-                          filters[key] ? "mr-2 w-1.5 opacity-100 shadow-[0_0_8px_1px_var(--good)]" : "mr-0 w-0 opacity-0",
-                        )}
-                      />
-                      {t.map.filters[key]}
-                    </button>
+              {/* The three you reach for most sit in the slim pill; the other three open in a small
+                  card from the sliders button (a green dot on the button says one of them is on). */}
+              <div ref={moreRef} className="relative max-w-full">
+                <LiquidSurface radius={999} className="flex w-max max-w-full flex-wrap items-center justify-center gap-0.5 p-1">
+                  {PRIMARY_FILTERS.map((key) => (
+                    <FilterChip key={key} on={filters[key]} label={t.map.filters[key]} onClick={() => setFilters((f) => ({ ...f, [key]: !f[key] }))} />
                   ))}
-                <button
-                  type="button"
-                  aria-label={t.map.moreFilters}
-                  aria-expanded={moreFilters}
-                  onClick={() => setMoreFilters((v) => !v)}
-                  className={cn("relative grid size-9 shrink-0 place-items-center rounded-full transition-colors duration-200", moreFilters ? "bg-fg/14 text-ink" : "text-ink/60 active:bg-fg/8")}
-                >
-                  <SlidersHorizontal className="size-4" aria-hidden />
-                  {!moreFilters && SECONDARY_FILTERS.some((key) => filters[key]) && <span aria-hidden className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-good" />}
-                </button>
-              </LiquidSurface>
-          
+                  <button
+                    type="button"
+                    aria-label={t.map.moreFilters}
+                    aria-expanded={moreFilters}
+                    onClick={() => setMoreFilters((v) => !v)}
+                    className={cn("relative grid size-9 shrink-0 place-items-center rounded-full transition-colors duration-200", moreFilters ? "bg-fg/14 text-ink" : "text-ink/60 active:bg-fg/8")}
+                  >
+                    <SlidersHorizontal className="size-4" aria-hidden />
+                    {SECONDARY_FILTERS.some((key) => filters[key]) && <span aria-hidden className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-good shadow-[0_0_6px_1px_var(--good)]" />}
+                  </button>
+                </LiquidSurface>
+                {moreFilters && (
+                  <LiquidSurface radius={22} className="filter-card absolute top-full right-0 z-20 mt-2 flex w-max flex-col gap-0.5 p-1.5 animate-in fade-in zoom-in-95 slide-in-from-top-1 duration-150">
+                    {SECONDARY_FILTERS.map((key) => (
+                      <FilterChip key={key} wide on={filters[key]} label={t.map.filters[key]} icon={FILTER_ICONS[key]} onClick={() => setFilters((f) => ({ ...f, [key]: !f[key] }))} />
+                    ))}
+                  </LiquidSurface>
+                )}
+              </div>
             </div>
           )}
             {(notice || justAdded || (filtering && visible.length === 0) || (toilets.length === 0 && !draft)) && (
