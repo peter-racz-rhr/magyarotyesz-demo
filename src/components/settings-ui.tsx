@@ -88,7 +88,7 @@ export function SwitchRow({ icon, hue, title, on, onChange }: { icon: ReactNode;
     <li>
       <button type="button" role="switch" aria-checked={on} onClick={() => onChange(!on)} className={ROW}>
         <Tile hue={hue}>{icon}</Tile>
-        <span className="min-w-0 flex-1 truncate">{title}</span>
+        <span className="min-w-0 flex-1 break-words">{title}</span>
         <span className={cn("relative h-[1.75rem] w-[3rem] shrink-0 rounded-full transition-colors duration-200", on ? "bg-brand" : "bg-fg/[0.16]")}>
           <span className={cn("absolute top-[0.125rem] left-[0.125rem] size-[1.5rem] rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.4)] transition-transform duration-200", on && "translate-x-[1.25rem]")} />
         </span>
@@ -124,8 +124,8 @@ export function LinkRow({
       <Tile hue={hue} tone={tone}>
         {icon}
       </Tile>
-      <span className={cn("min-w-0 flex-1 truncate", danger && "text-bad")}>{title}</span>
-      {value && <span className="max-w-[40%] truncate text-[0.9375rem] text-haze">{value}</span>}
+      <span className={cn("min-w-0 flex-1 break-words", danger && "text-bad")}>{title}</span>
+      {value && <span className="max-w-[40%] text-[0.9375rem] text-haze">{value}</span>}
       {chevron && <ChevronRight className="-mr-1 size-[1.125rem] shrink-0 text-fg/25" aria-hidden />}
     </>
   );

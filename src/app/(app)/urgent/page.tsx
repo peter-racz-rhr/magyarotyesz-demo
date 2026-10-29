@@ -6,7 +6,7 @@ import { useState } from "react";
 import { BACK, PageTransition } from "@/components/page-transition";
 import { HoursLine } from "@/components/toilet-card";
 import { useT } from "@/lib/i18n";
-import { distance, formatDistance, directionsUrl, isOpen, trust, useToilets, walkMinutes } from "@/lib/toilets";
+import { distance, formatDistance, directionsUrl, isOpen, trust, useToilets, walkIfNear } from "@/lib/toilets";
 import { useHere } from "@/lib/use-here";
 import { cn } from "@/lib/utils";
 
@@ -64,7 +64,7 @@ export default function UrgentPage() {
             <HoursLine toilet={pick.toilet} className="mt-0.5 text-[1.0625rem]" />
 
             <p className="mt-6 text-[4.25rem] leading-none font-extrabold tracking-tight tabular-nums">{formatDistance(pick.metres)}</p>
-            <p className="mt-1 text-[1.5rem] font-semibold text-brand">{t.card.walk(walkMinutes(pick.metres))}</p>
+            {walkIfNear(pick.metres) !== null && <p className="mt-1 text-[1.5rem] font-semibold text-brand">{t.card.walk(walkIfNear(pick.metres)!)}</p>}
 
             {pick.toilet.code !== "" ? (
               <button

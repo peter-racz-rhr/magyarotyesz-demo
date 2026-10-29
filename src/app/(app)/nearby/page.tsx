@@ -13,7 +13,7 @@ import { searchPlaces, type Place } from "@/lib/geocode";
 import { useT, type Dict } from "@/lib/i18n";
 import { useSettings } from "@/lib/settings";
 import { useSaved } from "@/lib/saved";
-import { distance, formatDistance, useToilets, walkMinutes, type Toilet } from "@/lib/toilets";
+import { distance, formatDistance, useToilets, walkIfNear, type Toilet } from "@/lib/toilets";
 import { useHere } from "@/lib/use-here";
 import { cn } from "@/lib/utils";
 
@@ -309,7 +309,7 @@ export default function NearbyPage() {
                     </span>
                     <span className="text-right tabular-nums">
                       <span className="block text-haze">{formatDistance(metres)}</span>
-                      <span className="block text-xs text-haze">{d.card.walk(walkMinutes(metres))}</span>
+                      {walkIfNear(metres) !== null && <span className="block text-xs text-haze">{d.card.walk(walkIfNear(metres)!)}</span>}
                     </span>
                     <ChevronDown
                       className={cn("size-5 shrink-0 text-haze transition-transform duration-300", isOpen && "rotate-180")}

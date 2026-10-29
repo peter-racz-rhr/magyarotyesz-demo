@@ -32,7 +32,7 @@ import {
   suggestCode,
   trust,
   trustColor,
-  walkMinutes,
+  walkIfNear,
   type Toilet,
 } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
@@ -182,7 +182,7 @@ export function ToiletCard({
   const { t, lang } = useT();
   const { showCodes } = useSettings();
   const saved = useSaved().includes(toilet.id);
-  const walk = from ? walkMinutes(distance(from, toilet)) : null;
+  const walk = from ? walkIfNear(distance(from, toilet)) : null;
   const [shown, setShown] = useState(showCodes);
   // A code that was tapped open hides itself again after a minute (unless "show codes right away" is on).
   useEffect(() => {

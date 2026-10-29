@@ -394,6 +394,9 @@ export const directionsUrl = (t: Toilet) =>
 /** Minutes on foot for a straight-line distance: about 80 m a minute, and streets are never straight. */
 export const walkMinutes = (metres: number) => Math.max(1, Math.round((metres * 1.25) / 80));
 
+/** Minutes on foot, or null when it is too far to walk (over about 90 minutes): then only the distance is shown. */
+export const walkIfNear = (metres: number) => (metres <= 6000 ? walkMinutes(metres) : null);
+
 /** How recently a code was confirmed: 0 (long ago) to 3 (today). */
 export function freshness(t: Toilet, now = Date.now()) {
   const last = t.confirmedAt ? Date.parse(t.confirmedAt) : Number.NaN;

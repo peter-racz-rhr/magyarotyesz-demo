@@ -756,6 +756,30 @@ html[data-sheet="open"] .app-dock {
 }
 
 /*
+  Liquid glass is clear: no dim, no grey, no colour change. The fill is nearly nothing, so the
+  map shows through as it is, bent and softly blurred at the edges by the lens, with the rim and
+  the shadow giving it shape. (Solid, below in Settings > Navigation, is the opaque option.)
+*/
+html[data-glass="liquid"][data-theme] .lq-surface,
+html[data-glass="liquid"][data-theme] .lq-surface[data-liquid-variant="clear"] {
+  --lq-fill: rgb(255 255 255 / 0.03);
+  /* what is behind keeps its own colour and brightness */
+  --lq-saturate: 1;
+  --lq-brighten: 1;
+  --lq-glow: 0;
+}
+html[data-glass="liquid"][data-theme="light"] .lq-surface {
+  --lq-line: rgb(0 0 0 / 0.1);
+}
+html[data-glass="liquid"][data-theme="dark"] .lq-surface .dock-disc,
+html[data-glass="liquid"][data-theme] .dock-disc {
+  background: rgb(255 255 255 / 0.1);
+}
+html[data-glass="liquid"][data-theme] .lq-icon-button {
+  background: rgb(255 255 255 / 0.03);
+}
+
+/*
   While a page slides in, the browser puts it on a layer above everything else,
   and glass can't blur a layer sitting above it, so the page's text used to
   show through the nav bar and the search bar (see ViewTransitionDock).

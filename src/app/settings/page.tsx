@@ -119,7 +119,7 @@ function ChoiceRow<K extends "navStyle" | "glass" | "flavour">({
             role="radio"
             aria-checked={value === key}
             onClick={() => updateSettings({ [field]: key } as Partial<Settings>)}
-            className={cn("h-8 min-w-0 flex-1 rounded-full px-2 text-[0.8125rem] font-semibold transition-colors", value === key ? "bg-ink text-night" : "text-haze")}
+            className={cn("min-h-8 min-w-0 flex-1 rounded-full px-2 py-1 text-[0.8125rem] leading-tight font-semibold transition-colors", value === key ? "bg-ink text-night" : "text-haze")}
           >
             {names[key]}
           </button>
@@ -214,12 +214,12 @@ export default function SettingsPage() {
         <h1 className="mt-1 px-1 text-[2rem] leading-tight font-bold tracking-tight">{t.settings.title}</h1>
 
         <Group id="general-heading" title={t.settings.general}>
-          <li className="flex min-h-[3.25rem] items-center gap-3.5 px-4 py-2 text-[1rem]">
+          <li className="flex min-h-[3.25rem] flex-wrap items-center gap-x-3.5 gap-y-2 px-4 py-2 text-[1rem]">
             <Tile hue={212}>
               <Globe />
             </Tile>
-            <span className="flex-1">{t.profile.language}</span>
-            <div role="radiogroup" aria-label={t.profile.language} className="flex rounded-full bg-well p-0.5">
+            <span className="min-w-0 flex-1 basis-24">{t.profile.language}</span>
+            <div role="radiogroup" aria-label={t.profile.language} className="ml-auto flex max-w-full rounded-full bg-well p-0.5">
               {(["en", "hu", "de"] as Lang[]).map((key) => (
                 <button
                   key={key}
@@ -227,19 +227,19 @@ export default function SettingsPage() {
                   role="radio"
                   aria-checked={settings.lang === key}
                   onClick={() => updateSettings({ lang: key })}
-                  className={cn("h-7 min-w-11 rounded-full px-3 text-[0.8125rem] font-semibold transition-colors", settings.lang === key ? "bg-ink text-night" : "text-haze")}
+                  className={cn("h-7 min-w-11 rounded-full px-3 text-[0.8125rem] font-semibold whitespace-nowrap transition-colors", settings.lang === key ? "bg-ink text-night" : "text-haze")}
                 >
                   {key.toUpperCase()}
                 </button>
               ))}
             </div>
           </li>
-          <li className="flex min-h-[3.25rem] items-center gap-3.5 px-4 py-2 text-[1rem]">
+          <li className="flex min-h-[3.25rem] flex-wrap items-center gap-x-3.5 gap-y-2 px-4 py-2 text-[1rem]">
             <Tile hue={42}>
               <SunMoon />
             </Tile>
-            <span className="flex-1">{t.settings.theme}</span>
-            <div role="radiogroup" aria-label={t.settings.theme} className="flex rounded-full bg-well p-0.5">
+            <span className="min-w-0 flex-1 basis-24">{t.settings.theme}</span>
+            <div role="radiogroup" aria-label={t.settings.theme} className="ml-auto flex max-w-full rounded-full bg-well p-0.5">
               {(["system", "dark", "light"] as const).map((key) => (
                 <button
                   key={key}
@@ -247,7 +247,7 @@ export default function SettingsPage() {
                   role="radio"
                   aria-checked={settings.theme === key}
                   onClick={() => updateSettings({ theme: key })}
-                  className={cn("h-7 min-w-11 rounded-full px-3 text-[0.8125rem] font-semibold transition-colors", settings.theme === key ? "bg-ink text-night" : "text-haze")}
+                  className={cn("h-7 min-w-11 rounded-full px-3 text-[0.8125rem] font-semibold whitespace-nowrap transition-colors", settings.theme === key ? "bg-ink text-night" : "text-haze")}
                 >
                   {t.settings.themeNames[key]}
                 </button>
@@ -269,7 +269,7 @@ export default function SettingsPage() {
                   role="radio"
                   aria-checked={settings.textSize === key}
                   onClick={() => updateSettings({ textSize: key })}
-                  className={cn("h-9 min-w-0 flex-1 rounded-full px-2 font-semibold transition-colors", settings.textSize === key ? "bg-ink text-night" : "text-haze")}
+                  className={cn("min-h-9 min-w-0 flex-1 rounded-full px-2 py-1 leading-tight font-semibold transition-colors", settings.textSize === key ? "bg-ink text-night" : "text-haze")}
                   style={{ fontSize: `${0.8125 + i * 0.125}rem` }}
                 >
                   {t.settings.textNames[key]}

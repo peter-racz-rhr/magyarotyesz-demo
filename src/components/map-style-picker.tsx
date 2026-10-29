@@ -41,7 +41,7 @@ export function MapStylePicker() {
               mapStyle === key ? "bg-white text-[#121212] shadow-[0_2px_10px_rgb(0_0_0/0.25)]" : onLight ? "text-[#121212]/80 active:bg-black/10" : "text-white/90 active:bg-white/15",
             )}
           >
-            <span className="block truncate">{t.settings.mapStyleNames[key]}</span>
+            <span className="block leading-tight break-words">{t.settings.mapStyleNames[key]}</span>
           </button>
         ))}
       </div>
