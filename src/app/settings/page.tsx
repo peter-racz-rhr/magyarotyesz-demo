@@ -121,7 +121,7 @@ function ChoiceRow<K extends "navStyle" | "glass" | "flavour">({
             role="radio"
             aria-checked={value === key}
             onClick={() => updateSettings({ [field]: key } as Partial<Settings>)}
-            className={cn("min-h-8 min-w-0 flex-1 rounded-full px-2 py-1 text-[0.8125rem] leading-tight font-semibold transition-colors", value === key ? "bg-ink text-night" : "text-haze")}
+            className={cn("min-h-8 min-w-0 flex-1 rounded-full px-1 py-1 text-[0.75rem] leading-tight font-semibold break-words transition-colors", value === key ? "bg-ink text-night" : "text-haze")}
           >
             {names[key]}
           </button>
@@ -276,15 +276,15 @@ export default function SettingsPage() {
               <span className="flex-1">{t.settings.textSize}</span>
             </div>
             <div role="radiogroup" aria-label={t.settings.textSize} className="flex rounded-full bg-well p-0.5">
-              {(["normal", "large", "xl"] as const).map((key, i) => (
+              {(["normal", "large", "xl"] as const).map((key) => (
                 <button
                   key={key}
                   type="button"
                   role="radio"
                   aria-checked={settings.textSize === key}
                   onClick={() => updateSettings({ textSize: key })}
-                  className={cn("min-h-9 min-w-0 flex-1 rounded-full px-1 py-1 leading-tight font-semibold whitespace-nowrap transition-colors", settings.textSize === key ? "bg-ink text-night" : "text-haze")}
-                  style={{ fontSize: `${0.8125 + i * 0.0625}rem` }}
+                  className={cn("min-h-9 min-w-0 flex-1 rounded-full px-1 py-1 text-[0.75rem] leading-tight font-semibold break-words transition-colors", settings.textSize === key ? "bg-ink text-night" : "text-haze")}
+                  
                 >
                   {t.settings.textNames[key]}
                 </button>
@@ -417,8 +417,8 @@ export default function SettingsPage() {
         {!REMOTE && (
           <Group id="danger" plain>
             {confirmClear ? (
-              <li className="flex min-h-[3.25rem] items-center gap-3 px-4 py-2">
-                <span className="flex-1 text-sm">{t.profile.deleteConfirm}</span>
+              <li className="flex min-h-[3.25rem] flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2">
+                <span className="min-w-0 flex-1 basis-40 text-sm">{t.profile.deleteConfirm}</span>
                 <button type="button" onClick={() => setConfirmClear(false)} className={cn(btn.quiet, btn.sm)}>
                   {t.profile.keep}
                 </button>

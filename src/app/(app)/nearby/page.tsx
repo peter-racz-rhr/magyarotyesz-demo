@@ -181,7 +181,7 @@ export default function NearbyPage() {
           <h1 className="t-display">{d.nearby.title}</h1>
           {anchor ? (
             <p className="mt-2 flex items-center gap-2 text-[1.0625rem] text-haze">
-              <span className="min-w-0 truncate">
+              <span className="min-w-0 break-words">
                 {d.nearby.closestTo} <span className="text-ink">{anchor.label}</span>
               </span>
               {origin && (
@@ -299,7 +299,7 @@ export default function NearbyPage() {
                   >
                     <HealthDot toilet={toilet} />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold">{toilet.name}</span>
+                      <span className="line-clamp-2 block font-semibold break-words">{toilet.name}</span>
                       <span className="flex items-center gap-2 text-sm text-haze">
                         {d.kinds[toilet.kind]}
                         {toilet.access === "paid" && <span className="rounded-full bg-stale/[0.14] px-2 py-0.5 text-xs font-bold text-stale">{toilet.price ? `${toilet.price} Ft` : d.access.paid}</span>}
@@ -380,7 +380,7 @@ export default function NearbyPage() {
                     className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left hover:bg-night/60"
                   >
                     <HealthDot toilet={toilet} />
-                    <span className="min-w-0 flex-1 truncate font-semibold">{toilet.name}</span>
+                    <span className="line-clamp-2 min-w-0 flex-1 font-semibold break-words">{toilet.name}</span>
                     <span className="text-sm text-haze tabular-nums">{formatDistance(metres)}</span>
                   </button>
                 ))}
@@ -397,7 +397,7 @@ export default function NearbyPage() {
                       <MapPin className="size-4 shrink-0 text-haze" aria-hidden />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate">{place.label}</span>
-                        <span className="block truncate text-sm text-haze">{place.detail}</span>
+                        <span className="block text-sm break-words text-haze">{place.detail}</span>
                       </span>
                       {Number.isFinite(metres) && (
                         <span className="shrink-0 text-right text-xs text-haze">

@@ -695,7 +695,7 @@ export default function MapPage() {
                 <button
                   type="button"
                   onClick={nearest}
-                  className="inline-flex h-14 items-center gap-2 px-5 text-[0.9375rem] font-bold [text-shadow:0_1px_8px_rgb(0_0_0/0.5)]"
+                  className="inline-flex h-14 items-center gap-2 px-5 text-[0.9375rem] font-bold [text-shadow:0_1px_8px_rgb(0_0_0/0.5)] [html[data-text=large]_&]:px-4 [html[data-text=xl]_&]:gap-1.5 [html[data-text=xl]_&]:px-3.5 [html[data-text=xl]_&]:text-[0.8125rem]"
                 >
                   <Zap className="size-4 fill-brand text-brand" aria-hidden />
                   {t.map.nearest}
@@ -737,7 +737,7 @@ export default function MapPage() {
               >
                 <X className="size-5" />
               </button>
-              <h2 className="t-section min-w-0 flex-1 truncate">{t.add.title}</h2>
+              <h2 className="t-section min-w-0 flex-1 leading-tight break-words">{t.add.title}</h2>
               <button type="submit" disabled={busy} aria-disabled={!ready} className={cn(btn.primary, "h-10 px-5 text-[0.9375rem]", !ready && "opacity-40")}>
                 {busy ? "…" : t.add.add}
               </button>

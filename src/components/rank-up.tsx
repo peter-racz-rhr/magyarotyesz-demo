@@ -157,11 +157,11 @@ function Overlay({ index, gotIn, onClose }: { index: number; gotIn: number; onCl
           {rank.icon}
         </motion.div>
 
-        <div className="relative mt-6 h-12 w-full overflow-hidden">
+        <div className="relative mt-5 h-[1.45em] w-full overflow-hidden text-[clamp(1.5rem,9vw,2.25rem)]">
           <AnimatePresence mode="wait" initial={false}>
             <motion.p
               key={word ? "new" : "old"}
-              className="absolute inset-0 text-[2.25rem] leading-none font-extrabold tracking-tight"
+              className="absolute inset-0 leading-[1.45] font-extrabold tracking-tight"
               style={word ? { color: "#fff" } : { color: "rgba(255,255,255,0.45)" }}
               initial={{ y: calm ? 0 : 36, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}

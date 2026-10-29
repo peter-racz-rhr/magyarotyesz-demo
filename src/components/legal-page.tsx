@@ -98,7 +98,7 @@ export function LegalPage({ doc }: { doc: DocKey }) {
           <section className="mt-10 rounded-[22px] bg-fg/[0.055] p-5">
             <h2 className="text-[1.0625rem] font-semibold">{t.legal.contact}</h2>
             <p className="mt-1 text-[0.9375rem] leading-relaxed text-haze">{t.legal.contactBody}</p>
-            <a href={`mailto:${OPERATOR.email}`} className="mt-4 inline-flex h-11 items-center rounded-full bg-ink px-5 text-[0.9375rem] font-semibold text-night active:opacity-80">
+            <a href={`mailto:${OPERATOR.email}`} className="mt-4 inline-flex min-h-11 max-w-full items-center justify-center rounded-full bg-ink px-5 py-2 text-center text-[0.9375rem] font-semibold break-all text-night active:opacity-80">
               {OPERATOR.email}
             </a>
           </section>

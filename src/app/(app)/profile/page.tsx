@@ -105,7 +105,7 @@ export default function ProfilePage() {
             </span>
           </button>
           <button type="button" onClick={() => setEditing(true)} className="mt-4 max-w-full px-2 active:opacity-70">
-            <span className={cn("block truncate text-[1.75rem] leading-tight font-bold tracking-tight", !settings.name && "text-haze")}>
+            <span className={cn("block text-[1.75rem] leading-tight font-bold tracking-tight break-words", !settings.name && "text-haze")}>
               {settings.name || t.profile.noName}
             </span>
           </button>
@@ -122,13 +122,13 @@ export default function ProfilePage() {
 
         {/* The two numbers that matter, in one block */}
         <dl className={cn(CARD, "mt-7 grid grid-cols-2 divide-x divide-fg/[0.07]")}>
-          <div className="px-4 py-3.5 text-center">
+          <div className="min-w-0 px-3 py-3.5 text-center">
             <dd className="text-[1.625rem] leading-none font-bold tabular-nums">{mine.length}</dd>
-            <dt className="mt-1.5 text-[0.75rem] text-haze">{t.profile.statShared}</dt>
+            <dt className="mt-1.5 text-[0.75rem] break-words hyphens-auto text-haze">{t.profile.statShared}</dt>
           </div>
-          <div className="px-4 py-3.5 text-center">
+          <div className="min-w-0 px-3 py-3.5 text-center">
             <dd className="text-[1.625rem] leading-none font-bold tabular-nums">{gotIn}</dd>
-            <dt className="mt-1.5 text-[0.75rem] text-haze">{t.profile.statGotIn}</dt>
+            <dt className="mt-1.5 text-[0.75rem] break-words hyphens-auto text-haze">{t.profile.statGotIn}</dt>
           </div>
         </dl>
 
@@ -247,8 +247,8 @@ export default function ProfilePage() {
               <li key={toilet.id} className="flex items-center gap-3 py-2.5 pr-1.5 pl-4">
                 <HealthDot toilet={toilet} />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[0.9375rem] font-semibold">{toilet.name}</span>
-                  <span className="block truncate text-[0.8125rem] text-haze">
+                  <span className="line-clamp-2 block text-[0.9375rem] font-semibold break-words">{toilet.name}</span>
+                  <span className="block text-[0.8125rem] text-haze">
                     {t.kinds[toilet.kind]} · {t.profile.added(ago(toilet.addedAt, lang))}
                   </span>
                 </span>
