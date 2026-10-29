@@ -17,6 +17,7 @@ export type Item = {
   ownerName: string;
   ownerBanned: boolean;
   reportCounts: Record<string, number>;
+  reportNotes?: { reason: string; note: string; at: string }[];
   reportTotal: number;
   flagged: string | null;
 };

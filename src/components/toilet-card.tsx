@@ -2,7 +2,7 @@
 
 import { Accessibility, Baby, Bookmark, Check, Coins, Eye, Flag, Navigation, Pencil, Share2, Signpost, ThumbsDown, ThumbsUp, Users } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { HintChips } from "@/components/hint-chips";
 import { LimitedInput } from "@/components/limited-input";
 import { btn } from "@/components/ui/buttons";
@@ -204,6 +204,19 @@ export function ToiletCard({
   // Reporting a place: closed, picking a reason, or done.
   const [reporting, setReporting] = useState<"closed" | "pick" | "sent">("closed");
   const [reportedFar, setReportedFar] = useState(false);
+  const [reportReason, setReportReason] = useState<string | null>(null);
+  const [reportNote, setReportNote] = useState("");
+  const [reportBusy, setReportBusy] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  // Switching between the card and the report form: the sheet it sits in starts from the top again.
+  useEffect(() => {
+    for (let el = root.current?.parentElement; el; el = el.parentElement) {
+      if (el.scrollHeight > el.clientHeight && /(auto|scroll)/.test(getComputedStyle(el).overflowY)) {
+        el.scrollTo({ top: 0 });
+        break;
+      }
+    }
+  }, [reporting]);
   const suggestions = toilet.mine ? (toilet.suggestions ?? []) : [];
 
   /** The phone's own share sheet where there is one; otherwise the link goes to the clipboard. */
@@ -271,10 +284,81 @@ export function ToiletCard({
     );
   }
 
+  if (reporting !== "closed") {
+    const leave = () => {
+      setReporting("closed");
+      setReportReason(null);
+      setReportNote("");
+    };
+    const send = async () => {
+      if (!reportReason || reportBusy) return;
+      setReportBusy(true);
+      // Near the place the report counts at once; from afar it is kept for a person to look at.
+      const spot = await checkOnTheSpot(toilet);
+      reportToilet(toilet.id, reportReason, spot.ok ? spot.location : undefined, reportNote);
+      setReportedFar(!spot.ok);
+      setReportBusy(false);
+      setReporting("sent");
+    };
+    return (
+      <div ref={root} className={cn("text-left", className)}>
+        {!inList && <p className="text-[1.0625rem] leading-tight font-semibold">{toilet.name}</p>}
+        {reporting === "sent" ? (
+          <>
+            <p className="mt-3 text-sm text-haze">{REMOTE ? (reportedFar ? t.card.reportSentFar : t.card.reportSent) : t.card.reportDemo}</p>
+            <button type="button" onClick={leave} className={cn(btn.primary, "mt-4 w-full")}>
+              {t.card.reportDone}
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="mt-3 text-sm font-semibold">{t.card.reportTitle}</p>
+            <div role="radiogroup" aria-label={t.card.reportTitle} className="mt-2 flex flex-col gap-1.5">
+              {Object.entries(t.card.reportReasons).map(([reason, label]) => (
+                <button
+                  key={reason}
+                  type="button"
+                  role="radio"
+                  aria-checked={reportReason === reason}
+                  onClick={() => setReportReason(reason)}
+                  className={cn("flex min-h-11 items-center gap-3 rounded-2xl border px-3.5 text-left text-[0.9375rem] transition-colors", reportReason === reason ? "border-brand bg-brand/10 font-semibold" : "border-dusk-edge")}
+                >
+                  <span aria-hidden className={cn("grid size-5 shrink-0 place-items-center rounded-full border-2", reportReason === reason ? "border-brand" : "border-haze/60")}>
+                    {reportReason === reason && <span className="size-2.5 rounded-full bg-brand" />}
+                  </span>
+                  {label}
+                </button>
+              ))}
+            </div>
+            <label className="mt-3 flex flex-col gap-1.5 text-[0.8125rem] font-semibold text-haze">
+              {t.card.reportMessage}
+              <textarea
+                value={reportNote}
+                rows={3}
+                maxLength={300}
+                placeholder={t.card.reportMessageHint}
+                onChange={(e) => setReportNote(cleanText(e.target.value, 300))}
+                className="w-full rounded-2xl border border-dusk-edge bg-dusk px-3.5 py-3 text-[1rem] font-normal text-ink outline-none placeholder:text-haze/70 focus:border-brand"
+              />
+            </label>
+            <div className="mt-3 flex gap-2">
+              <button type="button" onClick={leave} className={cn(btn.secondary, "flex-1")}>
+                {t.card.cancel}
+              </button>
+              <button type="button" disabled={!reportReason || reportBusy} onClick={() => void send()} className={cn(btn.primary, "flex-1 disabled:opacity-50")}>
+                {t.card.reportSend}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
   const access = toilet.access === "paid" && toilet.price ? `${t.access.paid} ${toilet.price} Ft` : t.access[toilet.access];
 
   return (
-    <div className={cn("text-left", className)}>
+    <div ref={root} className={cn("text-left", className)}>
       {/* What and where */}
       <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1">
@@ -495,38 +579,9 @@ export function ToiletCard({
       {/* Anything wrong with the place itself (not the code): offensive, private, gone */}
       {!toilet.mine && (
         <div className="mt-3">
-          {reporting === "closed" && (
-            <button type="button" onClick={() => setReporting("pick")} className={cn(btn.secondary, btn.sm, "w-full gap-2 text-[0.8125rem]")}>
-              <Flag className="size-3.5" aria-hidden /> {t.card.report}
-            </button>
-          )}
-          {reporting === "pick" && (
-            <div className="rounded-2xl border border-dusk-edge p-3">
-              <p className="text-sm font-semibold">{t.card.reportTitle}</p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {Object.entries(t.card.reportReasons).map(([reason, label]) => (
-                  <button
-                    key={reason}
-                    type="button"
-                    onClick={async () => {
-                      // Near the place the report counts at once; from afar it is kept for a person to look at.
-                      const spot = await checkOnTheSpot(toilet);
-                      reportToilet(toilet.id, reason, spot.ok ? spot.location : undefined);
-                      setReportedFar(!spot.ok);
-                      setReporting("sent");
-                    }}
-                    className={cn(btn.secondary, btn.sm, "px-3")}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              <button type="button" onClick={() => setReporting("closed")} className={cn(btn.quiet, btn.sm, "mt-1")}>
-                {t.card.cancel}
-              </button>
-            </div>
-          )}
-          {reporting === "sent" && <p className="text-xs text-haze">{REMOTE ? (reportedFar ? t.card.reportSentFar : t.card.reportSent) : t.card.reportDemo}</p>}
+          <button type="button" onClick={() => setReporting("pick")} className={cn(btn.secondary, btn.sm, "w-full gap-2 text-[0.8125rem]")}>
+            <Flag className="size-3.5" aria-hidden /> {t.card.report}
+          </button>
         </div>
       )}
     </div>

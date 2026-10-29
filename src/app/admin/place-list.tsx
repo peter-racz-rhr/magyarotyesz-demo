@@ -84,6 +84,11 @@ export function PlaceList({
               <span className="shrink-0 rounded-md bg-night px-2 py-1 font-mono text-sm tracking-widest">{t.code}</span>
             </div>
             {t.note && <p className="mt-2 text-sm break-words text-ink/85">{t.note}</p>}
+            {t.reportNotes?.map((r, i) => (
+              <p key={i} className="mt-2 rounded-xl bg-bad/10 px-3 py-2 text-sm break-words text-ink/85">
+                <span className="font-semibold">{r.reason}:</span> {r.note}
+              </p>
+            ))}
             <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs">
               {t.hidden && <span className="rounded-full bg-stale/20 px-2 py-0.5 text-stale">hidden</span>}
               {t.flagged && <span className="rounded-full bg-bad/20 px-2 py-0.5 text-bad">filter: {t.flagged}</span>}

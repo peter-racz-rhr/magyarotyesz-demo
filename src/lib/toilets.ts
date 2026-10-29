@@ -197,8 +197,9 @@ export function editToilet(
 }
 
 /** Tell the server a place is offensive, private, wrong or gone. Without a server there is nobody to tell. */
-export function reportToilet(id: string, reason: string, location?: Location) {
-  if (REMOTE) enqueue("report_toilet", { toiletId: id, reason }, { location, name: nameOf(id) });
+export function reportToilet(id: string, reason: string, location?: Location, note = "") {
+  const text = note.trim();
+  if (REMOTE) enqueue("report_toilet", text ? { toiletId: id, reason, note: text } : { toiletId: id, reason }, { location, name: nameOf(id) });
 }
 
 /** Anyone else can only suggest a new code. */
