@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, Layers, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, Layers, Megaphone, MessageSquare, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -247,6 +247,11 @@ export default function SettingsPage() {
           <SwitchRow icon={<Eye />} hue={46} title={t.settings.showCodes} on={settings.showCodes} onChange={(on) => updateSettings({ showCodes: on })} />
           <SwitchRow icon={<Sparkles />} hue={282} title={t.settings.animations} on={settings.animations} onChange={(on) => updateSettings({ animations: on })} />
           <SwitchRow icon={<Vibrate />} hue={330} title={t.settings.haptics} on={settings.haptics} onChange={(on) => updateSettings({ haptics: on })} />
+        </Group>
+
+        <Group id="help-heading" title={t.settings.helpGroup}>
+          <LinkRow icon={<MessageSquare />} hue={162} title={t.settings.feedbackLink} href="/feedback" />
+          <LinkRow icon={<Megaphone />} hue={42} title={t.settings.whatsNew} href="/changelog" />
         </Group>
 
         <Group id="data-heading" title={t.settings.dataGroup} footer={exported ? t.settings.exported : t.settings.footerData}>

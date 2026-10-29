@@ -1,6 +1,6 @@
 "use client";
 
-import { Accessibility, Baby, Bookmark, Check, Coins, Eye, Flag, Navigation, Pencil, Share2, Signpost, ThumbsDown, ThumbsUp } from "lucide-react";
+import { Accessibility, Baby, Bookmark, Check, Coins, Eye, Flag, Navigation, Pencil, Share2, Signpost, ThumbsDown, ThumbsUp, Users } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { HintChips } from "@/components/hint-chips";
@@ -316,10 +316,11 @@ export function ToiletCard({
         )}
       </div>
 
-      {(toilet.wheelchair || toilet.babyChanging) && (
+      {(toilet.wheelchair || toilet.babyChanging || toilet.genderNeutral) && (
         <div className="mt-2 flex flex-wrap gap-1.5">
           {toilet.wheelchair && <Chip icon={<Accessibility className="size-3.5" aria-hidden />}>{t.card.wheelchair}</Chip>}
           {toilet.babyChanging && <Chip icon={<Baby className="size-3.5" aria-hidden />}>{t.card.baby}</Chip>}
+          {toilet.genderNeutral && <Chip icon={<Users className="size-3.5" aria-hidden />}>{t.card.genderNeutral}</Chip>}
         </div>
       )}
 

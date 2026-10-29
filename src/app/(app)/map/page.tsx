@@ -1,7 +1,7 @@
 "use client";
 
 import "@/lib/maplibre-worker";
-import { Accessibility, Baby, ChevronUp, LocateFixed, Zap, X } from "lucide-react";
+import { Accessibility, Baby, ChevronUp, LocateFixed, Users, Zap, X } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AddedBurst, AddedCheck, DropIn } from "@/components/added-burst";
@@ -49,7 +49,7 @@ const BUDAPEST: [number, number] = [19.0402, 47.4979];
 const TRUSTED = 0.6;
 
 type Draft = { latitude: number; longitude: number };
-type Filters = { open: boolean; free: boolean; works: boolean };
+type Filters = { open: boolean; free: boolean; works: boolean; accessible: boolean; baby: boolean; neutral: boolean };
 
 /**
  * Tapping empty map starts adding a toilet there. If a card is open, that
@@ -254,7 +254,7 @@ export default function MapPage() {
     () => document.getElementById("dock-accessory"),
     () => null,
   );
-  const [filters, setFilters] = useState<Filters>({ open: false, free: false, works: false });
+  const [filters, setFilters] = useState<Filters>({ open: false, free: false, works: false, accessible: false, baby: false, neutral: false });
   const [focus, setFocus] = useState<Toilet | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -268,6 +268,7 @@ export default function MapPage() {
   const [opens, setOpens] = useState("08:00");
   const [closes, setCloses] = useState("22:00");
   const [wheelchair, setWheelchair] = useState(false);
+  const [neutral, setNeutral] = useState(false);
   const [baby, setBaby] = useState(false);
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -278,9 +279,12 @@ export default function MapPage() {
     (toilet) =>
       (!filters.open || isOpen(toilet) === true) &&
       (!filters.free || toilet.access === "free") &&
-      (!filters.works || trust(toilet) >= TRUSTED),
+      (!filters.works || trust(toilet) >= TRUSTED) &&
+      (!filters.accessible || toilet.wheelchair === true) &&
+      (!filters.baby || toilet.babyChanging === true) &&
+      (!filters.neutral || toilet.genderNeutral === true),
   );
-  const filtering = filters.open || filters.free || filters.works;
+  const filtering = Object.values(filters).some(Boolean);
 
   // Fly to you once we know where you are.
   const flownRef = useRef(false);
@@ -426,6 +430,7 @@ export default function MapPage() {
       setHoursMode("unknown");
       setWheelchair(false);
       setBaby(false);
+      setNeutral(false);
       setDetails(false);
       setError(null);
     }
@@ -477,6 +482,7 @@ export default function MapPage() {
       hours,
       wheelchair: wheelchair || undefined,
       babyChanging: baby || undefined,
+      genderNeutral: neutral || undefined,
       note: tidy(note, LIMITS.note),
       ...draft,
     }, spot.location);
@@ -807,6 +813,9 @@ export default function MapPage() {
                     </Toggle>
                     <Toggle on={baby} onChange={setBaby} icon={<Baby className="size-4" aria-hidden />}>
                       {t.add.baby}
+                    </Toggle>
+                    <Toggle on={neutral} onChange={setNeutral} icon={<Users className="size-4" aria-hidden />}>
+                      {t.add.genderNeutral}
                     </Toggle>
                   </div>
                   <LimitedInput

@@ -26,6 +26,8 @@ type ServerToilet = {
   hours: Toilet["hours"] | null;
   wheelchair: boolean;
   babyChanging: boolean;
+  /** Left out by older servers. */
+  genderNeutral?: boolean;
   note: string;
   latitude: number;
   longitude: number;
@@ -113,6 +115,7 @@ function fromServer(s: ServerToilet, me: Me): Toilet {
     hours: s.hours ?? undefined,
     wheelchair: s.wheelchair || undefined,
     babyChanging: s.babyChanging || undefined,
+    genderNeutral: s.genderNeutral || undefined,
     note: s.note,
     latitude: s.latitude,
     longitude: s.longitude,
@@ -148,6 +151,7 @@ function build(server: ServerToilet[], me: Me, actions: OutAction[]): Toilet[] {
         hours: p.hours ?? undefined,
         wheelchair: p.wheelchair || undefined,
         babyChanging: p.babyChanging || undefined,
+        genderNeutral: p.genderNeutral || undefined,
         note: p.note,
         latitude: p.latitude,
         longitude: p.longitude,
@@ -316,6 +320,9 @@ export function syncNow(): Promise<void> {
 }
 
 /* ------------------------- backup and export ------------------------- */
+
+/** The secret token of this phone's profile, or null before it has one (used to sign a message to the server). */
+export const getIdentityToken = () => identity.get()?.token ?? null;
 
 /** Whether this phone has a profile on the server yet (it gets one with its first action). */
 export const hasIdentity = () => identity.get() !== null;

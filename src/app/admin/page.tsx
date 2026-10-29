@@ -6,6 +6,7 @@ import { btn } from "@/components/ui/buttons";
 import { API_BASE } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { call, read, remember, useRun, type Counts, type Item } from "./admin-api";
+import { FeedbackPanel } from "./feedback-panel";
 import { PeoplePanel } from "./people-panel";
 import { PlaceList } from "./place-list";
 
@@ -29,7 +30,7 @@ export default function AdminPage() {
   const [token, setToken] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [booted, setBooted] = useState(false);
-  const [tab, setTab] = useState<"places" | "people">("places");
+  const [tab, setTab] = useState<"places" | "people" | "feedback">("places");
   const [personId, setPersonId] = useState<string | null>(null);
   const [scope, setScope] = useState<Scope>("recent");
   const [items, setItems] = useState<Item[]>([]);
@@ -143,7 +144,7 @@ export default function AdminPage() {
       )}
 
       <div role="tablist" aria-label="Section" className="mt-4 flex gap-1.5">
-        {(["places", "people"] as const).map((key) => (
+        {(["places", "people", "feedback"] as const).map((key) => (
           <button
             key={key}
             role="tab"
@@ -155,12 +156,14 @@ export default function AdminPage() {
             }}
             className={cn("h-9 rounded-full border px-5 text-sm font-semibold", tab === key ? "border-ink bg-ink text-night" : "border-dusk-edge text-haze")}
           >
-            {key === "places" ? "Places" : "People"}
+            {key === "places" ? "Places" : key === "people" ? "People" : "Feedback"}
           </button>
         ))}
       </div>
 
-      {tab === "people" ? (
+      {tab === "feedback" ? (
+        <FeedbackPanel token={token} onAuthError={signOut} onOpenPerson={openPerson} />
+      ) : tab === "people" ? (
         <PeoplePanel token={token} personId={personId} onOpen={setPersonId} onAuthError={signOut} />
       ) : (
         <>

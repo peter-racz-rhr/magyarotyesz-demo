@@ -42,6 +42,7 @@ export type Toilet = {
   hours?: Hours;
   wheelchair?: boolean;
   babyChanging?: boolean;
+  genderNeutral?: boolean;
   note: string;
   latitude: number;
   longitude: number;
@@ -66,7 +67,7 @@ export type Suggestion = { id: string; code: string; at: string };
 
 export type ToiletInput = Pick<
   Toilet,
-  "name" | "code" | "kind" | "access" | "price" | "hours" | "wheelchair" | "babyChanging" | "note" | "latitude" | "longitude"
+  "name" | "code" | "kind" | "access" | "price" | "hours" | "wheelchair" | "babyChanging" | "genderNeutral" | "note" | "latitude" | "longitude"
 >;
 
 const store = createLocalStore<Toilet[]>("magyarotyesz:toilets", []);
@@ -104,6 +105,8 @@ export function addToilet(raw: ToiletInput, location?: Location) {
         hours: input.hours ?? null,
         wheelchair: !!input.wheelchair,
         babyChanging: !!input.babyChanging,
+        // Only sent when set, so a server that does not know the tag yet still takes everything else.
+        ...(input.genderNeutral ? { genderNeutral: true } : {}),
         note: input.note,
         latitude: input.latitude,
         longitude: input.longitude,
@@ -163,7 +166,7 @@ export function reportCode(id: string, location?: Location) {
  */
 export function editToilet(
   id: string,
-  change: Partial<Pick<Toilet, "name" | "code" | "note" | "access" | "price" | "hours" | "wheelchair" | "babyChanging">>,
+  change: Partial<Pick<Toilet, "name" | "code" | "note" | "access" | "price" | "hours" | "wheelchair" | "babyChanging" | "genderNeutral">>,
 ) {
   if (change.code !== undefined) change = { ...change, code: cleanCode(change.code) };
   if (REMOTE) {
