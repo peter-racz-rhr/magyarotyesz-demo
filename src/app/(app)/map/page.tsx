@@ -1,7 +1,7 @@
 "use client";
 
 import "@/lib/maplibre-worker";
-import { Accessibility, Baby, ChevronUp, LocateFixed, SlidersHorizontal, Users, Zap, X } from "lucide-react";
+import { Accessibility, Baby, BadgeCheck, ChevronUp, Clock, ThumbsUp, LocateFixed, SlidersHorizontal, Users, Zap, X } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AddedBurst, AddedCheck, DropIn } from "@/components/added-burst";
@@ -50,6 +50,9 @@ const TRUSTED = 0.6;
 
 type Draft = { latitude: number; longitude: number };
 const FILTER_ICONS: Partial<Record<keyof Filters, ReactNode>> = {
+  open: <Clock className="size-4" aria-hidden />,
+  free: <BadgeCheck className="size-4" aria-hidden />,
+  works: <ThumbsUp className="size-4" aria-hidden />,
   accessible: <Accessibility className="size-4" aria-hidden />,
   baby: <Baby className="size-4" aria-hidden />,
   neutral: <Users className="size-4" aria-hidden />,
@@ -274,7 +277,7 @@ export default function MapPage() {
   const { t } = useT();
   const mapRef = useRef<MapRef>(null);
   const here = useHere();
-  const { buildings3d } = useSettings();
+  const { buildings3d, filterStyle } = useSettings();
   const base = useMapStyle();
   const toilets = useToilets();
 
@@ -625,7 +628,33 @@ export default function MapPage() {
 
         {/* Top of the map: the filter pill (glass, like the dock), and under it any notice. */}
         <div data-pull-zone className="pointer-events-none absolute inset-x-0 top-[max(env(safe-area-inset-top),0.75rem)] z-10 flex flex-col gap-2 px-4">
-          {!draft && (
+          {!draft && filterStyle === "corner" && (
+            <div className="pointer-events-auto flex justify-end">
+              {/* One small button in the corner; all six filters open under it. A green dot says some are on. */}
+              <div ref={moreRef} className="relative">
+                <LiquidSurface radius={999} className="size-11">
+                  <button
+                    type="button"
+                    aria-label={t.map.moreFilters}
+                    aria-expanded={moreFilters}
+                    onClick={() => setMoreFilters((v) => !v)}
+                    className="relative grid size-full place-items-center rounded-full"
+                  >
+                    <SlidersHorizontal className="size-[1.125rem]" aria-hidden />
+                    {filtering && <span aria-hidden className="absolute top-2.5 right-2.5 size-2 rounded-full bg-good shadow-[0_0_6px_1px_var(--good)]" />}
+                  </button>
+                </LiquidSurface>
+                {moreFilters && (
+                  <LiquidSurface radius={22} className="filter-card absolute top-full right-0 z-20 mt-2 flex w-max flex-col gap-0.5 p-1.5 animate-in fade-in zoom-in-95 slide-in-from-top-1 duration-150">
+                    {(Object.keys(t.map.filters) as (keyof Filters)[]).map((key) => (
+                      <FilterChip key={key} wide on={filters[key]} label={t.map.filters[key]} icon={FILTER_ICONS[key]} onClick={() => setFilters((f) => ({ ...f, [key]: !f[key] }))} />
+                    ))}
+                  </LiquidSurface>
+                )}
+              </div>
+            </div>
+          )}
+          {!draft && filterStyle === "pill" && (
             <div className="pointer-events-auto flex justify-center">
               {/* The three you reach for most sit in the slim pill; the other three open in a small
                   card from the sliders button (a green dot on the button says one of them is on). */}

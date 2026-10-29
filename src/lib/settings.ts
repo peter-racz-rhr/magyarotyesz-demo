@@ -25,6 +25,8 @@ export type Settings = {
   flavour: Flavour;
   /** How you move between Map, List and Profile: the bottom bar, or one round button that opens the pages. */
   navStyle: "bar" | "orb";
+  /** The map filters: a pill across the top, or one small button in the top right corner that opens a list. */
+  filterStyle: "pill" | "corner";
   /** The material of the bars and buttons: liquid glass, or one flat pastel of the palette with no effects. */
   glass: "liquid" | "solid";
   /** Which base map: "auto" follows the app's look; or night, day or satellite. */
@@ -56,6 +58,7 @@ const store = createLocalStore<Settings>("magyarotyesz:settings", {
   textSize: "normal",
   navStyle: "bar",
   glass: "liquid",
+  filterStyle: "corner",
   mapStyle: "auto",
   showCodes: false,
   haptics: true,
