@@ -105,6 +105,8 @@ export default function WelcomePage() {
   const [open, setOpen] = useState(false);
   const [locating, setLocating] = useState(false);
   const [step, setStep] = useState<"hero" | "how" | "terms" | "perms">("hero");
+  // Someone who agreed to an earlier version of the terms is shown that they changed.
+  const [returning, setReturning] = useState(false);
   const timers = useRef<number[]>([]);
 
   const unlock = () => {
@@ -154,6 +156,7 @@ export default function WelcomePage() {
     if (hasOnboarded() && !hasAcceptedTerms()) {
       queueMicrotask(() => {
         unlock();
+        setReturning(true);
         setStep("terms");
       });
     } else if (hasOnboarded() && hasAcceptedTerms()) {
@@ -237,6 +240,7 @@ export default function WelcomePage() {
         {open && step === "terms" && (
           <div className="absolute inset-0 z-20 bg-night">
             <TermsStep
+              updated={returning}
               onAgree={() => {
                 markTermsAccepted();
                 if (hasOnboarded()) router.replace("/map", { transitionTypes: FORWARD });

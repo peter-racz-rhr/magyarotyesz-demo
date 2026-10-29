@@ -1,7 +1,8 @@
 /*
-  Address search for Budapest, from OpenStreetMap data. Two free services,
-  tried in turn so one being busy or down doesn't leave you with nothing:
-  Photon first (fast, finds places as you type), then Nominatim.
+  Address search for Budapest, from OpenStreetMap data. Two free services:
+  Photon suggests places while you type (it allows that); Nominatim, whose usage
+  policy forbids search-as-you-type, is asked only when you press Search, at most
+  once a second. (A browser cannot set its own User-Agent; it identifies the site by Referer.)
   Used to sort toilets by distance from an address you type.
 */
 
@@ -136,23 +137,24 @@ function tidy(places: Place[]) {
 const cache = new Map<string, Place[]>();
 
 /**
- * Addresses and places matching what was typed. Rejects only when neither
- * service could be reached; "found nothing" is an empty list.
+ * Addresses and places matching what was typed. While typing only Photon is asked; with
+ * `submit` (the Search key) Nominatim is asked first and Photon is the fallback. Rejects only
+ * when no service could be reached; "found nothing" is an empty list.
  */
-export async function searchPlaces(query: string, signal?: AbortSignal): Promise<Place[]> {
+export async function searchPlaces(query: string, signal?: AbortSignal, submit = false): Promise<Place[]> {
   const q = normalizeQuery(query);
   if (q.length < 2) return [];
-  const cached = cache.get(q.toLowerCase());
+  const cached = cache.get((submit ? "s:" : "t:") + q.toLowerCase());
   if (cached) return cached;
 
   let answered = false;
   let failure: unknown = null;
-  for (const service of [photon, nominatim]) {
+  for (const service of submit ? [nominatim, photon] : [photon]) {
     try {
       const found = tidy(await service(q, signal));
       answered = true;
       if (found.length > 0) {
-        cache.set(q.toLowerCase(), found);
+        cache.set((submit ? "s:" : "t:") + q.toLowerCase(), found);
         return found;
       }
     } catch (error) {

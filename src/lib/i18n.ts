@@ -1,6 +1,7 @@
 "use client";
 
 import { de } from "./i18n-de";
+import { OPERATOR } from "./legal";
 import type { SpotCheck } from "./on-the-spot";
 import { useSettings, type Lang } from "./settings";
 import { formatDistance, type Access, type Kind } from "./toilets";
@@ -86,7 +87,14 @@ const en = {
     animations: "Celebration animation",
     animationsSub: "The little burst when your toilet lands on the map.",
     export: "Download my data",
-    exportSub: "A file with your name, settings and the places you shared.",
+    exportSub: "The file has everything our server links to your ID: your name, settings, the places you added, your votes, code suggestions, reports and alerts.",
+    verifyCode: "Your code for privacy requests",
+    verifyCodeSub: "If you write to us about your data, send this code to show the profile is yours.",
+    deleteMyData: "Delete my data",
+    deleteMyDataConfirm: "This deletes your ID, your name, the places you added, your votes, suggestions, reports and alerts from our server, and clears the app on this phone. It cannot be undone. Delete?",
+    deleteMyDataGo: "Delete everything",
+    deleteMyDataCancel: "Cancel",
+    deleteMyDataFailed: "That did not go through. Check your connection and try again.",
     exported: "Saved to your downloads.",
     backup: "Back up or move my profile",
   },
@@ -94,9 +102,9 @@ const en = {
     back: "Back",
     missing: "not set yet",
     more: "More documents",
-    draft: "This text is a plain-language draft for a small community project and is not legal advice.",
+    draft: "These texts are written in plain language for a small community project and have not yet been checked by a lawyer.",
     contact: "Contact",
-    contactBody: "Questions, data requests (access, correction, deletion), requests to remove a place, and reports of illegal content: write to this address. We answer in Hungarian or English.",
+    contactBody: "Questions, data requests (access, correction, deletion), requests to remove a place, and reports of illegal content. We answer in Hungarian or English.",
     terms: "Terms",
     privacy: "Privacy",
     imprint: "Imprint",
@@ -125,12 +133,13 @@ const en = {
     termsTitle: "Before you start",
     termsScroll: "Read to the end to continue",
     termsDone: "You have read it all",
+    termsUpdated: "We have updated the Terms of use. Please read the changes and agree to continue.",
     termsAgree: "I am 16 or older and I agree",
-    termsNote: "By continuing you confirm that you are at least 16, that you only use and share codes for toilets, and that you are responsible for what you do with a code.",
+    termsNote: "By continuing you confirm that you are at least 16 and accept the Terms of use. You confirm that you will only share codes for toilet doors, never for homes, staff or security areas or building entrances, and that you are responsible for what you do with a code. How we handle your data is explained in the Privacy policy.",
     permsTitle: "One quick thing",
     permsBody: "It is optional, and you can change it later in Settings.",
     permsLocation: "Your location",
-    permsLocationWhy: "Shows the toilets closest to you, and lets you add or check a code on the spot.",
+    permsLocationWhy: "Shows the toilets closest to you. When you add, check or report a code, your position is sent to our server once to check that you are on the spot (within 150 m); it is not stored.",
     allow: "Allow location and start",
     notNow: "Not now, just the map",
   },
@@ -200,6 +209,7 @@ const en = {
     another: "Send another",
     failed: "That did not go through. Check your connection and try again.",
     limited: "You have sent a few already. Try again in an hour.",
+    note: "We keep your message and contact detail for 12 months. Please don't write other people's personal details. More in the Privacy policy.",
     demo: "Feedback needs the shared server, which this version is not connected to.",
   },
   check: {
@@ -328,13 +338,13 @@ const en = {
     shareText: (name: string) => `Door code for ${name}, shared on magyarotyesz`,
     fresh: ["Checked long ago", "Checked this month", "Checked this week", "Checked today"],
     reportTitle: "What's wrong with this place?",
-    reportReasons: { offensive: "Offensive or hateful", private: "Private, shouldn't be listed", nottoilet: "Not a toilet (a gate, an office…)", wrong: "Wrong place or details", closed: "Closed or gone", other: "Something else" } as Record<string, string>,
+    reportReasons: { offensive: "Offensive or hateful", private: "Private, shouldn't be listed", nottoilet: "Not a toilet (a gate, an office…)", wrong: "Wrong place or details", opensmore: "Opens more than a toilet (building entrance, staff area)", illegal: "Illegal content", closed: "Closed or gone", other: "Something else" } as Record<string, string>,
     reportMessage: "Add a message (optional)",
-    reportMessageHint: "What did you see? Please don't write personal details.",
+    reportMessageHint: "What did you see? If you think it is illegal, tell us why. Please don't write personal details.",
     reportSend: "Send report",
     reportDone: "Done",
-    reportSent: "Thanks, we'll look at it.",
-    reportSentFar: "Thanks. You are not at the place, so we will look at it before anything changes.",
+    reportSent: "Thanks, we received your report. We'll look at it and tell you the result under Profile > Alerts.",
+    reportSentFar: "Thanks, we received your report. You are not at the place, so we will look at it before anything changes. You'll find the result under Profile > Alerts.",
     reportDemo: "Thanks. (In the demo nothing is sent.)",
   },
 
@@ -410,7 +420,10 @@ const en = {
     noAlerts: "Nothing yet. If someone says one of your codes stopped working, you'll see it here.",
     alertReport: (name: string) => `Someone said the code at ${name} doesn't work.`,
     alertSuggestion: (name: string, code: string) => `New code suggested for ${name}: ${code}`,
-    alertRemoved: (name: string, why: string) => `${name} was taken off the map. ${why}`,
+    alertRemoved: (name: string, why: string, email: string) => `Your place "${name}" has been removed by the administrator. Reason: ${why || "none given"} Rule: Terms of use, "What you may add" and "Reporting and removal". The decision was made by a person. If you disagree, write to ${email} within six months and we will look at it again. You can also go to court or complain to the NMHH (nmhh.hu).`,
+    alertHidden: (name: string, why: string, email: string) => `Your place "${name}" has been hidden. Reason: ${why} This happened automatically after a user report, based on the "Reporting and removal" section of the Terms. The administrator will check it, usually within a few days, and either show it again or remove it. If you disagree, write to ${email} within six months; a person will review it. You can also go to court or complain to the NMHH (nmhh.hu).`,
+    alertBlocked: (why: string, email: string) => `This phone is blocked from adding, voting and reporting. Reason: ${why || "none given"} Rule: Terms of use, "Reporting and removal" (repeated content that breaks the terms). The decision was made by a person. You can still view the map and download or delete your data. If you disagree, write to ${email} within six months, with the code from Settings.`,
+    alertAnswer: (name: string, outcome: string, note: string) => `About your report on "${name}": ${outcome === "removed" ? "we removed it" : outcome === "hidden" ? "we hid it" : "we checked it and it stays"}${note ? `: ${note}` : ""}. Thank you.`,
     alertMessage: (text: string) => `Message from magyarotyesz: ${text}`,
     removeReasons: {
       "auto:reports": "Several people reported it, so it is hidden until it has been checked.",
@@ -530,7 +543,14 @@ const hu: Dict = {
     animations: "Ünneplő animáció",
     animationsSub: "A kis robbanás, amikor a mosdód felkerül a térképre.",
     export: "Adataim letöltése",
-    exportSub: "Egy fájl a nevedről, a beállításaidról és a megosztott helyeidről.",
+    exportSub: "A fájlban minden benne van, amit a szerverünk az azonosítódhoz köt: a neved, a beállításaid, a hozzáadott helyeid, a szavazataid, a kódjavaslataid, a jelentéseid és az értesítéseid.",
+    verifyCode: "Kódod adatkezelési kérésekhez",
+    verifyCodeSub: "Ha az adataidról írsz nekünk, küldd el ezt a kódot, hogy igazold, hogy a profil a tiéd.",
+    deleteMyData: "Adataim törlése",
+    deleteMyDataConfirm: "Ez törli a szerverünkről az azonosítódat, a nevedet, az általad hozzáadott helyeket, a szavazataidat, a javaslataidat, a jelentéseidet és az értesítéseidet, és kiüríti az appot ezen a telefonon. Nem vonható vissza. Törlöd?",
+    deleteMyDataGo: "Minden törlése",
+    deleteMyDataCancel: "Mégse",
+    deleteMyDataFailed: "Ez nem ment át. Nézd meg a kapcsolatot, és próbáld újra.",
     exported: "Elmentve a letöltések közé.",
     backup: "Profil mentése vagy átvitele",
   },
@@ -538,9 +558,9 @@ const hu: Dict = {
     back: "Vissza",
     missing: "még nincs megadva",
     more: "További dokumentumok",
-    draft: "Ez a szöveg egy kis közösségi projekthez írt, közérthető tervezet, nem jogi tanács.",
+    draft: "Ezeket a szövegeket egy kis közösségi projekthez, közérthető nyelven írtuk; jogász még nem ellenőrizte őket.",
     contact: "Kapcsolat",
-    contactBody: "Kérdések, adatkezelési kérések (hozzáférés, helyesbítés, törlés), egy hely eltávolítására irányuló kérések és jogellenes tartalomról szóló bejelentések: írj erre a címre. Magyarul vagy angolul válaszolunk.",
+    contactBody: "Kérdések, adatkezelési kérések (hozzáférés, helyesbítés, törlés), egy hely eltávolítására irányuló kérések és jogellenes tartalomról szóló bejelentések. Magyarul vagy angolul válaszolunk.",
     terms: "Feltételek",
     privacy: "Adatkezelés",
     imprint: "Impresszum",
@@ -569,12 +589,13 @@ const hu: Dict = {
     termsTitle: "Mielőtt elkezdenéd",
     termsScroll: "Olvasd végig a folytatáshoz",
     termsDone: "Mindent elolvastál",
+    termsUpdated: "Frissítettük a Felhasználási feltételeket. Kérjük, olvasd el a változásokat, és a folytatáshoz fogadd el őket.",
     termsAgree: "Elmúltam 16 éves, és elfogadom",
-    termsNote: "A folytatással megerősíted, hogy legalább 16 éves vagy, hogy kódokat csak mosdókhoz használsz és osztasz meg, és hogy te felelsz azért, amit egy kóddal teszel.",
+    termsNote: "A folytatással megerősíted, hogy legalább 16 éves vagy, és elfogadod a Felhasználási feltételeket. Vállalod, hogy csak mosdóajtók kódját osztod meg, soha nem lakásokét, személyzeti vagy biztonsági területekét vagy épületbejáratokét, és hogy te felelsz azért, amit egy kóddal teszel. Az adataid kezeléséről az Adatkezelési tájékoztató szól.",
     permsTitle: "Egy gyors dolog",
     permsBody: "Nem kötelező, és később a Beállításokban megváltoztathatod.",
     permsLocation: "A helyzeted",
-    permsLocationWhy: "Megmutatja a hozzád legközelebbi mosdókat, és lehetővé teszi, hogy a helyszínen adj hozzá vagy ellenőrizz egy kódot.",
+    permsLocationWhy: "Megmutatja a hozzád legközelebbi mosdókat. Ha kódot adsz hozzá, ellenőrzöl vagy jelentesz, a pozíciódat egyszer elküldjük a szerverünkre, hogy ellenőrizzük, a helyszínen vagy-e (150 m-en belül); nem tároljuk.",
     allow: "Engedélyezem a helyzetet, indulás",
     notNow: "Most nem, csak a térképet",
   },
@@ -644,6 +665,7 @@ const hu: Dict = {
     another: "Újabb üzenet",
     failed: "Ez nem ment át. Nézd meg a kapcsolatot, és próbáld újra.",
     limited: "Már küldtél párat. Próbáld újra egy óra múlva.",
+    note: "Az üzenetedet és az elérhetőségedet 12 hónapig őrizzük meg. Kérjük, ne írd bele más személyes adatait. Bővebben az Adatkezelési tájékoztatóban.",
     demo: "A visszajelzéshez a közös szerver kell, amihez ez a verzió nincs kapcsolva.",
   },
   check: {
@@ -771,13 +793,13 @@ const hu: Dict = {
     shareText: (name: string) => `„${name}” mosdókódja, a magyarotyeszen megosztva`,
     fresh: ["Rég ellenőrizték", "E hónapban ellenőrizték", "E héten ellenőrizték", "Ma ellenőrizték"],
     reportTitle: "Mi a baj ezzel a hellyel?",
-    reportReasons: { offensive: "Sértő vagy gyűlöletkeltő", private: "Magán, nem kellene szerepelnie", nottoilet: "Nem mosdó (kapu, iroda…)", wrong: "Rossz hely vagy adatok", closed: "Bezárt vagy megszűnt", other: "Valami más" } as Record<string, string>,
+    reportReasons: { offensive: "Sértő vagy gyűlöletkeltő", private: "Magán, nem kellene szerepelnie", nottoilet: "Nem mosdó (kapu, iroda…)", wrong: "Rossz hely vagy adatok", opensmore: "Többet nyit egy mosdónál (épületbejárat, személyzeti rész)", illegal: "Jogellenes tartalom", closed: "Bezárt vagy megszűnt", other: "Valami más" } as Record<string, string>,
     reportMessage: "Üzenet hozzáadása (nem kötelező)",
-    reportMessageHint: "Mit láttál? Kérjük, ne írj személyes adatokat.",
+    reportMessageHint: "Mit láttál? Ha szerinted jogellenes, írd meg, miért. Kérjük, ne írj személyes adatokat.",
     reportSend: "Jelentés elküldése",
     reportDone: "Kész",
-    reportSent: "Köszönjük, megnézzük.",
-    reportSentFar: "Köszönjük. Nem vagy a helyszínen, ezért előbb megnézzük, mielőtt bármi változik.",
+    reportSent: "Köszönjük, megkaptuk a jelentésedet. Megnézzük, és az eredményt a Profil > Értesítések alatt találod.",
+    reportSentFar: "Köszönjük, megkaptuk a jelentésedet. Nem vagy a helyszínen, ezért megnézzük, mielőtt bármi változna. Az eredményt a Profil > Értesítések alatt találod.",
     reportDemo: "Köszönjük. (A demóban nem megy el semmi.)",
   },
 
@@ -852,7 +874,10 @@ const hu: Dict = {
     noAlerts: "Még semmi. Ha valaki szerint az egyik kódod nem működik, itt látod.",
     alertReport: (name: string) => `Valaki szerint nem működik a kód itt: ${name}.`,
     alertSuggestion: (name: string, code: string) => `Új kódot javasoltak ide: ${name}: ${code}`,
-    alertRemoved: (name: string, why: string) => `${name} lekerült a térképről. ${why}`,
+    alertRemoved: (name: string, why: string, email: string) => `A(z) „${name}” helyedet az adminisztrátor eltávolította. Ok: ${why || "nincs megadva"} Szabály: Felhasználási feltételek, „Mit adhatsz hozzá” és „Jelentés és eltávolítás”. A döntést ember hozta. Ha nem értesz egyet, hat hónapon belül írj a ${email} címre, és újra megnézzük. Bírósághoz is fordulhatsz, vagy panaszt tehetsz az NMHH-nál (nmhh.hu).`,
+    alertHidden: (name: string, why: string, email: string) => `A(z) „${name}” helyedet elrejtettük. Ok: ${why} Ez egy felhasználói jelentés után automatikusan történt, a Felhasználási feltételek „Jelentés és eltávolítás” pontja alapján. Az adminisztrátor megnézi, általában néhány napon belül, és vagy újra megjeleníti, vagy eltávolítja. Ha nem értesz egyet, hat hónapon belül írj a ${email} címre; ember vizsgálja meg. Bírósághoz is fordulhatsz, vagy panaszt tehetsz az NMHH-nál (nmhh.hu).`,
+    alertBlocked: (why: string, email: string) => `Ezt a telefont letiltottuk a hozzáadásról, szavazásról és jelentésről. Ok: ${why || "nincs megadva"} Szabály: Felhasználási feltételek, „Jelentés és eltávolítás” (a feltételeket ismételten sértő tartalom). A döntést ember hozta. A térképet továbbra is megnézheted, és letöltheted vagy törölheted az adataidat. Ha nem értesz egyet, hat hónapon belül írj a ${email} címre, a Beállításokban látható kóddal.`,
+    alertAnswer: (name: string, outcome: string, note: string) => `A(z) „${name}” helyről küldött jelentésedről: ${outcome === "removed" ? "eltávolítottuk" : outcome === "hidden" ? "elrejtettük" : "megnéztük, és marad"}${note ? `: ${note}` : ""}. Köszönjük.`,
     alertMessage: (text: string) => `Üzenet a magyarotyesztől: ${text}`,
     removeReasons: {
       "auto:reports": "Többen jelentették, ezért rejtve van, amíg meg nem nézik.",
@@ -892,10 +917,15 @@ const hu: Dict = {
 };
 
 /** One line for an alert: a report, a suggestion, a place taken off the map and why, or a note from us. */
-export function alertLine(t: Dict, alert: { kind: "report" | "suggestion" | "removed" | "message"; name: string; code?: string | null; reason?: string; text?: string }) {
+export function alertLine(t: Dict, alert: { kind: "report" | "suggestion" | "removed" | "message" | "answer" | "blocked"; name: string; code?: string | null; reason?: string; text?: string }) {
   if (alert.kind === "message") return t.profile.alertMessage(alert.text ?? "");
   if (alert.kind === "report") return t.profile.alertReport(alert.name);
-  if (alert.kind === "removed") return t.profile.alertRemoved(alert.name, t.profile.removeReasons[alert.reason ?? ""] ?? alert.reason ?? "");
+  if (alert.kind === "removed") {
+    const why = t.profile.removeReasons[alert.reason ?? ""] ?? alert.reason ?? "";
+    return (alert.reason ?? "").startsWith("auto:") ? t.profile.alertHidden(alert.name, why, OPERATOR.email) : t.profile.alertRemoved(alert.name, why, OPERATOR.email);
+  }
+  if (alert.kind === "blocked") return t.profile.alertBlocked(alert.reason ?? "", OPERATOR.email);
+  if (alert.kind === "answer") return t.profile.alertAnswer(alert.name, alert.reason ?? "", alert.text ?? "");
   return t.profile.alertSuggestion(alert.name, alert.code ?? "");
 }
 

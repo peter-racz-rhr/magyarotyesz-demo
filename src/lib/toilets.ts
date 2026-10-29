@@ -244,7 +244,7 @@ export type Alert = {
   id: string;
   toiletId: string;
   name: string;
-  kind: "report" | "suggestion" | "removed" | "message";
+  kind: "report" | "suggestion" | "removed" | "message" | "answer" | "blocked";
   code?: string;
   /** For "message": the words of the person running the app. */
   text?: string;

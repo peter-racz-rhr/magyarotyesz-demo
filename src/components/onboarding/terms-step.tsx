@@ -8,7 +8,7 @@ import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 /** The terms, privacy notice and imprint in one scroll. The agree button only works once you have reached the end. */
-export function TermsStep({ onAgree }: { onAgree: () => void }) {
+export function TermsStep({ onAgree, updated = false }: { onAgree: () => void; updated?: boolean }) {
   const { t } = useT();
   const box = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
@@ -48,6 +48,7 @@ export function TermsStep({ onAgree }: { onAgree: () => void }) {
           <LegalBody doc="imprint" />
         </div>
       </div>
+      {updated && <p className="mt-3 rounded-2xl bg-brand/12 px-4 py-2.5 text-center text-[0.9375rem] font-semibold">{t.welcome.termsUpdated}</p>}
       <p className={cn("mt-3 flex items-center justify-center gap-1.5 text-center text-[0.8125rem]", done ? "text-good" : "text-haze")} aria-live="polite">
         {done && <Check className="size-4" aria-hidden />}
         {done ? t.welcome.termsDone : t.welcome.termsScroll}

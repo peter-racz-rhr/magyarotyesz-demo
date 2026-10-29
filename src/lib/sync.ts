@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { api, ApiFailure, Offline, REMOTE } from "./api";
 import { createLocalStore } from "./local-store";
+import { acceptedTerms } from "./onboarding";
 import { getSettings, updateSettings } from "./settings";
 import type { Alert, Toilet } from "./toilets";
 
@@ -43,7 +44,7 @@ type Me = {
   owns: string[];
   votes: Record<string, boolean>;
   suggestions: Record<string, { id: string; code: string; at: string }[]>;
-  alerts: { id: string; toiletId: string; name: string; kind: "report" | "suggestion" | "removed" | "message"; code: string | null; at: string; read: boolean; reason?: string; text?: string }[];
+  alerts: { id: string; toiletId: string; name: string; kind: "report" | "suggestion" | "removed" | "message" | "answer" | "blocked"; code: string | null; at: string; read: boolean; reason?: string; text?: string }[];
   addsLeftToday: number;
   /** Running total of people who got in with this phone's codes; kept by the server across code changes. */
   gotIn?: number;
@@ -303,6 +304,7 @@ export function syncNow(): Promise<void> {
   running = (async () => {
     setStatus({ syncing: true });
     try {
+      await reportTerms();
       await run();
       setStatus({ online: true, lastSyncAt: new Date().toISOString() });
     } catch (error) {
@@ -386,6 +388,48 @@ export async function fetchMyData(): Promise<unknown | null> {
   } catch {
     return null;
   }
+}
+
+/** Tell the server which version of the terms this profile agreed to (once per version; kept as proof of acceptance). */
+async function reportTerms() {
+  const me = identity.get();
+  const accepted = acceptedTerms();
+  if (!me || !accepted) return;
+  try {
+    if (window.localStorage.getItem("magyarotyesz:terms-sent") === accepted.v) return;
+    await api("/v1/me/terms", { method: "POST", token: me.token, body: { version: accepted.v } });
+    window.localStorage.setItem("magyarotyesz:terms-sent", accepted.v);
+  } catch {
+    // Offline or an unknown profile: tried again with the next sync.
+  }
+}
+
+/** A short code (the start of the token's hash) shown in Settings: someone who writes by email can prove the profile is theirs. */
+export async function verifyCode(): Promise<string | null> {
+  const me = identity.get();
+  if (!me || !window.crypto?.subtle) return null;
+  const hash = await window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(me.token));
+  return [...new Uint8Array(hash).slice(0, 4)].map((b) => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+}
+
+/** "Delete my data": the server forgets this profile and everything it added, then this phone is emptied. */
+export async function deleteMyData(): Promise<"ok" | "offline" | "failed"> {
+  const me = identity.get();
+  if (me) {
+    try {
+      await api("/v1/me", { method: "DELETE", token: me.token });
+    } catch (e) {
+      // 401: the server no longer knows this profile, so there is nothing left to delete there.
+      if (!(e instanceof ApiFailure && e.status === 401)) return e instanceof Offline ? "offline" : "failed";
+    }
+  }
+  try {
+    for (const key of Object.keys(window.localStorage)) if (key.startsWith("magyarotyesz:")) window.localStorage.removeItem(key);
+  } catch {
+    // Storage blocked: nothing was saved there anyway.
+  }
+  window.location.assign("/");
+  return "ok";
 }
 
 async function ensureIdentity() {

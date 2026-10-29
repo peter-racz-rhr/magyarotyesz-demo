@@ -159,7 +159,7 @@ export default function NearbyPage() {
     if (!place && q.length >= 3) {
       setLookup("loading");
       try {
-        place = (await searchPlaces(q))[0];
+        place = (await searchPlaces(q, undefined, true))[0];
         setLookup("done");
       } catch {
         // No connection: fall back to the toilets you can already see.

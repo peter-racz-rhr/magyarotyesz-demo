@@ -3,6 +3,15 @@ export type Change = { date: string; title: { en: string; hu: string; de: string
 
 export const CHANGELOG: Change[] = [
   {
+    date: "2026-10-31",
+    title: { en: "Your data, your choice", hu: "Az adataid, a döntésed", de: "Deine Daten, deine Entscheidung" },
+    items: [
+      { en: "Settings > \"Delete my data\" removes your profile and everything you added.", hu: "Beállítások > „Adataim törlése”: törli a profilodat és mindent, amit hozzáadtál.", de: "Einstellungen > „Meine Daten löschen“ entfernt dein Profil und alles, was du hinzugefügt hast." },
+      { en: "Updated Terms and Privacy policy. You will be asked to agree again.", hu: "Frissített Felhasználási feltételek és Adatkezelési tájékoztató. Újra el kell fogadnod őket.", de: "Aktualisierte Bedingungen und Datenschutzerklärung. Du wirst um erneute Zustimmung gebeten." },
+      { en: "Decisions about your places are explained in Alerts, and you hear back about your reports.", hu: "A helyeidről hozott döntéseket az Értesítések magyarázzák, és a jelentéseidre választ kapsz.", de: "Entscheidungen zu deinen Orten werden unter Hinweise erklärt, und zu deinen Meldungen bekommst du eine Antwort." },
+    ],
+  },
+  {
     date: "2026-10-30",
     title: { en: "Catppuccin colours", hu: "Catppuccin színek", de: "Catppuccin-Farben" },
     items: [

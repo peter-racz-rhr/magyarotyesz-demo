@@ -2,131 +2,191 @@ import type { Lang } from "./settings";
 import type { DocKey } from "./legal";
 
 /*
-  The legal texts, in English and Hungarian. {operator}, {email} and {address}
-  are filled in from the environment (see legal.ts). These are drafts written
-  for a small hobby project: have a lawyer read them before relying on them.
+  The legal texts, in English and Hungarian (revised 29 October 2026). {operator}, {email},
+  {address} and {phone} are filled in from the environment (see legal.ts). A line starting
+  with "- " is a list item; **bold** is allowed. They are plain-language texts for a small
+  hobby project that no lawyer has read yet: change them only together with the app.
 */
 
 export type Section = { h: string; p: string[] };
 export type Doc = { title: string; updated: string; intro?: string; sections: Section[] };
 
-const UPDATED = { en: "Last updated: 16 October 2026", hu: "Utolsó frissítés: 2026. október 16." };
-
 const en: Record<DocKey, Doc> = {
   terms: {
     title: "Terms of use",
-    updated: UPDATED.en,
-    intro: "magyarotyesz is a free community map of toilet door codes in Budapest, run by {operator}. By using it you agree to these terms.",
+    updated: "Last updated: 29 October 2026",
+    intro: "magyarotyesz is a free community map of toilet door codes in Budapest, run by {operator} ({address}, {email}). By tapping \"I am 16 or older and I agree\" you accept these terms.",
     sections: [
       {
         h: "What this is",
         p: [
-          "People share the codes of toilet doors they have used. We do not own or control these places and cannot promise a code is right, current or that you will be let in. Use the codes at your own judgement.",
+          "People share the codes of toilet doors they have used, including toilets in cafés, restaurants and shops that are meant for customers. We do not own or control these places and cannot promise that a code is right or current, or that you will be let in. Use the codes at your own judgement and risk.",
         ],
       },
       {
         h: "Who can use it",
-        p: ["You must be at least 16 years old to use magyarotyesz. The app has no account: your phone gets a random anonymous ID."],
+        p: [
+          "You must be at least 16 years old to use magyarotyesz. The app has no account: your phone gets a random ID that does not contain your name or contact details.",
+        ],
       },
       {
         h: "What you may add",
         p: [
-          "Only add real door codes you have actually used, for places you are allowed to share. Do not add codes for private homes, staff-only or security areas, or anything you were told in confidence.",
-          "Do not add offensive, hateful, sexual, illegal or misleading names or notes, personal data about anyone, advertising or spam, or fake votes. Names and notes pass an automatic word filter; this is a safety net, not a guarantee.",
-          "You keep the rights to what you write, and you give us permission to store it, show it to other users and remove it, for as long as the service runs.",
+          "You may add the code of a toilet door that you have used yourself, including a toilet meant for a venue's customers (for example a code printed on a receipt). The venue can ask us to remove it at any time (see Reporting and removal).",
+          "Do not add:\n- codes for private homes, staff-only areas, offices, storerooms or security areas;\n- codes for building entrances, gates, stairwells or any door that opens more than a toilet;\n- codes you were told by staff or by someone else on the condition that you keep them to yourself;\n- offensive, hateful, sexual, illegal or misleading names or notes, personal data about anyone, advertising, spam or fake votes.",
+          "Names and notes pass an automatic word filter. This is a safety net, not a guarantee.",
+          "You keep the rights to what you write. You give us a free permission to store it, show it to other users and remove it, for as long as the service runs or until you delete it.",
         ],
       },
       {
         h: "Reporting and removal",
         p: [
-          "Every place has a Report button. One report that a place is not a toilet hides it straight away; several reports of offensive or private content hide it too. Hidden places stay hidden until someone has checked them. We remove content that breaks these terms or the law, and we may block a phone that keeps doing so.",
-          "When we hide or remove a place you shared, we tell you why in the app (Profile, Alerts).",
-          "If you run a place and do not want its code listed (for example it is meant for customers only), write to {email} with the name and address of the place and we will remove it within 48 hours. The same address takes notices about illegal content.",
-          "Contact point under the EU Digital Services Act, for users and for authorities: {email}. We answer in Hungarian and English.",
+          "Every place has a Report button. Our rules for hiding content are:\n- one report that a place is not a toilet hides it automatically, straight away;\n- several reports that a place is offensive or private hide it automatically too;\n- every hidden place is then checked by the administrator (one person), usually within a few days, and is either shown again or removed.",
+          "We remove content that breaks these terms or the law. We may block the ID of a phone that repeatedly adds such content.",
+          "**If you run a place** and do not want its code listed (for example because it is meant for customers only), write to {email} with the name and address of the place. We will remove it within 48 hours and will not list it again.",
+          "**Notices about illegal content** can be sent to the same address or with the Report button. Please explain why you think the content is illegal and where it is in the app. We confirm that we received your notice and tell you what we decided. If you report from the app, the answer appears under Profile > Alerts.",
+          "**If we hide or remove something you shared, or block your ID,** we tell you in the app (Profile > Alerts): what we did, why (which rule of these terms or which law), whether it happened automatically, and how you can challenge it. You can ask us to look at the decision again by writing to {email} within six months; a person, not a machine, will review it. You can also go to court, or complain to Hungary's Digital Services Coordinator, the National Media and Infocommunications Authority (NMHH, nmhh.hu).",
+          "If something in the app makes us suspect a crime that threatens someone's life or safety, we report it to the police.",
+          "Contact point under the EU Digital Services Act (Articles 11 and 12), for users and for authorities: {email}. We answer in Hungarian and English.",
         ],
       },
       {
         h: "Who is responsible",
         p: [
-          "magyarotyesz only passes on what its users share. We do not open doors, we do not give anyone permission to enter a place, and we are not a party between you and the people who run it. A code that works is not a right to enter.",
-          "You are responsible for what you do with a code and for what you share. If you use a code and cause damage or harm, you answer for it to the owner or to whoever was harmed, not magyarotyesz. If you share a code you are not entitled to share, or one that opens more than a toilet, you answer for that too.",
-          "We are a hosting service for what users add. We do not check every entry beforehand, but we remove illegal or reported content quickly once we know of it (see Reporting and removal). Other users' entries are theirs, not ours.",
+          "magyarotyesz only passes on what its users share. We do not open doors, we do not give anyone permission to enter a place, and we are not a party between you and the people who run it. A code that works is not a right to enter. If a venue's toilet is for customers, respect that.",
+          "You are responsible for what you do with a code and for what you share. If you share a code you were not allowed to share, or one that opens more than a toilet, you are responsible for that.",
+          "We are a hosting service for what users add. We do not check every entry beforehand, but once we know about illegal content we remove it quickly (see Reporting and removal). Other users' entries are theirs, not ours.",
           "Nothing in these terms limits liability that the law does not allow to be limited, for example for harm caused on purpose or by gross negligence, or for injury to life, body or health.",
         ],
       },
       {
         h: "No guarantees",
         p: [
-          "The service is free and provided as it is. We do not guarantee that it is available, accurate or error free. To the extent the law allows, we are not liable for loss caused by a wrong or outdated code or by the service being unavailable. Nothing here limits liability that cannot be limited by law.",
+          "The service is free and provided as it is. We do not guarantee that it is available, accurate or error free. To the extent the law allows, we are not liable for loss caused by a wrong or outdated code or by the service being unavailable.",
+        ],
+      },
+      {
+        h: "Ending use",
+        p: [
+          "You can stop using magyarotyesz at any time and delete your data in Settings (\"Delete my data\"). We can end or pause the service; if we shut it down, we will say so in the app at least 30 days in advance where possible.",
         ],
       },
       {
         h: "Changes and law",
-        p: ["We may change these terms or the service; the date above shows the latest version. Hungarian law applies, and consumers keep the rights they have under the mandatory law of their country."],
+        p: [
+          "We may change these terms. If we make a change that matters for you, we show it in the app before it takes effect and ask you to accept it again; if you do not agree, you can stop using the app and delete your data. The date above shows the current version.",
+          "Hungarian law applies. If you are a consumer, you keep the protection of the mandatory law of the country where you live, and you can go to court there.",
+        ],
       },
     ],
   },
   privacy: {
     title: "Privacy policy",
-    updated: UPDATED.en,
-    intro: "The controller of your data is {operator}, {address}, {email}. We keep this to the minimum the app needs.",
+    updated: "Last updated: 29 October 2026",
+    intro: "The controller of your data is {operator}, {address}, {email}, {phone}. We process only what the app needs.",
     sections: [
       {
         h: "What we process",
         p: [
-          "Anonymous ID: when you first use the shared map your phone gets a random ID and a secret token. The server keeps only a hash of the token, plus the list of places you added and when. There is no name, email or phone number.",
-          "Profile name: optional. If you choose a name, it is saved with your anonymous ID on the server. Only you and the administrator can see it; it is not shown on any place.",
-          "Your contributions: places you add (name, code, kind, opening hours, note, position), your votes, code suggestions and reports.",
-          "Location: your phone's position is read on the device to show you where you are and to find nearby places. When you add a place or vote, your position is sent with the request so the server can check you are within about 150 m of the toilet; the server does not store it. You can withdraw your consent at any time: switch off \"Use my location\" in Settings, or turn location off for the app in your phone or browser settings.",
-          "Technical data: your IP address is processed to deliver the service and to limit abuse. Our server writes no access log: the address is held in memory for about an hour to limit abuse and is then forgotten. The providers named below keep their own technical logs.",
-          "On your phone: settings, a copy of the places and a queue of actions waiting to be sent are stored in your browser's local storage. This is strictly necessary for the app to work, so there is no cookie banner. We do not use analytics or advertising trackers.",
+          "**Your ID.** When you first use the shared map your phone gets a random ID and a secret token. The server keeps the ID, a hash of the token, and which places you added and when. There is no name, email or phone number, but the ID is still personal data under the GDPR, because it links your contributions together. We call it pseudonymous, not anonymous.",
+          "**Profile name (optional).** If you choose a name, it is saved with your ID on the server. Only you and the administrator can see it; it is not shown on any place.",
+          "**Your contributions.** Places you add (name, code, kind, opening hours, note, position, date), your votes, your code suggestions and your reports, including the optional message in a report. Because a place shows where its toilet is and when you added it, it can show where you were at that time.",
+          "**Location.** Your phone's position is read on the phone to show where you are and to sort nearby places. When you add a place, vote, suggest a code or report a place, your position is sent with the request so the server can check that you are within about 150 m of the toilet. The server uses it for that check and does not store it. Location is off unless you allow it, and you can turn it off at any time in Settings (\"Use my location\") or in your phone or browser settings. Without it you can still browse the map; only adding and checking codes need it.",
+          "**Messages.** If you send feedback, we store your message and, if you give one, the contact detail you write in \"How can we answer?\". If the administrator sends you a message, it is stored with your ID so you can see it under Alerts.",
+          "**Moderation records.** If a place is hidden or removed or an ID is blocked, we keep what was decided, why, and when.",
+          "**Technical data.** Your IP address is processed to deliver the service and to limit abuse. Our server writes no access log: the address is held in memory for about an hour for abuse limits and is then forgotten. The providers named below keep their own technical logs.",
+          "**On your phone.** Settings, a copy of the places, your profile photo (which never leaves the phone) and a queue of actions waiting to be sent are stored in your browser's local storage. This is strictly necessary for the app you asked to use, so no cookie banner is needed. We use no analytics and no advertising trackers.",
         ],
       },
       {
-        h: "Why, and on what basis",
+        h: "Why, and on what legal basis",
         p: [
-          "To run the shared map you asked to use (performance of the service, GDPR Art. 6(1)(b)), and to keep it safe and free of abuse and illegal content (our legitimate interest, Art. 6(1)(f)). Location is used only when you allow your device to share it (Art. 6(1)(a)).",
+          "- Running the shared map you asked to use, including your ID, contributions and moderation messages: performance of the service (GDPR Art. 6(1)(b)).\n- Keeping the map safe and free of abuse and illegal content (IP abuse limits, reports, moderation records, blocking): our legitimate interest in a usable, lawful service (Art. 6(1)(f)), and our legal duties under the EU Digital Services Act (Art. 6(1)(c)).\n- The on-the-spot location check: your consent, given when you allow location (Art. 6(1)(a)). You can withdraw it at any time; this does not affect checks already made.\n- Feedback: our legitimate interest in answering you and improving the app (Art. 6(1)(f)).",
+          "Where we rely on legitimate interest, you can object at any time (see Your rights).",
         ],
       },
       {
         h: "Who else sees data",
         p: [
-          "Server: Oracle Cloud Infrastructure, Frankfurt, Germany (EU). Oracle is a US company; where data could be reached from outside the EU, the transfer relies on the EU–US Data Privacy Framework and/or standard contractual clauses, as set out in Oracle's data processing terms.",
-          "App hosting: Vercel Inc., USA. It delivers the web app and sees your IP address when it loads. The transfer relies on the EU–US Data Privacy Framework and/or standard contractual clauses in Vercel's data processing terms.",
-          "Map tiles: OpenFreeMap (openfreemap.org) with OpenStreetMap data. It receives your IP address and the map area you look at. We have no contract with it; it is a free public service.",
-          "Satellite view: Esri Inc., USA, server.arcgisonline.com. It receives your IP address and the map area. The transfer relies on the EU–US Data Privacy Framework and/or standard contractual clauses in Esri's terms.",
-          "Address search: Photon, run by Komoot, Germany (EU), and OpenStreetMap Nominatim, run by the OpenStreetMap Foundation, United Kingdom. They receive what you type, the area, and your IP address.",
-          "We do not sell data. Where a provider is outside the EU, the basis for the transfer is the one named above or the country's adequacy decision.",
+          "We do not sell data. These providers are involved:\n- **Server:** Oracle Cloud Infrastructure, Frankfurt, Germany (EU). It stores the server data. Oracle is a US company; any access from outside the EU is covered by the EU–US Data Privacy Framework and/or standard contractual clauses in Oracle's data processing terms.\n- **Server address:** the server is reached through sslip.io, a free DNS service that translates the server's name into its IP address. It handles the name lookup only, not your data.\n- **App hosting:** Vercel Inc., USA. It delivers the web app and sees your IP address when the app loads. The transfer is covered by the EU–US Data Privacy Framework and/or standard contractual clauses in Vercel's data processing terms.\n- **Map tiles:** OpenFreeMap (openfreemap.org), with OpenStreetMap data. It receives your IP address and the map area you look at. It is a free public service; we have no contract with it.\n- **Satellite view:** Esri Inc., USA (server.arcgisonline.com). Only if you switch the satellite view on, it receives your IP address and the map area. The transfer is covered by the EU–US Data Privacy Framework and/or standard contractual clauses in Esri's terms.\n- **Address search:** Photon, run by Komoot, Germany (EU), suggests results while you type. OpenStreetMap Nominatim, run by the OpenStreetMap Foundation in the United Kingdom, is asked only when you press Search. They receive what you typed, the map area and your IP address. The transfer to the United Kingdom relies on the European Commission's adequacy decision for the UK.",
         ],
       },
       {
-        h: "How long",
+        h: "How long we keep data",
         p: [
-          "Places, votes, suggestions and reports stay until they are deleted. If a place is deleted, its votes, suggestions and reports are deleted with it. You can delete the places you added in the Profile tab; an administrator can delete or hide places and block IDs that break the terms. Your anonymous ID and optional name stay until you ask us to delete them. Our server keeps no access logs. Clear your browser data to remove everything stored on your phone, including your profile photo, which never leaves it.",
+          "- Places stay on the map until you, the administrator or a venue's request removes them. When a place is deleted, its votes, suggestions and reports are deleted with it.\n- Your ID, profile name, and the link between you and your contributions: deleted when you use \"Delete my data\", or automatically after 24 months without any activity. After automatic deletion, the places you added stay on the map without any link to you.\n- Reports and their messages: deleted 6 months after they are handled.\n- Feedback messages and contact details: deleted 12 months after we receive them.\n- Moderation records and the ID of a blocked phone: kept while the block lasts, and at most 24 months.\n- IP addresses on our server: about one hour, in memory only.\n- Data on your phone: until you clear the app's browser data or use \"Delete my data\".",
         ],
       },
       {
         h: "Your rights",
         p: [
-          "You can ask for access, correction, deletion, restriction, or object to processing, and ask for your data in a portable format. Because the ID is anonymous, we may ask you to show that you control it. Write to {email}; we answer within one month.",
-          "You can complain to the Hungarian National Authority for Data Protection and Freedom of Information (NAIH), 1055 Budapest, Falk Miksa utca 9-11, www.naih.hu, or go to court, or complain to the authority of your own EU country.",
+          "You can ask for access to your data, correction, deletion, restriction of processing and a copy in a portable format, and you can object to processing based on our legitimate interest.",
+          "The quickest ways:\n- **Copy of your data:** Settings > \"Download my data\" gives you a file with everything the server links to your ID.\n- **Deletion:** Settings > \"Delete my data\" deletes your ID, your profile name, the places you added with their votes and suggestions, your votes and suggestions on other places, your reports, and your alerts from the server, and clears the app on your phone. This cannot be undone.",
+          "You can also write to {email}. Because we do not know who you are, we may ask you to prove that you control the ID, for example with a code shown in your app's Settings. We answer within one month.",
+          "You can complain to the Hungarian National Authority for Data Protection and Freedom of Information (NAIH), 1055 Budapest, Falk Miksa utca 9-11, www.naih.hu, or to the data protection authority of the EU country where you live, or go to court.",
         ],
       },
       {
         h: "Children",
-        p: ["The app is only for people aged 16 and over."],
+        p: [
+          "The app is only for people aged 16 and over. If we learn that a user is younger, we delete their data.",
+        ],
+      },
+      {
+        h: "Changes",
+        p: [
+          "If we change this policy in a way that matters for you, we tell you in the app before the change takes effect.",
+        ],
       },
     ],
   },
   imprint: {
     title: "Imprint",
-    updated: UPDATED.en,
+    updated: "Last updated: 29 October 2026",
     sections: [
-      { h: "Service provider", p: ["{operator}", "{address}"] },
-      { h: "Contact", p: ["{email}", "{phone}", "Use this address for questions, privacy requests, takedown requests and notices about illegal content. We aim to reply within a few working days."] },
-      { h: "Service", p: ["magyarotyesz, a free community map of toilet door codes in Budapest. Not a commercial service; no fee is charged."] },
-      { h: "Hosting", p: ["Web app: Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA.", "Server: Oracle Cloud Infrastructure, Frankfurt, Germany."] },
-      { h: "Map data", p: ["Map © OpenFreeMap, © OpenMapTiles, data © OpenStreetMap contributors. Style based on the CartoDB basemaps (CC BY 3.0).", "Satellite: Powered by Esri. Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community."] },
+      {
+        h: "Service provider",
+        p: [
+          "{operator} (private individual)",
+          "{address}",
+        ],
+      },
+      {
+        h: "Contact",
+        p: [
+          "Email: {email}",
+          "Phone: {phone}",
+          "Use the email address for questions, privacy requests, removal requests from venues and notices about illegal content. Removal requests from venues are handled within 48 hours; other messages usually within a few working days. We answer in Hungarian and English.",
+        ],
+      },
+      {
+        h: "Service",
+        p: [
+          "magyarotyesz, a free community map of toilet door codes in Budapest. Not a commercial service; no fee is charged.",
+        ],
+      },
+      {
+        h: "Supervisory authorities",
+        p: [
+          "Data protection: Nemzeti Adatvédelmi és Információszabadság Hatóság (NAIH), 1055 Budapest, Falk Miksa utca 9-11, www.naih.hu.",
+          "EU Digital Services Act: Nemzeti Média- és Hírközlési Hatóság (NMHH), Hungary's Digital Services Coordinator, nmhh.hu.",
+        ],
+      },
+      {
+        h: "Hosting",
+        p: [
+          "Web app: Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA.",
+          "Server: Oracle Cloud Infrastructure, Frankfurt, Germany.",
+        ],
+      },
+      {
+        h: "Map data",
+        p: [
+          "Map © OpenFreeMap, © OpenMapTiles, data © OpenStreetMap contributors. Style based on the CartoDB basemaps (CC BY 3.0).",
+          "Satellite: Powered by Esri. Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community.",
+          "---",
+        ],
+      },
     ],
   },
 };
@@ -134,110 +194,179 @@ const en: Record<DocKey, Doc> = {
 const hu: Record<DocKey, Doc> = {
   terms: {
     title: "Felhasználási feltételek",
-    updated: UPDATED.hu,
-    intro: "A magyarotyesz egy ingyenes, közösségi térkép budapesti mosdók ajtókódjairól, üzemeltetője: {operator}. A használatával elfogadod ezeket a feltételeket.",
+    updated: "Utolsó frissítés: 2026. október 29.",
+    intro: "A magyarotyesz ingyenes, közösségi térkép budapesti mosdók ajtókódjairól. Üzemeltetője: {operator} ({address}, {email}). Az „Elmúltam 16 éves, és elfogadom” gomb megnyomásával elfogadod ezeket a feltételeket.",
     sections: [
       {
         h: "Mi ez",
-        p: ["Az emberek megosztják azoknak a mosdóknak a kódját, amiket használtak. Ezek a helyek nem a mieink, és nem vállalhatjuk, hogy egy kód helyes, naprakész, vagy hogy beengednek. A kódokat saját felelősségedre használd."],
+        p: [
+          "Az emberek megosztják azoknak a mosdóknak az ajtókódját, amelyeket használtak, köztük kávézók, éttermek és üzletek vendégeknek szánt mosdóiét is. Ezek a helyek nem a mieink, nem mi irányítjuk őket, és nem vállalhatjuk, hogy egy kód helyes, naprakész, vagy hogy beengednek. A kódokat saját belátásod szerint és saját felelősségedre használd.",
+        ],
       },
       {
         h: "Ki használhatja",
-        p: ["A magyarotyesz használatához legalább 16 évesnek kell lenned. Az appban nincs fiók: a telefonod véletlenszerű, névtelen azonosítót kap."],
+        p: [
+          "A magyarotyesz használatához legalább 16 évesnek kell lenned. Az appban nincs fiók: a telefonod véletlenszerű azonosítót kap, amely nem tartalmazza a nevedet és az elérhetőségedet.",
+        ],
       },
       {
         h: "Mit adhatsz hozzá",
         p: [
-          "Csak valódi, általad ténylegesen használt kódot adj hozzá, olyan helyről, amelyet megoszthatsz. Ne adj hozzá magánlakások, csak személyzetnek szánt vagy biztonsági területek kódját, sem bizalmasan kapott információt.",
-          "Ne adj meg sértő, gyűlöletkeltő, szexuális, jogellenes vagy félrevezető nevet vagy megjegyzést, senki személyes adatát, reklámot, spamet, hamis szavazatot. A nevek és megjegyzések automatikus szófilteren mennek át; ez biztonsági háló, nem garancia.",
-          "A tartalom jogai nálad maradnak, de engedélyt adsz arra, hogy a szolgáltatás működése alatt eltároljuk, mutassuk másoknak és eltávolítsuk.",
+          "Hozzáadhatod annak a mosdóajtónak a kódját, amelyet te magad használtál, akkor is, ha a mosdó egy hely vendégeinek szól (például a blokkra nyomtatott kód). A hely üzemeltetője bármikor kérheti az eltávolítását (lásd: Jelentés és eltávolítás).",
+          "Ne add hozzá:\n- magánlakások, csak személyzetnek szánt helyiségek, irodák, raktárak vagy biztonsági területek kódját;\n- kapuk, épületbejáratok, lépcsőházak vagy bármely olyan ajtó kódját, amely többet nyit egy mosdónál;\n- olyan kódot, amelyet a személyzet vagy más azzal a feltétellel mondott el, hogy megtartod magadnak;\n- sértő, gyűlöletkeltő, szexuális, jogellenes vagy félrevezető nevet vagy megjegyzést, más személyes adatát, reklámot, spamet vagy hamis szavazatot.",
+          "A nevek és megjegyzések automatikus szófilteren mennek át. Ez biztonsági háló, nem garancia.",
+          "A tartalmad jogai nálad maradnak. Ingyenes engedélyt adsz arra, hogy eltároljuk, megmutassuk más felhasználóknak és eltávolítsuk, amíg a szolgáltatás működik, vagy amíg nem törlöd.",
         ],
       },
       {
         h: "Jelentés és eltávolítás",
         p: [
-          "Minden helyen van Jelentés gomb. Ha egyetlen jelentés szerint a hely nem mosdó, azonnal elrejtjük; ha többen jelentik sértőnek vagy magánjellegűnek, az is elrejti. A rejtett hely addig rejtett marad, amíg valaki meg nem nézte. Eltávolítjuk a feltételeket vagy a jogszabályt sértő tartalmat, és letilthatjuk azt a telefont, amely ezt ismételten teszi.",
-          "Ha elrejtünk vagy eltávolítunk egy általad megosztott helyet, az appban (Profil, Értesítések) megmondjuk, miért.",
-          "Ha egy hely üzemeltetője vagy, és nem szeretnéd, hogy a kódjuk szerepeljen (például csak vendégeknek szól), írj a {email} címre a hely nevével és címével, és 48 órán belül eltávolítjuk. Ugyanide küldhetők a jogellenes tartalomról szóló bejelentések.",
-          "Az EU digitális szolgáltatásokról szóló rendelete (DSA) szerinti kapcsolattartó pont felhasználóknak és hatóságoknak: {email}. Magyarul és angolul válaszolunk.",
+          "Minden helyen van Jelentés gomb. A tartalmak elrejtésének szabályai:\n- ha valaki jelenti, hogy egy hely nem mosdó, az automatikusan, azonnal elrejtődik;\n- ha többen jelentik sértőnek vagy magánjellegűnek, az is automatikusan elrejtődik;\n- minden elrejtett helyet ezután az adminisztrátor (egy személy) megnéz, általában néhány napon belül, és vagy újra megjeleníti, vagy eltávolítja.",
+          "Eltávolítjuk a feltételeket vagy a jogszabályt sértő tartalmat. Letilthatjuk annak a telefonnak az azonosítóját, amely ismételten ilyen tartalmat ad hozzá.",
+          "**Ha egy hely üzemeltetője vagy**, és nem szeretnéd, hogy a kódja szerepeljen (például mert csak vendégeknek szól), írj a {email} címre a hely nevével és címével. 48 órán belül eltávolítjuk, és nem tesszük vissza.",
+          "**Jogellenes tartalomról szóló bejelentést** ugyanerre a címre vagy a Jelentés gombbal küldhetsz. Kérjük, írd meg, miért tartod jogellenesnek, és hol található az appban. Visszaigazoljuk a bejelentés beérkezését, és tájékoztatunk a döntésünkről. Ha az appból jelentettél, a válasz a Profil > Értesítések alatt jelenik meg.",
+          "**Ha elrejtünk vagy eltávolítunk valamit, amit megosztottál, vagy letiltjuk az azonosítódat,** az appban (Profil > Értesítések) megírjuk: mit tettünk, miért (a feltételek melyik pontja vagy melyik jogszabály alapján), automatikusan történt-e, és hogyan kifogásolhatod. Hat hónapon belül kérheted a döntés felülvizsgálatát a {email} címen; ezt ember vizsgálja meg, nem gép. Bírósághoz is fordulhatsz, vagy panaszt tehetsz Magyarország digitális szolgáltatási koordinátoránál, a Nemzeti Média- és Hírközlési Hatóságnál (NMHH, nmhh.hu).",
+          "Ha az appban valami olyan bűncselekmény gyanújára utal, amely valakinek az életét vagy biztonságát veszélyezteti, azt jelentjük a rendőrségnek.",
+          "Az EU digitális szolgáltatásokról szóló rendelete (DSA, 11. és 12. cikk) szerinti kapcsolattartó pont a felhasználók és a hatóságok számára: {email}. Magyarul és angolul válaszolunk.",
         ],
       },
       {
         h: "Ki a felelős",
         p: [
-          "A magyarotyesz csak azt adja tovább, amit a felhasználók megosztanak. Nem mi nyitjuk az ajtókat, senkinek nem adunk engedélyt egy helyre való belépéshez, és nem vagyunk szerződő fél közted és a hely üzemeltetője között. Az, hogy egy kód működik, nem jogosít fel belépésre.",
-          "Te felelsz azért, amit egy kóddal teszel, és azért, amit megosztasz. Ha egy kód használatával kárt vagy sérelmet okozol, azért a tulajdonosnak vagy a károsultnak felelsz, nem a magyarotyesznek. Ha olyan kódot osztasz meg, amelyet nem jogosult vagy megosztani, vagy amely többet nyit egy mosdónál, azért is te felelsz.",
-          "Mi a felhasználók által feltöltött tartalom tárhelyszolgáltatója vagyunk. Nem ellenőrzünk előre minden bejegyzést, de a jogsértő vagy jelentett tartalmat, amint tudomást szerzünk róla, gyorsan eltávolítjuk (lásd: Jelentés és eltávolítás). A többi felhasználó bejegyzései az övéik, nem a mieink.",
-          "E feltételek egyike sem korlátozza azt a felelősséget, amelyet jogszabály nem enged korlátozni, például a szándékosan vagy súlyos gondatlansággal okozott kárért, illetve az élet, testi épség vagy egészség károsításáért.",
+          "A magyarotyesz csak azt adja tovább, amit a felhasználók megosztanak. Nem mi nyitjuk az ajtókat, senkinek nem adunk engedélyt egy helyre való belépéshez, és nem vagyunk fél közted és a hely üzemeltetője között. Az, hogy egy kód működik, nem jogosít fel a belépésre. Ha egy mosdó a vendégeknek szól, ezt tartsd tiszteletben.",
+          "Te felelsz azért, amit egy kóddal teszel, és azért, amit megosztasz. Ha olyan kódot osztasz meg, amelyet nem lett volna szabad, vagy amely többet nyit egy mosdónál, azért te felelsz.",
+          "A felhasználók által feltöltött tartalom tárhelyszolgáltatója vagyunk. Nem ellenőrzünk előre minden bejegyzést, de a jogellenes tartalmat, amint tudomást szerzünk róla, gyorsan eltávolítjuk (lásd: Jelentés és eltávolítás). A többi felhasználó bejegyzései az övéik, nem a mieink.",
+          "E feltételek egyike sem korlátozza azt a felelősséget, amelyet jogszabály nem enged korlátozni, például a szándékosan vagy súlyos gondatlansággal okozott kárért, illetve az élet, a testi épség vagy az egészség megsértéséért való felelősséget.",
         ],
       },
       {
         h: "Garancia nélkül",
-        p: ["A szolgáltatás ingyenes, ahogy van. Nem garantáljuk, hogy elérhető, pontos vagy hibamentes. A jogszabályok adta keretek között nem felelünk téves vagy elavult kódból, illetve az elérhetetlenségből eredő kárért. Ez nem korlátozza azt a felelősséget, amelyet jogszabály nem enged korlátozni."],
+        p: [
+          "A szolgáltatás ingyenes, és olyan, amilyen. Nem garantáljuk, hogy elérhető, pontos vagy hibamentes. A jogszabályok által megengedett mértékben nem felelünk a téves vagy elavult kódból, illetve a szolgáltatás elérhetetlenségéből eredő kárért.",
+        ],
+      },
+      {
+        h: "A használat befejezése",
+        p: [
+          "Bármikor abbahagyhatod a magyarotyesz használatát, és törölheted az adataidat a Beállításokban („Adataim törlése”). Mi befejezhetjük vagy szüneteltethetjük a szolgáltatást; ha megszüntetjük, ezt lehetőség szerint legalább 30 nappal előre jelezzük az appban.",
+        ],
       },
       {
         h: "Változások, irányadó jog",
-        p: ["A feltételeket és a szolgáltatást módosíthatjuk; a fenti dátum a legfrissebb változatot mutatja. A magyar jog az irányadó, a fogyasztók megtartják a lakóhelyük kötelező jogából fakadó jogaikat."],
+        p: [
+          "A feltételeket módosíthatjuk. Ha egy változás érint téged, azt a hatálybalépése előtt megmutatjuk az appban, és újra kérjük az elfogadásodat; ha nem értesz egyet, abbahagyhatod az app használatát és törölheted az adataidat. A fenti dátum a hatályos változatot mutatja.",
+          "A magyar jog az irányadó. Ha fogyasztó vagy, megtartod a lakóhelyed szerinti ország kötelező jogának védelmét, és ott is fordulhatsz bírósághoz.",
+        ],
       },
     ],
   },
   privacy: {
     title: "Adatkezelési tájékoztató",
-    updated: UPDATED.hu,
-    intro: "Az adataid kezelője: {operator}, {address}, {email}. Csak azt kezeljük, amire az appnak szüksége van.",
+    updated: "Utolsó frissítés: 2026. október 29.",
+    intro: "Az adataid kezelője: {operator}, {address}, {email}, {phone}. Csak azt kezeljük, amire az appnak szüksége van.",
     sections: [
       {
         h: "Milyen adatokat kezelünk",
         p: [
-          "Névtelen azonosító: amikor először használod a közös térképet, a telefonod kap egy véletlenszerű azonosítót és egy titkos tokent. A szerver a tokennek csak a hash-ét tárolja, valamint azt, hogy mely helyeket és mikor adtál hozzá. Nincs név, e-mail-cím vagy telefonszám.",
-          "Profilnév: nem kötelező. Ha megadsz egy nevet, az a névtelen azonosítódhoz kötve tárolódik a szerveren. Csak te és az adminisztrátor látja, egyetlen helynél sem jelenik meg.",
-          "Hozzájárulásaid: a hozzáadott helyek (név, kód, fajta, nyitva tartás, megjegyzés, helyzet), szavazataid, kódjavaslataid és jelentéseid.",
-          "Helyadat: a telefonod pozícióját az eszközön olvassuk, hogy megmutassuk, hol vagy, és a közeli helyeket. Hely hozzáadásakor és szavazáskor a pozíciód elküldjük a kéréssel, hogy a szerver ellenőrizze, hogy kb. 150 méteren belül vagy; a szerver nem tárolja. A hozzájárulásodat bármikor visszavonhatod: kapcsold ki a Beállításokban a „Helyem használata” kapcsolót, vagy a telefon / böngésző helybeállításaiban az appot.",
-          "Technikai adat: az IP-címedet a szolgáltatás nyújtásához és a visszaélések korlátozásához kezeljük. A szerverünk nem ír hozzáférési naplót: a címet kb. egy órán át a memóriában tartja a visszaélések korlátozásához, aztán elfelejti. Az alább megnevezett szolgáltatók saját technikai naplót vezetnek.",
-          "A telefonodon: a beállítások, a helyek másolata és az elküldésre váró műveletek a böngésző helyi tárolójában vannak. Ez az app működéséhez feltétlenül szükséges, ezért nincs sütibanner. Nem használunk analitikát vagy hirdetési követőket.",
+          "**Azonosító.** Amikor először használod a közös térképet, a telefonod kap egy véletlenszerű azonosítót és egy titkos tokent. A szerver tárolja az azonosítót, a token hash-ét, és azt, hogy mely helyeket és mikor adtad hozzá. Nincs név, e-mail-cím vagy telefonszám, de az azonosító a GDPR szerint így is személyes adat, mert összeköti a hozzájárulásaidat. Ezért álnevesnek, nem névtelennek nevezzük.",
+          "**Profilnév (nem kötelező).** Ha megadsz egy nevet, az az azonosítódhoz kötve tárolódik a szerveren. Csak te és az adminisztrátor látja, egyetlen helynél sem jelenik meg.",
+          "**Hozzájárulásaid.** A hozzáadott helyek (név, kód, fajta, nyitva tartás, megjegyzés, helyzet, dátum), a szavazataid, a kódjavaslataid és a jelentéseid, a jelentéshez írt üzenettel együtt. Mivel egy hely megmutatja, hol van a mosdó és mikor adtad hozzá, abból kiderülhet, hol voltál akkor.",
+          "**Helyadat.** A telefonod pozícióját a telefonon olvassuk, hogy megmutassuk, hol vagy, és sorba rendezzük a közeli helyeket. Hely hozzáadásakor, szavazáskor, kódjavaslatkor és jelentéskor a pozíciódat elküldjük a kéréssel, hogy a szerver ellenőrizze, hogy kb. 150 méteren belül vagy a mosdótól. A szerver csak erre az ellenőrzésre használja, és nem tárolja. A helymeghatározás csak akkor működik, ha engedélyezed, és bármikor kikapcsolhatod a Beállításokban („Helyem használata”) vagy a telefon, illetve a böngésző beállításaiban. Nélküle is böngészheted a térképet; csak a kódok hozzáadásához és ellenőrzéséhez kell.",
+          "**Üzenetek.** Ha visszajelzést küldesz, eltároljuk az üzenetedet és, ha megadod, a „Hogyan válaszolhatunk?” mezőbe írt elérhetőséget. Ha az adminisztrátor üzenetet küld neked, az az azonosítódhoz kötve tárolódik, hogy láthasd az Értesítések alatt.",
+          "**Moderálási nyilvántartás.** Ha egy helyet elrejtünk vagy eltávolítunk, vagy letiltunk egy azonosítót, megőrizzük, mit döntöttünk, miért és mikor.",
+          "**Technikai adat.** Az IP-címedet a szolgáltatás nyújtásához és a visszaélések korlátozásához kezeljük. A szerverünk nem ír hozzáférési naplót: a címet kb. egy órán át a memóriában tartja a visszaélések korlátozásához, aztán elfelejti. Az alább megnevezett szolgáltatók saját technikai naplót vezetnek.",
+          "**A telefonodon.** A beállítások, a helyek másolata, a profilképed (amely sosem hagyja el a telefont) és az elküldésre váró műveletek a böngésző helyi tárolójában vannak. Ez a kért app működéséhez feltétlenül szükséges, ezért nincs szükség sütibannerre. Nem használunk analitikát és hirdetési követőket.",
         ],
       },
       {
         h: "Miért és milyen jogalapon",
-        p: ["A kért közös térkép működtetéséhez (szerződés teljesítése, GDPR 6. cikk (1) b)), valamint a visszaélések és jogellenes tartalmak elleni védelemhez (jogos érdek, 6. cikk (1) f)). A helyadatot csak akkor használjuk, ha engedélyezed az eszközödnek a megosztást (6. cikk (1) a))."],
+        p: [
+          "- A kért közös térkép működtetése, ideértve az azonosítót, a hozzájárulásaidat és a moderálási üzeneteket: a szolgáltatás nyújtása (GDPR 6. cikk (1) b)).\n- A térkép biztonsága, a visszaélések és a jogellenes tartalmak elleni védelem (IP-alapú korlátozás, jelentések, moderálási nyilvántartás, letiltás): jogos érdekünk egy használható és jogszerű szolgáltatáshoz (6. cikk (1) f)), valamint az EU digitális szolgáltatásokról szóló rendeletéből fakadó kötelezettségeink (6. cikk (1) c)).\n- A helyszíni helyellenőrzés: a hozzájárulásod, amelyet a helymeghatározás engedélyezésével adsz (6. cikk (1) a)). Bármikor visszavonhatod; ez nem érinti a már elvégzett ellenőrzéseket.\n- Visszajelzések: jogos érdekünk, hogy válaszoljunk és javítsuk az appot (6. cikk (1) f)).",
+          "Ahol jogos érdekre hivatkozunk, bármikor tiltakozhatsz (lásd: Jogaid).",
+        ],
       },
       {
         h: "Ki látja még",
         p: [
-          "Szerver: Oracle Cloud Infrastructure, Frankfurt, Németország (EU). Az Oracle amerikai cég; ha az adatokhoz az EU-n kívülről is hozzá lehet férni, az átadás az EU–USA adatvédelmi keretrendszerre (Data Privacy Framework) és/vagy általános szerződési feltételekre (SCC) támaszkodik, az Oracle adatfeldolgozási feltételei szerint.",
-          "Az app kiszolgálása: Vercel Inc., USA. Szolgálja ki a webappot, betöltéskor látja az IP-címedet. Az átadás az EU–USA adatvédelmi keretrendszerre és/vagy általános szerződési feltételekre támaszkodik, a Vercel adatfeldolgozási feltételei szerint.",
-          "Térképcsempék: OpenFreeMap (openfreemap.org), OpenStreetMap adatokkal. Látja az IP-címedet és a megnézett térképterületet. Nincs vele szerződésünk, ingyenes nyilvános szolgáltatás.",
-          "Műholdas nézet: Esri Inc., USA, server.arcgisonline.com. Látja az IP-címedet és a térképterületet. Az adattovábbítás az EU–USA adatvédelmi keretrendszeren (DPF) és/vagy általános szerződési feltételeken alapul, az Esri feltételei szerint.",
-          "Címkeresés: Photon (Komoot, Németország, EU) és OpenStreetMap Nominatim (OpenStreetMap Foundation, Egyesült Királyság). Látják, amit beírsz, a területet és az IP-címedet.",
-          "Adatot nem adunk el. Ahol a szolgáltató az EU-n kívül van, az átadás jogalapja a fent megnevezett, vagy az adott ország megfelelőségi határozata.",
+          "Adatot nem adunk el. Ezek a szolgáltatók vesznek részt:\n- **Szerver:** Oracle Cloud Infrastructure, Frankfurt, Németország (EU). Itt tárolódnak a szerveradatok. Az Oracle amerikai cég; az EU-n kívüli esetleges hozzáférésre az EU–USA adatvédelmi keretrendszer (Data Privacy Framework) és/vagy az Oracle adatfeldolgozási feltételeiben szereplő általános szerződési feltételek (SCC) vonatkoznak.\n- **Szervercím:** a szervert az sslip.io-n keresztül érjük el. Ez egy ingyenes DNS-szolgáltatás, amely a szerver nevét IP-címre fordítja. Csak a névfeloldást végzi, az adataidat nem látja.\n- **Az app kiszolgálása:** Vercel Inc., USA. Kiszolgálja a webappot, és betöltéskor látja az IP-címedet. Az adattovábbításra az EU–USA adatvédelmi keretrendszer és/vagy a Vercel adatfeldolgozási feltételeiben szereplő általános szerződési feltételek vonatkoznak.\n- **Térképcsempék:** OpenFreeMap (openfreemap.org), OpenStreetMap adatokkal. Látja az IP-címedet és a megnézett térképterületet. Ingyenes, nyilvános szolgáltatás; nincs vele szerződésünk.\n- **Műholdas nézet:** Esri Inc., USA (server.arcgisonline.com). Csak ha bekapcsolod a műholdas nézetet, akkor látja az IP-címedet és a térképterületet. Az adattovábbításra az EU–USA adatvédelmi keretrendszer és/vagy az Esri feltételeiben szereplő általános szerződési feltételek vonatkoznak.\n- **Címkeresés:** a Photon (Komoot, Németország, EU) gépelés közben ad javaslatokat. Az OpenStreetMap Nominatimot (OpenStreetMap Foundation, Egyesült Királyság) csak akkor kérdezzük, ha megnyomod a Keresés gombot. Látják, amit beírtál, a térképterületet és az IP-címedet. Az Egyesült Királyságba történő továbbítás az Európai Bizottság megfelelőségi határozatán alapul.",
         ],
       },
       {
-        h: "Meddig",
-        p: ["A helyek, szavazatok, javaslatok és jelentések a törlésükig megmaradnak. Ha egy helyet törölnek, a szavazatai, javaslatai és jelentései is törlődnek vele. A hozzáadott helyeidet a Profil fülön törölheted; adminisztrátor törölhet vagy elrejthet helyeket és letilthat a feltételeket sértő azonosítókat. A névtelen azonosítód és az opcionális neved addig marad, amíg nem kéred a törlésüket. A szerverünk nem tart hozzáférési naplót. A telefonodon tárolt adatokat (a profilfotóddal együtt, ami sosem hagyja el a telefont) a böngészőadatok törlésével távolíthatod el."],
+        h: "Meddig őrizzük meg az adatokat",
+        p: [
+          "- A helyek addig maradnak a térképen, amíg te, az adminisztrátor vagy egy hely üzemeltetőjének kérése el nem távolítja őket. Egy hely törlésekor a hozzá tartozó szavazatok, javaslatok és jelentések is törlődnek.\n- Az azonosítód, a profilneved, valamint a közted és a hozzájárulásaid közötti kapcsolat: az „Adataim törlése” használatakor, vagy automatikusan 24 hónap inaktivitás után törlődik. Automatikus törlés után az általad hozzáadott helyek a térképen maradnak, de már nem kapcsolódnak hozzád.\n- A jelentések és üzeneteik: a kezelésük után 6 hónappal törlődnek.\n- A visszajelzések és a megadott elérhetőségek: a beérkezésük után 12 hónappal törlődnek.\n- A moderálási nyilvántartás és a letiltott telefon azonosítója: a letiltás idejéig, legfeljebb 24 hónapig.\n- Az IP-címek a szerverünkön: kb. egy óráig, csak a memóriában.\n- A telefonodon tárolt adatok: amíg nem törlöd az app böngészőadatait, vagy nem használod az „Adataim törlése” funkciót.",
+        ],
       },
       {
         h: "Jogaid",
         p: [
-          "Kérhetsz hozzáférést, helyesbítést, törlést, korlátozást, tiltakozhatsz az adatkezelés ellen, és kérheted az adataid hordozhatóságát. Mivel az azonosító névtelen, kérhetjük, hogy igazold, hogy a tiéd. Írj a {email} címre; egy hónapon belül válaszolunk.",
-          "Panasszal fordulhatsz a Nemzeti Adatvédelmi és Információszabadság Hatósághoz (NAIH), 1055 Budapest, Falk Miksa utca 9-11., www.naih.hu, bírósághoz, vagy a saját EU-s országod hatóságához.",
+          "Kérhetsz hozzáférést az adataidhoz, helyesbítést, törlést, az adatkezelés korlátozását és az adataid hordozható formában való kiadását, valamint tiltakozhatsz a jogos érdeken alapuló adatkezelés ellen.",
+          "A leggyorsabb módok:\n- **Másolat az adataidról:** Beállítások > „Adataim letöltése”: egy fájlt kapsz mindenről, amit a szerver az azonosítódhoz köt.\n- **Törlés:** Beállítások > „Adataim törlése”: a szerverről törli az azonosítódat, a profilnevedet, az általad hozzáadott helyeket a szavazataikkal és javaslataikkal, a más helyekre adott szavazataidat és javaslataidat, a jelentéseidet és az értesítéseidet, és kiüríti az appot a telefonodon. Nem vonható vissza.",
+          "Írhatsz a {email} címre is. Mivel nem tudjuk, ki vagy, kérhetjük, hogy igazold, hogy az azonosító a tiéd, például az app Beállításaiban látható kóddal. Egy hónapon belül válaszolunk.",
+          "Panaszt tehetsz a Nemzeti Adatvédelmi és Információszabadság Hatóságnál (NAIH), 1055 Budapest, Falk Miksa utca 9-11., www.naih.hu, vagy annak az EU-s országnak az adatvédelmi hatóságánál, ahol élsz, illetve bírósághoz fordulhatsz.",
         ],
       },
       {
         h: "Gyermekek",
-        p: ["Az app csak 16 éves és idősebb felhasználóknak szól."],
+        p: [
+          "Az app csak 16 éves és idősebb felhasználóknak szól. Ha kiderül, hogy egy felhasználó fiatalabb, töröljük az adatait.",
+        ],
+      },
+      {
+        h: "Változások",
+        p: [
+          "Ha ezt a tájékoztatót olyan módon változtatjuk meg, amely érint téged, a hatálybalépés előtt jelezzük az appban.",
+        ],
       },
     ],
   },
   imprint: {
     title: "Impresszum",
-    updated: UPDATED.hu,
+    updated: "Utolsó frissítés: 2026. október 29.",
     sections: [
-      { h: "Szolgáltató", p: ["{operator}", "{address}"] },
-      { h: "Kapcsolat", p: ["{email}", "{phone}", "Kérdésekkel, adatkezelési kérésekkel, eltávolítási kérésekkel és jogellenes tartalomról szóló bejelentésekkel erre a címre írj. Néhány munkanapon belül igyekszünk válaszolni."] },
-      { h: "Szolgáltatás", p: ["magyarotyesz, ingyenes közösségi térkép budapesti mosdók ajtókódjairól. Nem üzleti szolgáltatás, díjat nem számítunk fel."] },
-      { h: "Tárhely", p: ["Webapp: Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA.", "Szerver: Oracle Cloud Infrastructure, Frankfurt, Németország."] },
-      { h: "Térképadatok", p: ["Térkép © OpenFreeMap, © OpenMapTiles, adatok © OpenStreetMap közreműködők. A stílus a CartoDB alaptérképeken alapul (CC BY 3.0).", "Műholdkép: Powered by Esri. Forrás: Esri, Vantor, Earthstar Geographics és a GIS User Community."] },
+      {
+        h: "Szolgáltató",
+        p: [
+          "{operator} (magánszemély)",
+          "{address}",
+        ],
+      },
+      {
+        h: "Kapcsolat",
+        p: [
+          "E-mail: {email}",
+          "Telefon: {phone}",
+          "Kérdésekkel, adatkezelési kérésekkel, helyek üzemeltetőitől érkező eltávolítási kérésekkel és jogellenes tartalomról szóló bejelentésekkel az e-mail-címre írj. Az üzemeltetők eltávolítási kéréseit 48 órán belül, a többi üzenetet általában néhány munkanapon belül intézzük. Magyarul és angolul válaszolunk.",
+        ],
+      },
+      {
+        h: "Szolgáltatás",
+        p: [
+          "magyarotyesz, ingyenes közösségi térkép budapesti mosdók ajtókódjairól. Nem üzleti szolgáltatás, díjat nem számítunk fel.",
+        ],
+      },
+      {
+        h: "Felügyeleti hatóságok",
+        p: [
+          "Adatvédelem: Nemzeti Adatvédelmi és Információszabadság Hatóság (NAIH), 1055 Budapest, Falk Miksa utca 9-11., www.naih.hu.",
+          "EU digitális szolgáltatásokról szóló rendelet: Nemzeti Média- és Hírközlési Hatóság (NMHH), Magyarország digitális szolgáltatási koordinátora, nmhh.hu.",
+        ],
+      },
+      {
+        h: "Tárhely",
+        p: [
+          "Webapp: Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA.",
+          "Szerver: Oracle Cloud Infrastructure, Frankfurt, Németország.",
+        ],
+      },
+      {
+        h: "Térképadatok",
+        p: [
+          "Térkép © OpenFreeMap, © OpenMapTiles, adatok © OpenStreetMap közreműködők. A stílus a CartoDB alaptérképeken alapul (CC BY 3.0).",
+          "Műholdkép: Powered by Esri. Forrás: Esri, Vantor, Earthstar Geographics és a GIS User Community.",
+          "---",
+        ],
+      },
     ],
   },
 };

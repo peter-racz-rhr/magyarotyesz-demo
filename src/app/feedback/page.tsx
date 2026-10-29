@@ -85,6 +85,7 @@ export default function FeedbackPage() {
             </label>
             {state === "failed" && <p role="alert" className="text-sm text-stale">{t.feedback.failed}</p>}
             {state === "limited" && <p role="alert" className="text-sm text-stale">{t.feedback.limited}</p>}
+            <p className="text-[0.8125rem] leading-relaxed text-haze">{t.feedback.note}</p>
             <button type="submit" disabled={state === "sending" || message.trim().length < 3} className={cn(btn.primary, btn.md, "mt-1 gap-2")}>
               <Send className="size-4" aria-hidden /> {state === "sending" ? t.feedback.sending : t.feedback.send}
             </button>

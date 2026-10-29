@@ -23,6 +23,27 @@ function fill(text: string, missing: string) {
   });
 }
 
+/** One paragraph of a legal text: plain lines, "- " list items and **bold**, with the operator's details filled in. */
+function Para({ text, missing, className }: { text: string; missing: string; className: string }) {
+  const lines = text.split("\n");
+  const first = lines.findIndex((l) => l.startsWith("- "));
+  const lead = first === -1 ? lines : lines.slice(0, first);
+  const items = first === -1 ? [] : lines.slice(first).map((l) => l.slice(2));
+  const rich = (line: string) => line.split(/(\*\*[^*]+\*\*)/).map((part, i) => (part.startsWith("**") ? <strong key={i}>{fill(part.slice(2, -2), missing)}</strong> : <span key={i}>{fill(part, missing)}</span>));
+  return (
+    <div className={className}>
+      {lead.length > 0 && <p>{rich(lead.join(" "))}</p>}
+      {items.length > 0 && (
+        <ul className="mt-1 list-disc space-y-1 pl-5">
+          {items.map((item) => (
+            <li key={item}>{rich(item)}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 /** The text of one document without the page around it (used where the terms must be read before agreeing). */
 export function LegalBody({ doc }: { doc: DocKey }) {
   const { t } = useT();
@@ -37,9 +58,7 @@ export function LegalBody({ doc }: { doc: DocKey }) {
         <section key={s.h} className="mt-6">
           <h3 className="text-[1.0625rem] font-semibold">{s.h}</h3>
           {s.p.filter((p) => p !== "{phone}" || OPERATOR.phone).map((p) => (
-            <p key={p} className="mt-2 text-[0.9375rem] leading-relaxed text-ink/85">
-              {fill(p, t.legal.missing)}
-            </p>
+            <Para key={p} text={p} missing={t.legal.missing} className="mt-2 text-[0.9375rem] leading-relaxed text-ink/85" />
           ))}
         </section>
       ))}
@@ -64,9 +83,7 @@ export function LegalPage({ doc }: { doc: DocKey }) {
           <section key={s.h} className="mt-7">
             <h2 className="t-section">{s.h}</h2>
             {s.p.filter((p) => p !== "{phone}" || OPERATOR.phone).map((p) => (
-              <p key={p} className="mt-2 leading-relaxed text-ink/85">
-                {fill(p, t.legal.missing)}
-              </p>
+              <Para key={p} text={p} missing={t.legal.missing} className="mt-2 leading-relaxed text-ink/85" />
             ))}
           </section>
         ))}

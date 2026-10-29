@@ -3,7 +3,7 @@
 import { ArrowLeft, Bell, Box, CloudDownload, Layers, Megaphone, MessageSquare, Moon, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BACK, PageTransition } from "@/components/page-transition";
 import { MapStylePicker } from "@/components/map-style-picker";
 import { PalettePicker } from "@/components/palette-picker";
@@ -19,7 +19,7 @@ import { replayIntro } from "@/lib/onboarding";
 import { normalizePalette } from "@/lib/palettes";
 import { updateSettings, useSettings, type Lang, type Settings } from "@/lib/settings";
 import { useLook } from "@/lib/theme";
-import { fetchMyData, useUserId } from "@/lib/sync";
+import { deleteMyData, fetchMyData, hasIdentity, useUserId, verifyCode } from "@/lib/sync";
 import { addDemoToilets, clearAlerts, clearToilets, simulateActivity, useToilets } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
 
@@ -140,6 +140,12 @@ export default function SettingsPage() {
   const [notifyBlocked, setNotifyBlocked] = useState(false);
   const [locationBlocked, setLocationBlocked] = useState(false);
   const [exported, setExported] = useState(false);
+  const [code, setCode] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState<"idle" | "busy" | "failed">("idle");
+  useEffect(() => {
+    if (REMOTE) void verifyCode().then(setCode);
+  }, [userId]);
   const mine = toilets.filter((x) => x.mine);
   const docs = legalFor(lang);
 
@@ -329,10 +335,51 @@ export default function SettingsPage() {
         <Group id="data-heading" title={t.settings.dataGroup} footer={exported ? t.settings.exported : t.settings.footerData}>
           <LinkRow icon={<Download />} hue={212} title={t.settings.export} onClick={() => void exportData()} chevron={false} />
           {REMOTE && <LinkRow icon={<KeyRound />} hue={268} title={t.settings.backup} href="/backup" />}
+          {REMOTE && code && (
+            <li className="flex min-h-[3.25rem] items-center gap-3.5 px-4 py-2 text-[1rem]">
+              <Tile hue={150}>
+                <ShieldCheck />
+              </Tile>
+              <span className="min-w-0 flex-1">
+                {t.settings.verifyCode}
+                <span className="block text-[0.8125rem] leading-snug text-haze">{t.settings.verifyCodeSub}</span>
+              </span>
+              <span className="font-mono text-[1.0625rem] font-semibold tracking-widest select-all">{code}</span>
+            </li>
+          )}
           <LinkRow icon={<FileText />} tone="grey" title={docs.terms.title} href="/terms" />
           <LinkRow icon={<ShieldCheck />} tone="grey" title={docs.privacy.title} href="/privacy" />
           <LinkRow icon={<Landmark />} tone="grey" title={docs.imprint.title} href="/imprint" />
         </Group>
+
+        {REMOTE && hasIdentity() && (
+          <Group id="delete-data" plain>
+            {confirmDelete ? (
+              <li className="flex flex-col gap-3 px-4 py-3">
+                <span className="text-sm">{t.settings.deleteMyDataConfirm}</span>
+                {deleting === "failed" && <span role="alert" className="text-sm text-stale">{t.settings.deleteMyDataFailed}</span>}
+                <span className="flex gap-2">
+                  <button type="button" onClick={() => setConfirmDelete(false)} className={cn(btn.secondary, btn.sm, "flex-1")}>
+                    {t.settings.deleteMyDataCancel}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={deleting === "busy"}
+                    onClick={async () => {
+                      setDeleting("busy");
+                      if ((await deleteMyData()) !== "ok") setDeleting("failed");
+                    }}
+                    className={cn(btn.sm, "inline-flex flex-1 items-center justify-center rounded-full bg-bad font-semibold text-night active:scale-[0.97] disabled:opacity-60")}
+                  >
+                    {t.settings.deleteMyDataGo}
+                  </button>
+                </span>
+              </li>
+            ) : (
+              <LinkRow icon={<Trash2 />} tone="bad" danger title={t.settings.deleteMyData} onClick={() => setConfirmDelete(true)} chevron={false} />
+            )}
+          </Group>
+        )}
 
         {!REMOTE && (mine.length > 0 || !toilets.some((x) => !x.mine)) && (
           <Group id="demo-heading" title={t.profile.demo} footer={t.profile.demoSub}>
