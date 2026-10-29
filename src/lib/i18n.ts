@@ -1,6 +1,7 @@
 "use client";
 
 import { de } from "./i18n-de";
+import { REMOTE } from "./api";
 import { OPERATOR } from "./legal";
 import type { SpotCheck } from "./on-the-spot";
 import { useSettings, type Lang } from "./settings";
@@ -286,10 +287,11 @@ const en = {
   },
   spot: {
     far: (m: number) =>
-      `You're ${formatDistance(m)} away. Codes can only be added or checked on the spot, within 150 m. (For the demo you can turn this off in Profile.)`,
+      `You're ${formatDistance(m)} away. Codes can only be added or checked on the spot, within 150 m.`,
     location: "Turn on location: codes can only be added or checked on the spot.",
     vague: (m: number) => `Your location is too vague right now (about ${m} m). Step outside or wait a moment, then try again.`,
     checking: "Checking you're there…",
+    demoHint: " (For the demo you can turn this off in Profile.)",
     off: "Location is off. Turn it on in Settings: codes can only be added or checked on the spot.",
   },
 
@@ -795,10 +797,11 @@ const hu: Dict = {
   },
   spot: {
     far: (m: number) =>
-      `${formatDistance(m)}-re vagy. Kódot csak a helyszínen, 150 m-en belül lehet hozzáadni vagy ellenőrizni. (A demóhoz kikapcsolhatod a Profilban.)`,
+      `${formatDistance(m)}-re vagy. Kódot csak a helyszínen, 150 m-en belül lehet hozzáadni vagy ellenőrizni.`,
     vague: (m: number) => `A helyzeted most túl pontatlan (kb. ${m} m). Menj ki, vagy várj egy kicsit, aztán próbáld újra.`,
     location: "Kapcsold be a helymeghatározást: kódot csak a helyszínen lehet hozzáadni vagy ellenőrizni.",
     checking: "Ellenőrizzük, hogy ott vagy…",
+    demoHint: " (A demóhoz kikapcsolhatod a Profilban.)",
     off: "A helymeghatározás ki van kapcsolva. Kapcsold be a Beállításokban: kódot csak a helyszínen lehet hozzáadni vagy ellenőrizni.",
   },
 
@@ -1037,7 +1040,8 @@ export function alertLine(t: Dict, alert: { kind: "report" | "suggestion" | "rem
 
 /** The sentence for a failed on-the-spot check. */
 export function spotMessage(t: Dict, spot: SpotCheck & { ok: false }) {
-  if (spot.reason === "far") return t.spot.far(spot.metres);
+  // The demo can switch the check off in Profile; with the shared server the check is always on.
+  if (spot.reason === "far") return t.spot.far(spot.metres) + (REMOTE ? "" : t.spot.demoHint);
   if (spot.reason === "vague") return t.spot.vague(spot.metres);
   if (spot.reason === "off") return t.spot.off;
   return t.spot.location;

@@ -281,10 +281,11 @@ export const de: Dict = {
   },
   spot: {
     far: (m: number) =>
-      `Du bist ${formatDistance(m)} entfernt. Codes können nur vor Ort hinzugefügt oder geprüft werden, innerhalb von 150 m. (Für die Demo kannst du das im Profil ausschalten.)`,
+      `Du bist ${formatDistance(m)} entfernt. Codes können nur vor Ort hinzugefügt oder geprüft werden, innerhalb von 150 m.`,
     location: "Schalte den Standort ein: Codes können nur vor Ort hinzugefügt oder geprüft werden.",
     vague: (m: number) => `Dein Standort ist gerade zu ungenau (etwa ${m} m). Geh nach draußen oder warte kurz und versuche es dann erneut.`,
     checking: "Prüfe, ob du da bist…",
+    demoHint: " (Für die Demo kannst du das im Profil ausschalten.)",
     off: "Der Standort ist aus. Schalte ihn in den Einstellungen ein: Codes können nur vor Ort hinzugefügt oder geprüft werden.",
   },
 

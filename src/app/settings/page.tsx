@@ -283,8 +283,8 @@ export default function SettingsPage() {
                   role="radio"
                   aria-checked={settings.textSize === key}
                   onClick={() => updateSettings({ textSize: key })}
-                  className={cn("min-h-9 min-w-0 flex-1 rounded-full px-2 py-1 leading-tight font-semibold transition-colors", settings.textSize === key ? "bg-ink text-night" : "text-haze")}
-                  style={{ fontSize: `${0.8125 + i * 0.125}rem` }}
+                  className={cn("min-h-9 min-w-0 flex-1 rounded-full px-1 py-1 leading-tight font-semibold whitespace-nowrap transition-colors", settings.textSize === key ? "bg-ink text-night" : "text-haze")}
+                  style={{ fontSize: `${0.8125 + i * 0.0625}rem` }}
                 >
                   {t.settings.textNames[key]}
                 </button>

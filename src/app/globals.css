@@ -768,8 +768,15 @@ html[data-glass="liquid"][data-theme] .lq-surface[data-liquid-variant="clear"] {
   --lq-brighten: 1;
   --lq-glow: 0;
 }
-html[data-glass="liquid"][data-theme="light"] .lq-surface {
-  --lq-line: rgb(0 0 0 / 0.1);
+/* On the light theme a clear pill would vanish into the pale map: a frosted white veil, a fine dark edge and a soft shadow make every button and bar stand out. */
+html[data-glass="liquid"][data-theme="light"] .lq-surface,
+html[data-glass="liquid"][data-theme="light"] .lq-surface[data-liquid-variant="clear"] {
+  --lq-fill: rgb(255 255 255 / 0.5);
+  --lq-line: rgb(20 25 40 / 0.16);
+  --lq-shadow-color: rgb(25 30 45 / 0.3);
+}
+html[data-glass="liquid"][data-theme="light"] .lq-icon-button {
+  background: rgb(255 255 255 / 0.5);
 }
 html[data-glass="liquid"][data-theme="dark"] .lq-surface .dock-disc,
 html[data-glass="liquid"][data-theme] .dock-disc {
@@ -796,7 +803,7 @@ html[data-theme][data-glass] .lq-surface.filter-card.filter-card.filter-card {
 html[data-vt-new] .app-dock {
   view-transition-name: dock;
 }
-html[data-vt-new] .dock-shield::before {
+html[data-vt-new]:not([data-glass="liquid"]) .dock-shield::before {
   content: "";
   position: absolute;
   inset: auto 0 0 0;

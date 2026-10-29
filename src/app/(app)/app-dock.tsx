@@ -1,6 +1,6 @@
 "use client";
 
-import { List, Map, UserRound } from "lucide-react";
+import { Map, Search, UserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { BACK, FORWARD } from "@/components/page-transition";
 import { FloatingDock, type DockItem } from "@/components/ui/floating-dock";
@@ -17,7 +17,7 @@ export function AppDock() {
   const unread = useAlerts().filter((a) => !a.read).length + useNotices().length;
   const ITEMS: DockItem[] = [
     { title: t.tabs.map, href: "/map", icon: <Map strokeWidth={1.75} /> },
-    { title: t.tabs.nearby, href: "/nearby", icon: <List strokeWidth={1.75} /> },
+    { title: t.tabs.nearby, href: "/nearby", icon: <Search strokeWidth={1.75} /> },
     { title: t.tabs.profile, href: "/profile", icon: <UserRound strokeWidth={1.75} />, badge: unread },
   ];
   // Tabs to the right slide in from the right, tabs to the left from the left.
