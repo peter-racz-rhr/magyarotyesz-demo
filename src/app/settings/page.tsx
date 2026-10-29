@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, Layers, PanelBottom, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, Layers, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -184,6 +184,29 @@ export default function SettingsPage() {
                   className={cn("h-7 min-w-11 rounded-full px-3 text-[0.8125rem] font-semibold transition-colors", settings.theme === key ? "bg-ink text-night" : "text-haze")}
                 >
                   {t.settings.themeNames[key]}
+                </button>
+              ))}
+            </div>
+          </li>
+          <li className="flex flex-col gap-2.5 px-4 py-3 text-[1rem]">
+            <div className="flex items-center gap-3.5">
+              <Tile hue={196}>
+                <Type />
+              </Tile>
+              <span className="flex-1">{t.settings.textSize}</span>
+            </div>
+            <div role="radiogroup" aria-label={t.settings.textSize} className="flex rounded-full bg-well p-0.5">
+              {(["normal", "large", "xl"] as const).map((key, i) => (
+                <button
+                  key={key}
+                  type="button"
+                  role="radio"
+                  aria-checked={settings.textSize === key}
+                  onClick={() => updateSettings({ textSize: key })}
+                  className={cn("h-9 min-w-0 flex-1 rounded-full px-2 font-semibold transition-colors", settings.textSize === key ? "bg-ink text-night" : "text-haze")}
+                  style={{ fontSize: `${0.8125 + i * 0.125}rem` }}
+                >
+                  {t.settings.textNames[key]}
                 </button>
               ))}
             </div>

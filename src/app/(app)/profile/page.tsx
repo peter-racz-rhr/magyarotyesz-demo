@@ -71,6 +71,7 @@ export default function ProfilePage() {
   return (
     <PageTransition>
       <main className="mx-auto w-full max-w-md px-5 pt-[max(env(safe-area-inset-top),1rem)]">
+        <h1 className="sr-only">{t.profile.title}</h1>
         {/* One slim line on top: sync state on the left, the gear on the right edge */}
         <div className="flex h-11 items-center">
           {REMOTE && (
@@ -142,7 +143,7 @@ export default function ProfilePage() {
                 {t.profile.levels[level.index]}
                 {level.next && <span className="text-[0.8125rem] font-normal text-haze tabular-nums">{gotIn} / {level.next}</span>}
               </p>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-fg/[0.1]" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-fg/[0.1]" role="progressbar" aria-label={t.profile.levels[level.index]} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
                 <div className="h-full rounded-full bg-brand transition-[width] duration-500" style={{ width: `${Math.round(progress * 100)}%` }} />
               </div>
               <p className="mt-2 text-[0.8125rem] text-haze">

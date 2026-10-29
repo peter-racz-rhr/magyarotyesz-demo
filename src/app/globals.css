@@ -52,7 +52,7 @@
   --glass-solid: #f6f3ee;
   --night: #f6f3ee;
   --ink: #1b1917;
-  --haze: #635c55;
+  --haze: #605952;
   --dusk: #ffffff;
   --dusk-edge: #ddd6cc;
   --ember: #d9531a;
@@ -302,7 +302,7 @@ html[data-theme="light"][data-palette="forest"] {
   --dusk: #fbfcf8;
   --dusk-edge: #d3dacb;
   --ink: #18231b;
-  --haze: #56635a;
+  --haze: #4f5a51;
   --glass-fill: rgb(248 249 246 / 0.72);
   --glass-solid: #eef1e9;
   --solid: #dee7e3;
@@ -330,7 +330,7 @@ html[data-theme="light"][data-palette="mint"] {
   --dusk: #fafffc;
   --dusk-edge: #c8e2d6;
   --ink: #10271f;
-  --haze: #4f6a5f;
+  --haze: #475e53;
   --glass-fill: rgb(246 251 249 / 0.72);
   --glass-solid: #e9f5ef;
   --solid: #d8eae5;
@@ -358,7 +358,7 @@ html[data-theme="light"][data-palette="teal"] {
   --dusk: #fafdfd;
   --dusk-edge: #c4dede;
   --ink: #0e2a2c;
-  --haze: #4a6a6c;
+  --haze: #425e60;
   --glass-fill: rgb(246 250 250 / 0.72);
   --glass-solid: #e8f3f3;
   --solid: #d8e9e9;
@@ -386,7 +386,7 @@ html[data-theme="light"][data-palette="ocean"] {
   --dusk: #fbfdff;
   --dusk-edge: #d0dbe6;
   --ink: #13202b;
-  --haze: #52626f;
+  --haze: #4c5966;
   --glass-fill: rgb(248 250 252 / 0.72);
   --glass-solid: #edf2f7;
   --solid: #dae6f0;
@@ -414,7 +414,7 @@ html[data-theme="light"][data-palette="midnight"] {
   --dusk: #fbfbff;
   --dusk-edge: #d0d4ec;
   --ink: #161a2e;
-  --haze: #555b78;
+  --haze: #505571;
   --glass-fill: rgb(247 248 252 / 0.72);
   --glass-solid: #eceef8;
   --solid: #e0e1f6;
@@ -442,7 +442,7 @@ html[data-theme="light"][data-palette="plum"] {
   --dusk: #fdfbfe;
   --dusk-edge: #e1d4e4;
   --ink: #251a29;
-  --haze: #675a6c;
+  --haze: #615466;
   --glass-fill: rgb(251 248 251 / 0.72);
   --glass-solid: #f4eef5;
   --solid: #eadfed;
@@ -470,7 +470,7 @@ html[data-theme="light"][data-palette="rose"] {
   --dusk: #fffbfc;
   --dusk-edge: #ead3d8;
   --ink: #2a1a1f;
-  --haze: #6c585d;
+  --haze: #69555a;
   --glass-fill: rgb(253 249 249 / 0.72);
   --glass-solid: #f9eff1;
   --solid: #f2dee4;
@@ -498,7 +498,7 @@ html[data-theme="light"][data-palette="peach"] {
   --dusk: #fffcfa;
   --dusk-edge: #ecd5c6;
   --ink: #2d1c14;
-  --haze: #6e5a4e;
+  --haze: #68544a;
   --glass-fill: rgb(253 249 245 / 0.72);
   --glass-solid: #fbefe7;
   --solid: #f4e1db;
@@ -526,7 +526,7 @@ html[data-theme="light"][data-palette="sand"] {
   --dusk: #fdfaf4;
   --dusk-edge: #ded2bd;
   --ink: #2a2116;
-  --haze: #675a47;
+  --haze: #615443;
   --glass-fill: rgb(250 247 242 / 0.72);
   --glass-solid: #f3ecdf;
   --solid: #ece5d9;
@@ -554,7 +554,7 @@ html[data-theme="light"][data-palette="lime"] {
   --dusk: #fcfdf6;
   --dusk-edge: #d9e0bd;
   --ink: #1d2410;
-  --haze: #5a6340;
+  --haze: #545d3c;
   --glass-fill: rgb(249 251 244 / 0.72);
   --glass-solid: #f1f4e3;
   --solid: #e2e8d8;
@@ -582,7 +582,7 @@ html[data-theme="light"][data-palette="mono"] {
   --dusk: #ffffff;
   --dusk-edge: #d9d9d9;
   --ink: #111111;
-  --haze: #5c5c5c;
+  --haze: #595959;
   --glass-fill: rgb(250 250 250 / 0.72);
   --glass-solid: #f3f3f3;
   --solid: #dddddd;
@@ -627,6 +627,14 @@ html[data-theme="dark"][data-palette="mono"] {
   .lq-button {
     border-radius: calc(var(--lq-button-radius) + var(--lq-squish) * 5px);
   }
+}
+
+/* Text size (Settings): everything is in rem, so the whole app scales with the root size. */
+html[data-text="large"] {
+  font-size: 112.5%;
+}
+html[data-text="xl"] {
+  font-size: 125%;
 }
 
 /* Liquid glass: a slightly thicker rim than Liquefy's 1.6px default. */

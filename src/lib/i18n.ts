@@ -55,6 +55,8 @@ const en = {
     navGroup: "Navigation",
     navStyle: "Navigation style",
     navNames: { bar: "Bar", orb: "Orb" } as Record<string, string>,
+    textSize: "Text size",
+    textNames: { normal: "Normal", large: "Large", xl: "Extra large" } as Record<string, string>,
     glass: "Bars and buttons",
     glassNames: { liquid: "Liquid glass", solid: "Solid" } as Record<string, string>,
     footerNav: "Bar: always there. Orb: one button that opens the three pages. Solid: flat bars and buttons in a pastel of your colour palette, no glass effects.",
@@ -96,6 +98,16 @@ const en = {
     finding: "Finding you…",
     mapOnly: "Just show me the map",
     continue: "Get started",
+    how: {
+      title: "How it works",
+      slides: [
+        { title: "Find a toilet", body: "Green dots are codes that worked lately. Tap one to see how far it is." },
+        { title: "Get the code", body: "Tap to show the code, then walk there. It hides itself again so people nearby can't read it." },
+        { title: "Pass it on", body: "Did you get in? Say so. Know a code? Tap the map where it is and add it." },
+      ],
+      next: "Next",
+      done: "Got it",
+    },
     termsTitle: "Before you start",
     termsScroll: "Read to the end to continue",
     termsDone: "You have read it all",
@@ -159,6 +171,25 @@ const en = {
     pullUp: "Pull up for hours, access and a note",
   },
 
+  check: {
+    title: (name: string) => `Did the code at ${name} work?`,
+    yes: "Yes, I got in",
+    no: "No",
+    later: "Not now",
+  },
+  urgent: {
+    title: "Need one now",
+    link: "I need a toilet now",
+    finding: "Finding the closest one…",
+    none: "No open toilet that usually works nearby yet. Try the map.",
+    go: "Take me there",
+    another: "Show another",
+    code: "The code",
+    tapCode: "Show the code",
+    back: "Back",
+    noLocation: "Turn on location and I will find the closest one.",
+    allow: "Use my location",
+  },
   spot: {
     far: (m: number) =>
       `You're ${formatDistance(m)} away. Codes can only be added or checked on the spot, within 150 m. (For the demo you can turn this off in Profile.)`,
@@ -433,6 +464,8 @@ const hu: Dict = {
     navGroup: "Navigáció",
     navStyle: "Navigáció stílusa",
     navNames: { bar: "Sáv", orb: "Gömb" } as Record<string, string>,
+    textSize: "Szövegméret",
+    textNames: { normal: "Normál", large: "Nagy", xl: "Extra nagy" } as Record<string, string>,
     glass: "Sávok és gombok",
     glassNames: { liquid: "Folyékony üveg", solid: "Egyszínű" } as Record<string, string>,
     footerNav: "Sáv: mindig látszik. Gömb: egy gomb, ami megnyitja a három oldalt. Egyszínű: sima sávok és gombok a színpalettád pasztell árnyalatában, üveghatás nélkül.",
@@ -474,6 +507,16 @@ const hu: Dict = {
     finding: "Keresünk…",
     mapOnly: "Csak a térképet kérem",
     continue: "Kezdjük",
+    how: {
+      title: "Így működik",
+      slides: [
+        { title: "Keress egy WC-t", body: "A zöld pontok a mostanában bevált kódok. Koppints egyre, és látod, milyen messze van." },
+        { title: "Szerezd meg a kódot", body: "Koppints a kód megmutatásához, aztán indulj. Magától újra elrejtőzik, hogy a környékbeliek ne lássák." },
+        { title: "Add tovább", body: "Bejutottál? Jelezd. Tudsz egy kódot? Koppints a térképen oda, ahol van, és add hozzá." },
+      ],
+      next: "Tovább",
+      done: "Értem",
+    },
     termsTitle: "Mielőtt elkezdenéd",
     termsScroll: "Olvasd végig a folytatáshoz",
     termsDone: "Mindent elolvastál",
@@ -537,6 +580,25 @@ const hu: Dict = {
     pullUp: "Húzd fel: nyitvatartás, akadálymentesség, megjegyzés",
   },
 
+  check: {
+    title: (name: string) => `Bejutottál a(z) ${name} helyen a kóddal?`,
+    yes: "Igen, bejutottam",
+    no: "Nem",
+    later: "Most nem",
+  },
+  urgent: {
+    title: "Sürgős",
+    link: "Most kell egy WC",
+    finding: "Keressük a legközelebbit…",
+    none: "A közelben még nincs nyitva lévő, megbízható WC. Nézd a térképet.",
+    go: "Vigyél oda",
+    another: "Mutass másikat",
+    code: "A kód",
+    tapCode: "Kód mutatása",
+    back: "Vissza",
+    noLocation: "Kapcsold be a helyzetmeghatározást, és megkeresem a legközelebbit.",
+    allow: "Helyzetem használata",
+  },
   spot: {
     far: (m: number) =>
       `${formatDistance(m)}-re vagy. Kódot csak a helyszínen, 150 m-en belül lehet hozzáadni vagy ellenőrizni. (A demóhoz kikapcsolhatod a Profilban.)`,

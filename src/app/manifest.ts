@@ -13,6 +13,7 @@ export default function manifest(): MetadataRoute.Manifest {
     // Long-press the home-screen icon: straight to the nearest toilet, or to the places you kept.
     shortcuts: [
       { name: "Nearest toilet", short_name: "Nearest", url: "/map?nearest=1", icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }] },
+      { name: "I need a toilet now", short_name: "Urgent", url: "/urgent", icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }] },
       { name: "Saved places", short_name: "Saved", url: "/nearby?saved=1", icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }] },
     ],
     icons: [

@@ -10,6 +10,7 @@ import { spotMessage, useT } from "@/lib/i18n";
 import { LIMITS, cleanCode, cleanText, tidy, validCode, validName } from "@/lib/limits";
 import { REMOTE } from "@/lib/api";
 import { checkFields } from "@/lib/moderation";
+import { rememberReveal } from "@/lib/code-check";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
 import { toggleSaved, useSaved } from "@/lib/saved";
 import { useSettings } from "@/lib/settings";
@@ -189,6 +190,10 @@ export function ToiletCard({
     const timer = window.setTimeout(() => setShown(false), 60_000);
     return () => window.clearTimeout(timer);
   }, [shown, showCodes]);
+  // Looking at someone else's code starts the "did it work?" question for a few minutes later (see CodeCheckPrompt).
+  useEffect(() => {
+    if (shown && toilet.code !== "" && !toilet.mine && !toilet.myVote) rememberReveal(toilet.id, toilet.name);
+  }, [shown, toilet.id, toilet.name, toilet.code, toilet.mine, toilet.myVote]);
   const [linkCopied, setLinkCopied] = useState(false);
   const [editing, setEditing] = useState(false);
   // After a vote: thanks, or (after "no") asking for the new code.

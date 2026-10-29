@@ -34,11 +34,12 @@ export const THEME_COLOR: Record<Look, string> = { dark: "#121212", light: "#f6f
 /** Puts the look on the page (<html data-theme>) and the browser bar colour. Renders nothing. */
 export function ThemeRunner() {
   const look = useLook();
-  const { navStyle, glass, palette } = useSettings();
+  const { navStyle, glass, palette, textSize } = useSettings();
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.theme = look;
     root.dataset.palette = palette;
+    root.dataset.text = textSize;
     // The navigation reads these to dress itself (globals.css).
     root.dataset.nav = navStyle;
     root.dataset.glass = glass;
@@ -53,9 +54,9 @@ export function ThemeRunner() {
       meta.content = page;
       document.head.appendChild(meta);
     }
-  }, [look, navStyle, glass, palette]);
+  }, [look, navStyle, glass, palette, textSize]);
   return null;
 }
 
 /** Runs before the first paint so a light phone does not flash dark. Kept tiny and defensive. */
-export const THEME_BOOT = `try{var c=JSON.parse(localStorage.getItem("magyarotyesz:settings")||"{}");var s=c.theme||"system";var l=s==="system"?(matchMedia("${QUERY}").matches?"light":"dark"):s;document.documentElement.dataset.theme=l;if(c.palette)document.documentElement.dataset.palette=c.palette}catch(e){document.documentElement.dataset.theme="dark"}`;
+export const THEME_BOOT = `try{var c=JSON.parse(localStorage.getItem("magyarotyesz:settings")||"{}");var s=c.theme||"system";var l=s==="system"?(matchMedia("${QUERY}").matches?"light":"dark"):s;document.documentElement.dataset.theme=l;if(c.palette)document.documentElement.dataset.palette=c.palette;if(c.textSize)document.documentElement.dataset.text=c.textSize}catch(e){document.documentElement.dataset.theme="dark"}`;

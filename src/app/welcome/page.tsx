@@ -5,6 +5,7 @@ import { MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ActionButton } from "@/components/onboarding/action-button";
+import { HowStep } from "@/components/onboarding/how-step";
 import { TermsStep } from "@/components/onboarding/terms-step";
 import { FORWARD, PageTransition } from "@/components/page-transition";
 import { Wordmark } from "@/components/wordmark";
@@ -103,7 +104,7 @@ export default function WelcomePage() {
   const [pressed, setPressed] = useState<{ key: string; n: number } | null>(null);
   const [open, setOpen] = useState(false);
   const [locating, setLocating] = useState(false);
-  const [step, setStep] = useState<"hero" | "terms" | "perms">("hero");
+  const [step, setStep] = useState<"hero" | "how" | "terms" | "perms">("hero");
   const timers = useRef<number[]>([]);
 
   const unlock = () => {
@@ -210,7 +211,7 @@ export default function WelcomePage() {
                       {t.welcome.sub}
                     </p>,
                     <div key="b" className="mt-9 flex flex-col gap-2">
-                      <ActionButton onClick={() => setStep("terms")}>{t.welcome.continue}</ActionButton>
+                      <ActionButton onClick={() => setStep("how")}>{t.welcome.continue}</ActionButton>
                     </div>,
                   ].map((child) => (
                     <motion.div
@@ -227,7 +228,12 @@ export default function WelcomePage() {
           </div>
         </div>
 
-        {/* Step 2: the terms, read to the end. Step 3: location and notifications. */}
+        {/* Step 2: how it works, in three pictures. Step 3: the terms, read to the end. Step 4: location. */}
+        {open && step === "how" && (
+          <div className="absolute inset-0 z-20 bg-night">
+            <HowStep onDone={() => setStep("terms")} />
+          </div>
+        )}
         {open && step === "terms" && (
           <div className="absolute inset-0 z-20 bg-night">
             <TermsStep

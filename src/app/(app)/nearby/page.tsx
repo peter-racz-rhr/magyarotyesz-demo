@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bookmark, ChevronDown, MapPin, Search, X } from "lucide-react";
+import { Bookmark, ChevronDown, MapPin, Search, Siren, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { LegalLinks } from "@/components/legal-page";
@@ -225,6 +225,13 @@ export default function NearbyPage() {
           )}
         </header>
 
+        <Link
+          href="/urgent"
+          className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-bad/15 text-[0.9375rem] font-bold text-ink active:opacity-80"
+        >
+          <Siren className="size-5 text-bad" aria-hidden /> {d.urgent.link}
+        </Link>
+
         {(saved.length > 0 || onlySaved) && (
           <div role="radiogroup" aria-label={d.nearby.savedFilter} className="mt-5 inline-flex rounded-full bg-fg/[0.07] p-0.5">
             {([false, true] as const).map((on) => (
@@ -302,7 +309,7 @@ export default function NearbyPage() {
                     </span>
                     <span className="text-right tabular-nums">
                       <span className="block text-haze">{formatDistance(metres)}</span>
-                      <span className="block text-xs text-haze/80">{d.card.walk(walkMinutes(metres))}</span>
+                      <span className="block text-xs text-haze">{d.card.walk(walkMinutes(metres))}</span>
                     </span>
                     <ChevronDown
                       className={cn("size-5 shrink-0 text-haze transition-transform duration-300", isOpen && "rotate-180")}
@@ -336,6 +343,7 @@ export default function NearbyPage() {
       {/* Search: a glass bar above the dock; while typing it sits on the keyboard */}
       {focused && <div aria-hidden onClick={done} className="fixed inset-0 z-40 bg-black/50 animate-in fade-in" />}
       <div
+        role="search"
         className={cn(
           "nearby-search pointer-events-none fixed inset-x-0 z-50 flex justify-center transition-[bottom,translate,opacity] duration-300 ease-out",
           focused || navStyle === "orb"
