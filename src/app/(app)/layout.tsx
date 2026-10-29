@@ -1,6 +1,7 @@
 import { AppGlass } from "./app-glass";
 import { TermsGuard } from "@/components/terms-guard";
 import { CodeCheckPrompt } from "@/components/code-check-prompt";
+import { RankUp } from "@/components/rank-up";
 import { PullToRefresh } from "@/components/pull-to-refresh";
 import { ViewTransitionDock } from "@/components/view-transition-dock";
 import { AppDock } from "./app-dock";
@@ -14,6 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="pb-28">{children}</div>
       <PullToRefresh />
       <CodeCheckPrompt />
+      <RankUp />
       <AppDock />
       <ViewTransitionDock />
     </AppGlass>
