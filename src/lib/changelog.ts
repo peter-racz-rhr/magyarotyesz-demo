@@ -7,7 +7,7 @@ export const CHANGELOG: Change[] = [
     title: { en: "Catppuccin colours", hu: "Catppuccin színek", de: "Catppuccin-Farben" },
     items: [
       { en: "The colours are now Catppuccin: pick one of twelve accents, light is Latte.", hu: "A színek mostantól Catppuccin: válassz a tizenkét kiemelőszín közül, a világos a Latte.", de: "Die Farben sind jetzt Catppuccin: wähle einen von zwölf Akzenten, hell ist Latte." },
-      { en: "Map filters: a small corner button with a list, or the pill. Choose in Settings.", hu: "Térképszűrők: kis sarokgomb listával, vagy a sáv. A Beállításokban választhatsz.", de: "Kartenfilter: ein kleiner Eckknopf mit Liste oder die Leiste. Wähle in den Einstellungen." },
+      { en: "Map filters: one small button in the corner opens the list.", hu: "Térképszűrők: egy kis sarokgomb nyitja a listát.", de: "Kartenfilter: ein kleiner Eckknopf öffnet die Liste." },
       { en: "Dark has three flavours: Mocha, Macchiato and Frappé.", hu: "A sötétnek három változata van: Mocha, Macchiato és Frappé.", de: "Dunkel gibt es in drei Varianten: Mocha, Macchiato und Frappé." },
     ],
   },

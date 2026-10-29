@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, CloudDownload, Layers, Megaphone, MessageSquare, Moon, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, SlidersHorizontal, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, CloudDownload, Layers, Megaphone, MessageSquare, Moon, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -90,7 +90,7 @@ function OfflineMapRow() {
 }
 
 /** A row with a title and a wrapping set of options, for choices with more than three answers. */
-function ChoiceRow<K extends "navStyle" | "glass" | "flavour" | "filterStyle">({
+function ChoiceRow<K extends "navStyle" | "glass" | "flavour">({
   icon,
   hue,
   title,
@@ -297,7 +297,6 @@ export default function SettingsPage() {
 
         <Group id="nav-heading" title={t.settings.navGroup} footer={t.settings.footerNav}>
           <ChoiceRow icon={<PanelBottom />} hue={162} title={t.settings.navStyle} names={t.settings.navNames} value={settings.navStyle} field="navStyle" />
-          <ChoiceRow icon={<SlidersHorizontal />} hue={290} title={t.settings.filterStyle} names={t.settings.filterNames} value={settings.filterStyle} field="filterStyle" />
           <ChoiceRow icon={<Layers />} hue={24} title={t.settings.glass} names={t.settings.glassNames} value={settings.glass} field="glass" />
         </Group>
 

@@ -62,8 +62,6 @@ export const de: Dict = {
     navGroup: "Navigation",
     navStyle: "Navigationsstil",
     navNames: { bar: "Leiste", orb: "Kugel" } as Record<string, string>,
-    filterStyle: "Kartenfilter",
-    filterNames: { corner: "Eckknopf", pill: "Leiste" } as Record<string, string>,
     helpGroup: "Hilfe und Neuigkeiten",
     feedbackLink: "Feedback senden",
     whatsNew: "Neuigkeiten",

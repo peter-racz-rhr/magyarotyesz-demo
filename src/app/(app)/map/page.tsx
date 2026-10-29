@@ -82,8 +82,6 @@ function FilterChip({ on, label, icon, wide, onClick }: { on: boolean; label: st
 /** The "tap the map" tip is shown once per visit, briefly, and only while the map has no places. */
 let hintShown = false;
 
-const PRIMARY_FILTERS: (keyof Filters)[] = ["open", "free", "works"];
-const SECONDARY_FILTERS: (keyof Filters)[] = ["accessible", "baby", "neutral"];
 type Filters = { open: boolean; free: boolean; works: boolean; accessible: boolean; baby: boolean; neutral: boolean };
 
 /**
@@ -280,7 +278,7 @@ export default function MapPage() {
   const { t } = useT();
   const mapRef = useRef<MapRef>(null);
   const here = useHere();
-  const { buildings3d, filterStyle } = useSettings();
+  const { buildings3d } = useSettings();
   const base = useMapStyle();
   const toilets = useToilets();
 
@@ -638,7 +636,7 @@ export default function MapPage() {
 
         {/* Top of the map: the filter pill (glass, like the dock), and under it any notice. */}
         <div data-pull-zone className="pointer-events-none absolute inset-x-0 top-[max(env(safe-area-inset-top),0.75rem)] z-10 flex flex-col gap-2 px-4">
-          {!draft && filterStyle === "corner" && (
+          {!draft && (
             <div className="pointer-events-auto flex justify-end">
               {/* One small button in the corner; all six filters open under it. A green dot says some are on. */}
               <div ref={moreRef} className="relative">
@@ -657,36 +655,6 @@ export default function MapPage() {
                 {moreFilters && (
                   <LiquidSurface radius={22} className="filter-card absolute top-full right-0 z-20 mt-2 flex w-max flex-col gap-0.5 p-1.5 animate-in fade-in zoom-in-95 slide-in-from-top-1 duration-150">
                     {(Object.keys(t.map.filters) as (keyof Filters)[]).map((key) => (
-                      <FilterChip key={key} wide on={filters[key]} label={t.map.filters[key]} icon={FILTER_ICONS[key]} onClick={() => setFilters((f) => ({ ...f, [key]: !f[key] }))} />
-                    ))}
-                  </LiquidSurface>
-                )}
-              </div>
-            </div>
-          )}
-          {!draft && filterStyle === "pill" && (
-            <div className="pointer-events-auto flex justify-center">
-              {/* The three you reach for most sit in the slim pill; the other three open in a small
-                  card from the sliders button (a green dot on the button says one of them is on). */}
-              <div ref={moreRef} className="relative max-w-full">
-                <LiquidSurface radius={999} className="flex w-max max-w-full flex-wrap items-center justify-center gap-0.5 p-1">
-                  {PRIMARY_FILTERS.map((key) => (
-                    <FilterChip key={key} on={filters[key]} label={t.map.filters[key]} onClick={() => setFilters((f) => ({ ...f, [key]: !f[key] }))} />
-                  ))}
-                  <button
-                    type="button"
-                    aria-label={t.map.moreFilters}
-                    aria-expanded={moreFilters}
-                    onClick={() => setMoreFilters((v) => !v)}
-                    className={cn("relative grid size-9 shrink-0 place-items-center rounded-full transition-colors duration-200", moreFilters ? "bg-fg/14 text-ink" : "text-ink/60 active:bg-fg/8")}
-                  >
-                    <SlidersHorizontal className="size-4" aria-hidden />
-                    {SECONDARY_FILTERS.some((key) => filters[key]) && <span aria-hidden className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-good shadow-[0_0_6px_1px_var(--good)]" />}
-                  </button>
-                </LiquidSurface>
-                {moreFilters && (
-                  <LiquidSurface radius={22} className="filter-card absolute top-full right-0 z-20 mt-2 flex w-max flex-col gap-0.5 p-1.5 animate-in fade-in zoom-in-95 slide-in-from-top-1 duration-150">
-                    {SECONDARY_FILTERS.map((key) => (
                       <FilterChip key={key} wide on={filters[key]} label={t.map.filters[key]} icon={FILTER_ICONS[key]} onClick={() => setFilters((f) => ({ ...f, [key]: !f[key] }))} />
                     ))}
                   </LiquidSurface>
