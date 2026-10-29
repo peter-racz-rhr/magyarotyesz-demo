@@ -143,6 +143,7 @@ const en = {
     nearestNone: "No open toilet that usually works nearby yet.",
     locationOff: "Location is off. Turn it on in Settings.",
     noMatch: "No toilets match these filters.",
+    moreFilters: "More filters",
     filters: { open: "Open now", free: "Free", works: "Usually works", accessible: "Accessible", baby: "Baby changing", neutral: "Gender-neutral" },
   },
 
@@ -582,6 +583,7 @@ const hu: Dict = {
     nearestNone: "A közelben még nincs nyitva lévő, megbízható WC.",
     locationOff: "A helymeghatározás ki van kapcsolva. Kapcsold be a Beállításokban.",
     noMatch: "Egy WC sem felel meg a szűrőknek.",
+    moreFilters: "További szűrők",
     filters: { open: "Most nyitva", free: "Ingyenes", works: "Megbízható", accessible: "Akadálymentes", baby: "Pelenkázó", neutral: "Mindenkinek" },
   },
 

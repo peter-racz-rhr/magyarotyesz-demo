@@ -139,6 +139,7 @@ export const de: Dict = {
     nearestNone: "Noch keine geöffnete Toilette in der Nähe, die meistens funktioniert.",
     locationOff: "Der Standort ist aus. Schalte ihn in den Einstellungen ein.",
     noMatch: "Keine Toiletten passen zu diesen Filtern.",
+    moreFilters: "Weitere Filter",
     filters: { open: "Jetzt offen", free: "Kostenlos", works: "Meist okay", accessible: "Barrierefrei", baby: "Wickeltisch", neutral: "Für alle" },
   },
 

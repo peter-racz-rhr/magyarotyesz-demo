@@ -1,7 +1,7 @@
 "use client";
 
 import "@/lib/maplibre-worker";
-import { Accessibility, Baby, ChevronUp, LocateFixed, Users, Zap, X } from "lucide-react";
+import { Accessibility, Baby, ChevronUp, LocateFixed, SlidersHorizontal, Users, Zap, X } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AddedBurst, AddedCheck, DropIn } from "@/components/added-burst";
@@ -49,6 +49,8 @@ const BUDAPEST: [number, number] = [19.0402, 47.4979];
 const TRUSTED = 0.6;
 
 type Draft = { latitude: number; longitude: number };
+const PRIMARY_FILTERS: (keyof Filters)[] = ["open", "free", "works"];
+const SECONDARY_FILTERS: (keyof Filters)[] = ["accessible", "baby", "neutral"];
 type Filters = { open: boolean; free: boolean; works: boolean; accessible: boolean; baby: boolean; neutral: boolean };
 
 /**
@@ -254,6 +256,7 @@ export default function MapPage() {
     () => document.getElementById("dock-accessory"),
     () => null,
   );
+  const [moreFilters, setMoreFilters] = useState(false);
   const [filters, setFilters] = useState<Filters>({ open: false, free: false, works: false, accessible: false, baby: false, neutral: false });
   const [focus, setFocus] = useState<Toilet | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -585,34 +588,76 @@ export default function MapPage() {
 
         {/* Filters: one glass bar, the same material as the dock. It sits in
             the middle when it fits and scrolls sideways when it doesn't. */}
-        {!draft && (
-          <div data-pull-zone className="absolute inset-x-0 top-[max(env(safe-area-inset-top),0.75rem)] z-10 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <LiquidSurface radius={999} className="mx-auto flex w-max gap-0.5 p-1">
-              {(Object.keys(t.map.filters) as (keyof Filters)[]).map((key) => (
+        {/* Top of the map: the filter pill, and under it any notice, so the two never overlap
+            when the pill grows to a second row. */}
+        <div data-pull-zone className="pointer-events-none absolute inset-x-0 top-[max(env(safe-area-inset-top),0.75rem)] z-10 flex flex-col gap-2 px-4">
+          {!draft && (
+            <div className="pointer-events-auto flex justify-center">
+              {/* The three you reach for most sit in the pill; the others open from the sliders button
+                  (and stay open while one of them is on). The pill is round at both ends and wraps
+                  to a second row rather than running off the screen. */}
+              <LiquidSurface radius={999} className="mx-auto flex w-max max-w-full flex-wrap justify-center gap-0.5 p-1">
+                {(Object.keys(t.map.filters) as (keyof Filters)[])
+                  .filter((key) => PRIMARY_FILTERS.includes(key) || moreFilters || filters[key])
+                  .map((key) => (
+                    <button
+                      key={key}
+                      type="button"
+                      aria-pressed={filters[key]}
+                      onClick={() => setFilters((f) => ({ ...f, [key]: !f[key] }))}
+                      className={cn(
+                        "inline-flex min-h-9 shrink-0 items-center rounded-full px-3.5 text-[0.8125rem] font-medium whitespace-nowrap transition-colors duration-200",
+                        filters[key] ? "bg-fg/14 text-ink" : "text-ink/60 active:bg-fg/8",
+                      )}
+                    >
+                      {/* A small light when the filter is on: green, like "this one works" */}
+                      <span
+                        aria-hidden
+                        className={cn(
+                          "h-1.5 rounded-full bg-good transition-all duration-200",
+                          filters[key] ? "mr-2 w-1.5 opacity-100 shadow-[0_0_8px_1px_var(--good)]" : "mr-0 w-0 opacity-0",
+                        )}
+                      />
+                      {t.map.filters[key]}
+                    </button>
+                  ))}
                 <button
-                  key={key}
                   type="button"
-                  aria-pressed={filters[key]}
-                  onClick={() => setFilters((f) => ({ ...f, [key]: !f[key] }))}
-                  className={cn(
-                    "inline-flex h-9 shrink-0 items-center rounded-full px-3.5 text-[0.8125rem] font-medium whitespace-nowrap transition-colors duration-200",
-                    filters[key] ? "bg-fg/14 text-ink" : "text-ink/60 active:bg-fg/8",
-                  )}
+                  aria-label={t.map.moreFilters}
+                  aria-expanded={moreFilters}
+                  onClick={() => setMoreFilters((v) => !v)}
+                  className={cn("relative grid size-9 shrink-0 place-items-center rounded-full transition-colors duration-200", moreFilters ? "bg-fg/14 text-ink" : "text-ink/60 active:bg-fg/8")}
                 >
-                  {/* A small light when the filter is on: green, like "this one works" */}
-                  <span
-                    aria-hidden
-                    className={cn(
-                      "h-1.5 rounded-full bg-good transition-all duration-200",
-                      filters[key] ? "mr-2 w-1.5 opacity-100 shadow-[0_0_8px_1px_var(--good)]" : "mr-0 w-0 opacity-0",
-                    )}
-                  />
-                  {t.map.filters[key]}
+                  <SlidersHorizontal className="size-4" aria-hidden />
+                  {!moreFilters && SECONDARY_FILTERS.some((key) => filters[key]) && <span aria-hidden className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-good" />}
                 </button>
-              ))}
-            </LiquidSurface>
-          </div>
-        )}
+              </LiquidSurface>
+          
+            </div>
+          )}
+            {(notice || justAdded || (filtering && visible.length === 0) || (toilets.length === 0 && !draft)) && (
+              <div className="pointer-events-none flex justify-center px-2">
+                <LiquidSurface
+                  radius={999}
+                  veil={0.45}
+                  role="status"
+                  className="px-5 py-3 text-center text-[0.9375rem] [text-shadow:0_1px_8px_rgb(0_0_0/0.55)] animate-in fade-in slide-in-from-top-2"
+                >
+                  {notice ??
+                    (justAdded
+                      ? (
+                          <span className="inline-flex items-center gap-2">
+                            <AddedCheck />
+                            {t.map.added(justAdded.name)}
+                          </span>
+                        )
+                      : filtering && visible.length === 0 && toilets.length > 0
+                        ? t.map.noMatch
+                        : t.map.hint)}
+                </LiquidSurface>
+              </div>
+            )}
+        </div>
 
         {/* Above the dock: the nearest toilet on the left, center-on-me on the right */}
         {dockSlot &&
@@ -636,29 +681,6 @@ export default function MapPage() {
             </div>,
             dockSlot,
           )}
-
-        {(notice || justAdded || (filtering && visible.length === 0) || (toilets.length === 0 && !draft)) && (
-          <div className="pointer-events-none absolute inset-x-0 top-[calc(max(env(safe-area-inset-top),0.75rem)+3rem)] z-20 flex justify-center px-6">
-            <LiquidSurface
-              radius={999}
-              veil={0.45}
-              role="status"
-              className="px-5 py-3 text-center text-[0.9375rem] [text-shadow:0_1px_8px_rgb(0_0_0/0.55)] animate-in fade-in slide-in-from-top-2"
-            >
-              {notice ??
-                (justAdded
-                  ? (
-                      <span className="inline-flex items-center gap-2">
-                        <AddedCheck />
-                        {t.map.added(justAdded.name)}
-                      </span>
-                    )
-                  : filtering && visible.length === 0 && toilets.length > 0
-                    ? t.map.noMatch
-                    : t.map.hint)}
-            </LiquidSurface>
-          </div>
-        )}
 
         {/* Add sheet */}
         {draft && (
