@@ -1,8 +1,9 @@
 "use client";
 
-import { Accessibility, Baby, Check, Coins, Eye, Flag, Navigation, Pencil, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
+import { Accessibility, Baby, Bookmark, Check, Coins, Eye, Flag, Navigation, Pencil, Share2, Signpost, ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { HintChips } from "@/components/hint-chips";
 import { LimitedInput } from "@/components/limited-input";
 import { btn } from "@/components/ui/buttons";
 import { spotMessage, useT } from "@/lib/i18n";
@@ -10,6 +11,7 @@ import { LIMITS, cleanCode, cleanText, tidy, validCode, validName } from "@/lib/
 import { REMOTE } from "@/lib/api";
 import { checkFields } from "@/lib/moderation";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
+import { toggleSaved, useSaved } from "@/lib/saved";
 import { useSettings } from "@/lib/settings";
 import {
   ago,
@@ -17,6 +19,8 @@ import {
   confirmCode,
   directionsUrl,
   dismissSuggestion,
+  distance,
+  freshness,
   editToilet,
   isOpen,
   isStale,
@@ -27,6 +31,7 @@ import {
   suggestCode,
   trust,
   trustColor,
+  walkMinutes,
   type Toilet,
 } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
@@ -135,6 +140,7 @@ function EditForm({ toilet, onDone }: { toilet: Toilet; onDone: () => void }) {
         rejectedHint={t.add.textHint}
         className={field}
       />
+      <HintChips note={note} onChange={setNote} />
       {error && (
         <p role="alert" className="text-sm text-stale">
           {error}
@@ -163,14 +169,19 @@ export function ToiletCard({
   toilet,
   className,
   inList = false,
+  from = null,
 }: {
   toilet: Toilet;
   className?: string;
   /** In a list the row already shows the name and kind. */
   inList?: boolean;
+  /** Where you are, to say how long the walk is. */
+  from?: { latitude: number; longitude: number } | null;
 }) {
   const { t, lang } = useT();
   const { showCodes } = useSettings();
+  const saved = useSaved().includes(toilet.id);
+  const walk = from ? walkMinutes(distance(from, toilet)) : null;
   const [shown, setShown] = useState(showCodes);
   // A code that was tapped open hides itself again after a minute (unless "show codes right away" is on).
   useEffect(() => {
@@ -195,7 +206,7 @@ export function ToiletCard({
     const url = placeLink(toilet);
     try {
       if (navigator.share) {
-        await navigator.share({ title: toilet.name, url });
+        await navigator.share({ title: toilet.name, text: t.card.shareText(toilet.name), url });
         return;
       }
       await navigator.clipboard.writeText(url);
@@ -276,6 +287,15 @@ export function ToiletCard({
             </p>
           )}
         </div>
+        <button
+          type="button"
+          onClick={() => toggleSaved(toilet.id)}
+          aria-label={saved ? t.card.unsavePlace : t.card.savePlace}
+          aria-pressed={saved}
+          className={cn(btn.quiet, "-mt-1 size-9")}
+        >
+          <Bookmark className={cn("size-4", saved && "fill-brand text-brand")} aria-hidden />
+        </button>
         <button type="button" onClick={share} aria-label={linkCopied ? t.card.linkCopied : t.card.share} className={cn(btn.quiet, "-mt-1 size-9", toilet.mine ? "" : "-mr-1")}>
           {linkCopied ? <Check className="size-4 text-good" aria-hidden /> : <Share2 className="size-4" aria-hidden />}
         </button>
@@ -359,7 +379,7 @@ export function ToiletCard({
         className={cn(btn.secondary, "mt-2 h-11 w-full gap-2 rounded-2xl text-[0.9375rem]")}
       >
         <Navigation className="size-[1.125rem] text-good" aria-hidden />
-        {t.card.directions}
+        {walk ? t.card.directionsWalk(walk) : t.card.directions}
       </a>
 
       {isStale(toilet) && <p className="mt-2 text-xs text-stale">{t.card.stale}</p>}
@@ -369,9 +389,20 @@ export function ToiletCard({
         <HealthDot toilet={toilet} className="size-2" />
         <span className="font-semibold">{t.card.votes(toilet.confirms, toilet.reports)}</span>
       </p>
-      <p className="mt-0.5 pl-4 text-xs text-haze">
+      <p className="mt-0.5 flex items-center gap-2 pl-4 text-xs text-haze">
+        <span role="img" aria-label={t.card.fresh[freshness(toilet)]} className="flex shrink-0 items-end gap-[2px]">
+          {[0, 1, 2, 3].map((i) => (
+            <span
+              key={i}
+              className={cn("w-[3px] rounded-[1px]", i <= freshness(toilet) ? "bg-good" : "bg-fg/20")}
+              style={{ height: 4 + i * 2.5 }}
+            />
+          ))}
+        </span>
+        <span>
         {t.card.lastWorked(ago(toilet.confirmedAt, lang))}
         {toilet.reportedAt && toilet.reportedAt > toilet.confirmedAt && t.card.lastFailed(ago(toilet.reportedAt, lang))}
+        </span>
       </p>
 
       {/* New codes people suggested, for the person who shared it */}
@@ -445,13 +476,21 @@ export function ToiletCard({
         </form>
       )}
 
-      {toilet.note && <p className="mt-3 text-sm text-haze">{toilet.note}</p>}
+      {toilet.note && (
+        <div className="mt-3 flex items-start gap-2.5 rounded-2xl bg-fg/[0.05] px-3 py-2.5">
+          <Signpost className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
+          <p className="min-w-0 text-sm">
+            <span className="block text-xs font-semibold text-haze">{t.card.howToFind}</span>
+            {toilet.note}
+          </p>
+        </div>
+      )}
 
       {/* Anything wrong with the place itself (not the code): offensive, private, gone */}
       {!toilet.mine && (
         <div className="mt-3">
           {reporting === "closed" && (
-            <button type="button" onClick={() => setReporting("pick")} className="inline-flex h-8 items-center gap-1.5 rounded-full text-xs text-haze hover:text-ink">
+            <button type="button" onClick={() => setReporting("pick")} className={cn(btn.secondary, btn.sm, "w-full gap-2 text-[0.8125rem]")}>
               <Flag className="size-3.5" aria-hidden /> {t.card.report}
             </button>
           )}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, MapPin, Search, X } from "lucide-react";
+import { Bookmark, ChevronDown, MapPin, Search, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { LegalLinks } from "@/components/legal-page";
@@ -12,7 +12,8 @@ import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { searchPlaces, type Place } from "@/lib/geocode";
 import { useT, type Dict } from "@/lib/i18n";
 import { useSettings } from "@/lib/settings";
-import { distance, formatDistance, useToilets, type Toilet } from "@/lib/toilets";
+import { useSaved } from "@/lib/saved";
+import { distance, formatDistance, useToilets, walkMinutes, type Toilet } from "@/lib/toilets";
 import { useHere } from "@/lib/use-here";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +53,14 @@ export default function NearbyPage() {
   // Beside the orb the bottom is free, so the search bar sits lower.
   const { navStyle } = useSettings();
   const here = useHere();
-  const toilets = useToilets();
+  const allToilets = useToilets();
+  const saved = useSaved();
+  // /nearby?saved=1 (the "Saved places" app shortcut) opens on the places you kept.
+  const [onlySaved, setOnlySaved] = useState(false);
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("saved") === "1") queueMicrotask(() => setOnlySaved(true));
+  }, []);
+  const toilets = onlySaved ? allToilets.filter((x) => saved.includes(x.id)) : allToilets;
   const [open, setOpen] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
@@ -217,10 +225,39 @@ export default function NearbyPage() {
           )}
         </header>
 
+        {(saved.length > 0 || onlySaved) && (
+          <div role="radiogroup" aria-label={d.nearby.savedFilter} className="mt-5 inline-flex rounded-full bg-fg/[0.07] p-0.5">
+            {([false, true] as const).map((on) => (
+              <button
+                key={String(on)}
+                type="button"
+                role="radio"
+                aria-checked={onlySaved === on}
+                onClick={() => setOnlySaved(on)}
+                className={cn("inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-[0.8125rem] font-semibold transition-colors", onlySaved === on ? "bg-ink text-night" : "text-haze")}
+              >
+                {on && <Bookmark className="size-3.5" aria-hidden />}
+                {on ? d.nearby.savedFilter : d.nearby.allFilter}
+              </button>
+            ))}
+          </div>
+        )}
+
         {toilets.length === 0 ? (
-          <p className="mt-10 max-w-[32ch] text-haze">
-            {d.nearby.empty}
-          </p>
+          onlySaved ? (
+            <p className="mt-8 max-w-[32ch] text-haze">{d.nearby.savedEmpty}</p>
+          ) : (
+            <div className="mt-12 flex flex-col items-center text-center">
+              <span aria-hidden className="grid size-20 place-items-center rounded-full bg-brand/15 text-brand">
+                <MapPin className="size-9" strokeWidth={1.6} />
+              </span>
+              <p className="mt-5 text-[1.375rem] font-bold tracking-tight">{d.nearby.emptyTitle}</p>
+              <p className="mt-2 max-w-[28ch] text-haze">{d.nearby.empty}</p>
+              <Link href="/map" className="mt-6 inline-flex h-12 items-center rounded-full bg-ink px-6 font-semibold text-night">
+                {d.nearby.emptyCta}
+              </Link>
+            </div>
+          )
         ) : anchor && sorted.length === 0 ? (
           <div className="mt-10">
             <p className="max-w-[32ch] text-haze">{d.nearby.noneWithin(anchor.label)}</p>
@@ -263,7 +300,10 @@ export default function NearbyPage() {
                         <HoursLine toilet={toilet} className="text-xs" />
                       </span>
                     </span>
-                    <span className="text-haze tabular-nums">{formatDistance(metres)}</span>
+                    <span className="text-right tabular-nums">
+                      <span className="block text-haze">{formatDistance(metres)}</span>
+                      <span className="block text-xs text-haze/80">{d.card.walk(walkMinutes(metres))}</span>
+                    </span>
                     <ChevronDown
                       className={cn("size-5 shrink-0 text-haze transition-transform duration-300", isOpen && "rotate-180")}
                       aria-hidden
@@ -278,7 +318,7 @@ export default function NearbyPage() {
                         transition={{ type: "spring", duration: 0.45, bounce: 0 }}
                         className="overflow-hidden"
                       >
-                        <ToiletCard toilet={toilet} inList className="pb-5" />
+                        <ToiletCard toilet={toilet} inList from={here.coords} className="pb-5" />
                       </motion.div>
                     )}
                   </AnimatePresence>

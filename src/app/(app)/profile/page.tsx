@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Camera, Check, Copy, Settings, Trash2 } from "lucide-react";
+import { Bell, Bookmark, Camera, Check, ChevronRight, Copy, Settings, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ProfileEditor } from "@/components/profile-editor";
@@ -13,7 +13,8 @@ import { alertLine, useT } from "@/lib/i18n";
 import { askForNotifications } from "@/lib/notify";
 import { updateSettings, useSettings } from "@/lib/settings";
 import { dismissNotice, syncNow, useGotInTotal, usePendingCount, useNotices, useSyncStatus, useUserId } from "@/lib/sync";
-import { ago, clearAlerts, markAlertsRead, removeToilet, useAlerts, useToilets } from "@/lib/toilets";
+import { useSaved } from "@/lib/saved";
+import { ago, clearAlerts, levelFor, markAlertsRead, removeToilet, useAlerts, useToilets } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
 
 export default function ProfilePage() {
@@ -32,6 +33,8 @@ export default function ProfilePage() {
   useEffect(() => {
     queueMicrotask(() => setCanNotify(typeof Notification !== "undefined" && Notification.permission !== "denied"));
   }, []);
+  const saved = useSaved();
+  const [now] = useState(() => Date.now());
   const mine = toilets.filter((x) => x.mine);
   // People who got in with the codes you shared. The server keeps a running total (a new code resets the
   // votes, not this); without a server it is every "yes" on your codes except your own.
@@ -127,6 +130,42 @@ export default function ProfilePage() {
             <dt className="mt-1.5 text-[0.75rem] text-haze">{t.profile.statGotIn}</dt>
           </div>
         </dl>
+
+        {/* Your level: more people getting in with your codes, a higher level */}
+        {(() => {
+          const level = levelFor(gotIn);
+          const span = level.next ? level.next - level.from : 1;
+          const progress = level.next ? Math.min(1, (gotIn - level.from) / span) : 1;
+          return (
+            <div className={cn(CARD, "mt-3 px-4 py-3.5")}>
+              <p className="flex items-center justify-between text-[0.9375rem] font-semibold">
+                {t.profile.levels[level.index]}
+                {level.next && <span className="text-[0.8125rem] font-normal text-haze tabular-nums">{gotIn} / {level.next}</span>}
+              </p>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-fg/[0.1]" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
+                <div className="h-full rounded-full bg-brand transition-[width] duration-500" style={{ width: `${Math.round(progress * 100)}%` }} />
+              </div>
+              <p className="mt-2 text-[0.8125rem] text-haze">
+                {level.next ? t.profile.levelNext(level.next - gotIn, t.profile.levels[level.index + 1]) : t.profile.levelTop}
+              </p>
+            </div>
+          );
+        })()}
+
+        <Link href="/nearby?saved=1" className={cn(CARD, "mt-3 flex items-center gap-3 px-4 py-3.5 text-[1rem] active:opacity-70")}>
+          <Bookmark className="size-5 text-brand" aria-hidden />
+          <span className="flex-1">{t.profile.savedPlaces(saved.length)}</span>
+          <ChevronRight className="size-5 text-haze" aria-hidden />
+        </Link>
+
+        <div className={cn(CARD, "mt-3 px-4 py-3.5")}>
+          <p className="text-[0.75rem] font-semibold tracking-wide text-haze uppercase">{t.profile.cityTitle}</p>
+          <p className="mt-1 text-[1rem]">
+            {t.profile.cityPlaces(toilets.length)}
+            <span className="text-haze"> · {t.profile.cityChecked(toilets.filter((x) => now - Date.parse(x.confirmedAt) < 86400000).length)}</span>
+          </p>
+        </div>
+
         {REMOTE && (pending > 0 || sync.online === false) && !sync.syncing && (
           <button type="button" onClick={() => void syncNow()} className={cn(btn.secondary, btn.sm, "mt-3 w-full")}>
             {t.sync.sendNow}

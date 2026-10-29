@@ -5,6 +5,7 @@ import { Accessibility, Baby, ChevronUp, LocateFixed, Zap, X } from "lucide-reac
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AddedBurst, AddedCheck, DropIn } from "@/components/added-burst";
+import { HintChips } from "@/components/hint-chips";
 import { LegalLinks } from "@/components/legal-page";
 import { PageTransition } from "@/components/page-transition";
 import { HealthDot, ToiletCard } from "@/components/toilet-card";
@@ -349,6 +350,21 @@ export default function MapPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // /map?nearest=1 (the "Nearest toilet" app shortcut): once there is a position, or after a few
+  // seconds without one, jump to the nearest open toilet that usually works.
+  const wantNearest = useRef(false);
+  const nearestRef = useRef<() => Promise<void>>(async () => {});
+  useEffect(() => {
+    wantNearest.current = new URLSearchParams(window.location.search).get("nearest") === "1";
+  }, []);
+  useEffect(() => {
+    if (!wantNearest.current || toilets.length === 0 || !mapRef.current) return;
+    if (!here.coords && here.status !== "denied" && here.status !== "off") return;
+    wantNearest.current = false;
+    window.history.replaceState(null, "", "/map");
+    void nearestRef.current();
+  }, [here.coords, here.status, toilets.length]);
+
   const flash = (text: string) => {
     setNotice(text);
     window.setTimeout(() => setNotice(null), 3200);
@@ -386,13 +402,17 @@ export default function MapPage() {
         from = { latitude: BUDAPEST[1], longitude: BUDAPEST[0] };
       }
     }
-    const best = toilets
+    // The filters you set count: with "Free" on, the nearest is the nearest free one.
+    const best = visible
       .filter((toilet) => isOpen(toilet) !== false && trust(toilet) >= TRUSTED)
       .map((toilet) => ({ toilet, metres: distance(from, toilet) }))
       .sort((a, b) => a.metres - b.metres)[0];
     if (!best) return flash(t.map.nearestNone);
     openCard(best.toilet, 17);
   };
+  useEffect(() => {
+    nearestRef.current = nearest;
+  });
 
   const startDraft = (next: Draft) => {
     if (!draft) {
@@ -533,7 +553,7 @@ export default function MapPage() {
               onClose={() => setFocus((f) => (f?.id === focus.id ? null : f))}
               className="max-h-[calc(100dvh-13rem)] w-[20rem] max-w-[calc(100vw-2rem)] overflow-y-auto overscroll-contain rounded-[1.25rem] border-dusk-edge p-4"
             >
-              <ToiletCard toilet={toilets.find((x) => x.id === focus.id) ?? focus} />
+              <ToiletCard toilet={toilets.find((x) => x.id === focus.id) ?? focus} from={here.coords} />
             </MapPopup>
           )}
 
@@ -799,6 +819,7 @@ export default function MapPage() {
                     rejectedHint={t.add.textHint}
                     className={cn(field, "w-full")}
                   />
+                  <HintChips note={note} onChange={setNote} />
                 </div>
               </div>
             </div>

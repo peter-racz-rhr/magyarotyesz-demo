@@ -387,3 +387,25 @@ export function ago(iso: string, lang: "en" | "hu" = "en", now = Date.now()) {
 /** Walking directions in Google Maps (opens the app on phones that have it). */
 export const directionsUrl = (t: Toilet) =>
   `https://www.google.com/maps/dir/?api=1&destination=${t.latitude},${t.longitude}&travelmode=walking`;
+
+/** Minutes on foot for a straight-line distance: about 80 m a minute, and streets are never straight. */
+export const walkMinutes = (metres: number) => Math.max(1, Math.round((metres * 1.25) / 80));
+
+/** How recently a code was confirmed: 0 (long ago) to 3 (today). */
+export function freshness(t: Toilet, now = Date.now()) {
+  const last = t.confirmedAt ? Date.parse(t.confirmedAt) : Number.NaN;
+  if (Number.isNaN(last)) return 0;
+  const days = (now - last) / 86400000;
+  return days < 1 ? 3 : days < 7 ? 2 : days < 30 ? 1 : 0;
+}
+
+/** Contributor levels, by how many people got in with your codes. */
+export const LEVEL_STEPS = [0, 5, 25, 100] as const;
+export function levelFor(gotIn: number) {
+  let index = 0;
+  LEVEL_STEPS.forEach((from, i) => {
+    if (gotIn >= from) index = i;
+  });
+  const next = LEVEL_STEPS[index + 1] ?? null;
+  return { index, from: LEVEL_STEPS[index], next };
+}
