@@ -15,7 +15,7 @@ const en: Record<DocKey, Doc> = {
   terms: {
     title: "Terms of use",
     updated: "Last updated: 30 October 2026",
-    intro: "magyarotyesz is a free community map of toilet door codes, run by {operator} ({address}, {email}). By tapping \"I am 16 or older and I agree\" you accept these terms.",
+    intro: "LooKey is a free community map of toilet door codes, run by {operator} ({address}, {email}). By tapping \"I am 16 or older and I agree\" you accept these terms.",
     sections: [
       {
         h: "What this is",
@@ -26,7 +26,7 @@ const en: Record<DocKey, Doc> = {
       {
         h: "Who can use it",
         p: [
-          "You must be at least 16 years old to use magyarotyesz. You do not need an account: your phone gets a random ID that does not contain your name or contact details. You can also sign in with Google or with an email address, so that your profile stays with you when you change browser or phone.",
+          "You must be at least 16 years old to use LooKey. You do not need an account: your phone gets a random ID that does not contain your name or contact details. You can also sign in with Google or with an email address, so that your profile stays with you when you change browser or phone.",
         ],
       },
       {
@@ -53,7 +53,7 @@ const en: Record<DocKey, Doc> = {
       {
         h: "Who is responsible",
         p: [
-          "magyarotyesz only passes on what its users share. We do not open doors, we do not give anyone permission to enter a place, and we are not a party between you and the people who run it. A code that works is not a right to enter. If a venue's toilet is for customers, respect that.",
+          "LooKey only passes on what its users share. We do not open doors, we do not give anyone permission to enter a place, and we are not a party between you and the people who run it. A code that works is not a right to enter. If a venue's toilet is for customers, respect that.",
           "You are responsible for what you do with a code and for what you share. If you share a code you were not allowed to share, or one that opens more than a toilet, you are responsible for that.",
           "We are a hosting service for what users add. We do not check every entry beforehand, but once we know about illegal content we remove it quickly (see Reporting and removal). Other users' entries are theirs, not ours.",
           "Nothing in these terms limits liability that the law does not allow to be limited, for example for harm caused on purpose or by gross negligence, or for injury to life, body or health.",
@@ -68,7 +68,7 @@ const en: Record<DocKey, Doc> = {
       {
         h: "Ending use",
         p: [
-          "You can stop using magyarotyesz at any time and delete your data in Settings (\"Delete my data\"). We can end or pause the service; if we shut it down, we will say so in the app at least 30 days in advance where possible.",
+          "You can stop using LooKey at any time and delete your data in Settings (\"Delete my data\"). We can end or pause the service; if we shut it down, we will say so in the app at least 30 days in advance where possible.",
         ],
       },
       {
@@ -110,7 +110,7 @@ const en: Record<DocKey, Doc> = {
       {
         h: "Who else sees data",
         p: [
-          "We do not sell data. These providers are involved:\n- **Server:** Oracle Cloud Infrastructure, Frankfurt, Germany (EU). It stores the server data. Oracle is a US company; any access from outside the EU is covered by the EU–US Data Privacy Framework and/or standard contractual clauses in Oracle's data processing terms.\n- **Server address:** the server is reached through sslip.io, a free DNS service that translates the server's name into its IP address. It handles the name lookup only, not your data.\n- **App hosting:** Vercel Inc., USA. It delivers the web app and sees your IP address when the app loads. The transfer is covered by the EU–US Data Privacy Framework and/or standard contractual clauses in Vercel's data processing terms.\n- **Map tiles:** OpenFreeMap (openfreemap.org), with OpenStreetMap data. It receives your IP address and the map area you look at. It is a free public service; we have no contract with it.\n- **Sign-in with Google (optional):** Google LLC, USA, only if you press Continue with Google. It sees your IP address and that you use magyarotyesz. The transfer is covered by the EU–US Data Privacy Framework and/or standard contractual clauses in Google's terms.\n- **Emailed codes (optional):** the email provider that delivers the code to you (it sees your address and the code email). \n- **Satellite view:** Esri Inc., USA (server.arcgisonline.com). Only if you switch the satellite view on, it receives your IP address and the map area. The transfer is covered by the EU–US Data Privacy Framework and/or standard contractual clauses in Esri's terms.\n- **Address search:** Photon, run by Komoot, Germany (EU), suggests results while you type. OpenStreetMap Nominatim, run by the OpenStreetMap Foundation in the United Kingdom, is asked only when you press Search. They receive what you typed, the map area and your IP address. The transfer to the United Kingdom relies on the European Commission's adequacy decision for the UK.",
+          "We do not sell data. These providers are involved:\n- **Server:** Oracle Cloud Infrastructure, Frankfurt, Germany (EU). It stores the server data. Oracle is a US company; any access from outside the EU is covered by the EU–US Data Privacy Framework and/or standard contractual clauses in Oracle's data processing terms.\n- **Server address:** the server is reached through sslip.io, a free DNS service that translates the server's name into its IP address. It handles the name lookup only, not your data.\n- **App hosting:** Vercel Inc., USA. It delivers the web app and sees your IP address when the app loads. The transfer is covered by the EU–US Data Privacy Framework and/or standard contractual clauses in Vercel's data processing terms.\n- **Map tiles:** OpenFreeMap (openfreemap.org), with OpenStreetMap data. It receives your IP address and the map area you look at. It is a free public service; we have no contract with it.\n- **Sign-in with Google (optional):** Google LLC, USA, only if you press Continue with Google. It sees your IP address and that you use LooKey. The transfer is covered by the EU–US Data Privacy Framework and/or standard contractual clauses in Google's terms.\n- **Emailed codes (optional):** the email provider that delivers the code to you (it sees your address and the code email). \n- **Satellite view:** Esri Inc., USA (server.arcgisonline.com). Only if you switch the satellite view on, it receives your IP address and the map area. The transfer is covered by the EU–US Data Privacy Framework and/or standard contractual clauses in Esri's terms.\n- **Address search:** Photon, run by Komoot, Germany (EU), suggests results while you type. OpenStreetMap Nominatim, run by the OpenStreetMap Foundation in the United Kingdom, is asked only when you press Search. They receive what you typed, the map area and your IP address. The transfer to the United Kingdom relies on the European Commission's adequacy decision for the UK.",
         ],
       },
       {
@@ -164,7 +164,7 @@ const en: Record<DocKey, Doc> = {
       {
         h: "Service",
         p: [
-          "magyarotyesz, a free community map of toilet door codes. Not a commercial service; no fee is charged.",
+          "LooKey, a free community map of toilet door codes. Not a commercial service; no fee is charged.",
         ],
       },
       {
@@ -196,7 +196,7 @@ const hu: Record<DocKey, Doc> = {
   terms: {
     title: "Felhasználási feltételek",
     updated: "Utolsó frissítés: 2026. október 30.",
-    intro: "A magyarotyesz ingyenes, közösségi térkép mosdók ajtókódjairól. Üzemeltetője: {operator} ({address}, {email}). Az „Elmúltam 16 éves, és elfogadom” gomb megnyomásával elfogadod ezeket a feltételeket.",
+    intro: "A LooKey ingyenes, közösségi térkép mosdók ajtókódjairól. Üzemeltetője: {operator} ({address}, {email}). Az „Elmúltam 16 éves, és elfogadom” gomb megnyomásával elfogadod ezeket a feltételeket.",
     sections: [
       {
         h: "Mi ez",
@@ -207,7 +207,7 @@ const hu: Record<DocKey, Doc> = {
       {
         h: "Ki használhatja",
         p: [
-          "A magyarotyesz használatához legalább 16 évesnek kell lenned. Fiók nem szükséges: a telefonod véletlenszerű azonosítót kap, amely nem tartalmazza a nevedet és az elérhetőségedet. Bejelentkezhetsz Google-lel vagy e-mail-címmel is, hogy a profilod böngészőváltáskor vagy új telefonon is megmaradjon.",
+          "A LooKey használatához legalább 16 évesnek kell lenned. Fiók nem szükséges: a telefonod véletlenszerű azonosítót kap, amely nem tartalmazza a nevedet és az elérhetőségedet. Bejelentkezhetsz Google-lel vagy e-mail-címmel is, hogy a profilod böngészőváltáskor vagy új telefonon is megmaradjon.",
         ],
       },
       {
@@ -234,7 +234,7 @@ const hu: Record<DocKey, Doc> = {
       {
         h: "Ki a felelős",
         p: [
-          "A magyarotyesz csak azt adja tovább, amit a felhasználók megosztanak. Nem mi nyitjuk az ajtókat, senkinek nem adunk engedélyt egy helyre való belépéshez, és nem vagyunk fél közted és a hely üzemeltetője között. Az, hogy egy kód működik, nem jogosít fel a belépésre. Ha egy mosdó a vendégeknek szól, ezt tartsd tiszteletben.",
+          "A LooKey csak azt adja tovább, amit a felhasználók megosztanak. Nem mi nyitjuk az ajtókat, senkinek nem adunk engedélyt egy helyre való belépéshez, és nem vagyunk fél közted és a hely üzemeltetője között. Az, hogy egy kód működik, nem jogosít fel a belépésre. Ha egy mosdó a vendégeknek szól, ezt tartsd tiszteletben.",
           "Te felelsz azért, amit egy kóddal teszel, és azért, amit megosztasz. Ha olyan kódot osztasz meg, amelyet nem lett volna szabad, vagy amely többet nyit egy mosdónál, azért te felelsz.",
           "A felhasználók által feltöltött tartalom tárhelyszolgáltatója vagyunk. Nem ellenőrzünk előre minden bejegyzést, de a jogellenes tartalmat, amint tudomást szerzünk róla, gyorsan eltávolítjuk (lásd: Jelentés és eltávolítás). A többi felhasználó bejegyzései az övéik, nem a mieink.",
           "E feltételek egyike sem korlátozza azt a felelősséget, amelyet jogszabály nem enged korlátozni, például a szándékosan vagy súlyos gondatlansággal okozott kárért, illetve az élet, a testi épség vagy az egészség megsértéséért való felelősséget.",
@@ -249,7 +249,7 @@ const hu: Record<DocKey, Doc> = {
       {
         h: "A használat befejezése",
         p: [
-          "Bármikor abbahagyhatod a magyarotyesz használatát, és törölheted az adataidat a Beállításokban („Adataim törlése”). Mi befejezhetjük vagy szüneteltethetjük a szolgáltatást; ha megszüntetjük, ezt lehetőség szerint legalább 30 nappal előre jelezzük az appban.",
+          "Bármikor abbahagyhatod a LooKey használatát, és törölheted az adataidat a Beállításokban („Adataim törlése”). Mi befejezhetjük vagy szüneteltethetjük a szolgáltatást; ha megszüntetjük, ezt lehetőség szerint legalább 30 nappal előre jelezzük az appban.",
         ],
       },
       {
@@ -345,7 +345,7 @@ const hu: Record<DocKey, Doc> = {
       {
         h: "Szolgáltatás",
         p: [
-          "magyarotyesz, ingyenes közösségi térkép mosdók ajtókódjairól. Nem üzleti szolgáltatás, díjat nem számítunk fel.",
+          "LooKey, ingyenes közösségi térkép mosdók ajtókódjairól. Nem üzleti szolgáltatás, díjat nem számítunk fel.",
         ],
       },
       {

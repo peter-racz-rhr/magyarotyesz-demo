@@ -1,4 +1,4 @@
-# Where to launch magyarotyesz (free users)
+# Where to launch LooKey (free users)
 
 From the reel "Five places to get free users" (loomodcreation), plus notes for this app.
 
@@ -10,7 +10,7 @@ From the reel "Five places to get free users" (loomodcreation), plus notes for t
 | 4 | **Indie Hackers**: https://www.indiehackers.com | Makers' community | Post your build story (why, how, first numbers), not an ad. |
 | 5 | **Uneed**: https://www.uneed.best | Launch directory, homepage spot and a backlink | Submit on the Launchpad; pick a quiet launch day. |
 
-## Fit for magyarotyesz
+## Fit for LooKey
 
 The five sites are international and tech-heavy: good for feedback, an early boost and backlinks, but most visitors are not in Budapest.
 The users who matter are in Budapest, so pair them with local channels: r/budapest, Hungarian Facebook groups (Budapest, expats in Budapest,

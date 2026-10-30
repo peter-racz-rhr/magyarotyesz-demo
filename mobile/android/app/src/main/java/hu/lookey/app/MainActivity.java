@@ -1,4 +1,4 @@
-package hu.magyarotyesz.app;
+package hu.lookey.app;
 
 import android.os.Bundle;
 import androidx.core.splashscreen.SplashScreen;

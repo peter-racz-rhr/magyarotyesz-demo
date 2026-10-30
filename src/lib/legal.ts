@@ -1,5 +1,5 @@
 /*
-  Who runs magyarotyesz. These are the operator's details; the Vercel project's Environment
+  Who runs LooKey. These are the operator's details; the Vercel project's Environment
   Variables (NEXT_PUBLIC_OPERATOR_NAME, _CONTACT_EMAIL, _OPERATOR_ADDRESS, _OPERATOR_PHONE)
   override them if they are ever set.
 */

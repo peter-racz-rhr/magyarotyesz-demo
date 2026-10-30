@@ -1,6 +1,6 @@
-# magyarotyesz for Android (standalone app)
+# LooKey for Android (standalone app)
 
-This is the Android app. It is a **Capacitor** app: it shows the website (https://project-1y1mw.vercel.app) in its
+This is the Android app. It is a **Capacitor** app: it shows the website (https://lookey.hu) in its
 **own** WebView, so it does not need Chrome, never says "Running in Chrome", and draws edge to edge (the map goes
 behind the status bar and the gesture bar). Every screen still comes from the website, so when the website is
 updated, the app is updated the next time it opens. A new APK is only needed when something in this folder changes.
@@ -37,7 +37,7 @@ Android's sign-in needs to know which app may use your Google login:
 1. Get the **SHA-1** of the key that signs the APK: in Android Studio's **Terminal** (in `mobile/android`) run
    `.\gradlew signingReport` and copy the `SHA1:` line of `Variant: debug`.
 2. Google Cloud Console > **Google Auth Platform > Clients > Create client** > Application type **Android**:
-   - Package name: `hu.magyarotyesz.app`
+   - Package name: `hu.lookey.app`
    - SHA-1 certificate fingerprint: the SHA-1 from step 1
 3. Create. Nothing to copy: the app keeps using the **Web** client id (the server already knows it).
 

@@ -1,5 +1,5 @@
 {
-  "name": "magyarotyesz-mobile",
+  "name": "lookey-mobile",
   "private": true,
   "description": "The standalone Android app: a Capacitor shell that shows the website in its own WebView (no Chrome).",
   "scripts": {

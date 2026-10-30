@@ -20,7 +20,7 @@ export function SyncRunner() {
     onNewAlerts((fresh) => {
       for (const alert of fresh) {
         void notify(
-          "magyarotyesz",
+          "LooKey",
           alertLine(t, alert),
         );
       }

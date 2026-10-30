@@ -14,7 +14,7 @@ import { PlaceList } from "./place-list";
   Moderation page: look at what was added or reported, then hide, delete or
   ban, see who added what, and send a person a short text. English only, not
   linked from the app. The token lives in this tab's sessionStorage and goes
-  only to the magyarotyesz server (X-Admin-Token); the server must have
+  only to the LooKey server (X-Admin-Token); the server must have
   ADMIN_FROM_BROWSER=true for the browser to be allowed.
 */
 
@@ -97,7 +97,7 @@ export default function AdminPage() {
     return (
       <main className="mx-auto max-w-sm px-5 pt-24">
         <h1 className="text-2xl font-bold">Admin</h1>
-        <p className="mt-1 text-sm text-haze">magyarotyesz moderation. Enter the admin token from the server.</p>
+        <p className="mt-1 text-sm text-haze">LooKey moderation. Enter the admin token from the server.</p>
         <form onSubmit={signIn} className="mt-6 flex flex-col gap-3">
           <input
             type="password"

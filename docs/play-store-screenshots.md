@@ -97,7 +97,7 @@ Take them at 1080×1920 or larger in portrait, with the status bar clean (batter
 ## Other Play graphics
 
 - **Icon 512×512:** `public/icons/icon-512.png`.
-- **Feature graphic 1024×500** (the banner at the top of the listing): one more generation, landscape 2:1: "magyarotyesz: toilet codes in Budapest" on the dark-green background with the keypad
+- **Feature graphic 1024×500** (the banner at the top of the listing): one more generation, landscape 2:1: "LooKey: toilet door codes in Budapest" on the dark-green background with the keypad
   glow and one phone on the right.
 
 ## Checklist before upload

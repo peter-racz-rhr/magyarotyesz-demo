@@ -8,12 +8,12 @@ import { SyncRunner } from "@/components/sync-runner";
 import { THEME_BOOT, ThemeRunner } from "@/lib/theme";
 
 export const metadata: Metadata = {
-  title: "magyarotyesz",
+  title: "LooKey",
   description: "Toilet door codes, shared by people who needed them too.",
-  applicationName: "magyarotyesz",
+  applicationName: "LooKey",
   appleWebApp: {
     capable: true,
-    title: "magyarotyesz",
+    title: "LooKey",
     statusBarStyle: "black-translucent",
   },
   icons: {

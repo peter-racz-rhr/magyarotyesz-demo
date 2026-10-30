@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "magyarotyesz",
-    short_name: "magyarotyesz",
+    name: "LooKey",
+    short_name: "LooKey",
     description: "Toilet door codes, shared by people who needed them too.",
     start_url: "/",
     display: "standalone",

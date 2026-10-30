@@ -1,4 +1,4 @@
-# magyarotyesz (demo)
+# LooKey (demo)
 
 Toilet door codes in Budapest, shared by the people who needed them. A
 mobile-first web app (installable to the Home Screen), built with Next.js,
@@ -35,4 +35,4 @@ pnpm dev
 
 ## Server
 
-By default the app is a demo that keeps everything on the phone. Set `NEXT_PUBLIC_API_URL` to share codes through the magyarotyesz server: see [docs/connect-to-server.md](docs/connect-to-server.md).
+By default the app is a demo that keeps everything on the phone. Set `NEXT_PUBLIC_API_URL` to share codes through the LooKey server: see [docs/connect-to-server.md](docs/connect-to-server.md).

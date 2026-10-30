@@ -186,7 +186,7 @@ export default function SettingsPage() {
   const simulate = () => {
     for (const alert of simulateActivity()) {
       void notify(
-        "magyarotyesz",
+        "LooKey",
         alertLine(t, alert),
       );
     }

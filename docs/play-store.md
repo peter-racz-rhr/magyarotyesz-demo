@@ -1,4 +1,4 @@
-# magyarotyesz on Google Play: steps and store texts
+# LooKey on Google Play: steps and store texts
 
 ## Part 1. Steps (about one afternoon of work, plus Google's waiting times)
 
@@ -6,8 +6,8 @@
 2. **Own domain (recommended).** The Android app is tied to the web address. If you will ever move from `project-1y1mw.vercel.app`, do it **before** the first upload, then use the new address everywhere below.
 3. **Build the Android app.** The `mobile/` folder of this repository is the standalone Android app (Capacitor, see `mobile/README.md`: run `npm install`, open `mobile/android`, build a signed `.aab`). Or, instead, use PWABuilder:
    **Build the Android app with PWABuilder.** Open https://www.pwabuilder.com, enter the app address, press Start, then Package for stores > Android.
-   - Package ID: pick one and never change it, for example `hu.magyarotyesz.app`.
-   - App name: `magyarotyesz`. Display mode: standalone. Notifications: on. Location delegation: on.
+   - Package ID: pick one and never change it, for example `hu.lookey.app`.
+   - App name: `LooKey`. Display mode: standalone. Notifications: on. Location delegation: on.
    - Signing key: choose **Create new** and **download the key file and passwords, back them up** (a lost key means you cannot update the app). Play App Signing will also re-sign it.
    - Download the zip; it contains the `.aab` file to upload.
 4. **Asset links** (so the app opens the site without a browser bar). This repository already serves `/.well-known/assetlinks.json`. In the Vercel project (Settings > Environment Variables) set:
@@ -28,7 +28,7 @@
 
 ## Part 3. Store listing, English
 
-**App name (max 30):** magyarotyesz: toilet codes
+**App name (max 30):** LooKey: toilet door codes
 
 **Short description (max 80):** Toilet door codes in Budapest, shared by people who got in.
 
@@ -36,7 +36,7 @@
 
 Never guess a toilet code again.
 
-Many cafés, restaurants and shops in Budapest keep their toilet behind a keypad. magyarotyesz is a free community map of those door codes, shared by people who have just used them.
+Many cafés, restaurants and shops in Budapest keep their toilet behind a keypad. LooKey is a free community map of those door codes, shared by people who have just used them.
 
 What you can do
 • See toilets near you on the map, with how fresh each code is: green dots are codes that worked lately.
@@ -55,13 +55,13 @@ No ads, no tracking. You do not need an account: your phone gets a random ID. If
 
 Please share only codes for toilet doors, never for homes, staff areas or building entrances, and respect places meant for customers. Venues can ask us to remove their code at any time.
 
-magyarotyesz is a community project. Codes are shared by users and can be wrong or out of date.
+LooKey is a community project. Codes are shared by users and can be wrong or out of date.
 
 **What's new (first beta):** First beta. Find toilet codes in Budapest, add your own, and tell us what to improve in Settings > Send feedback.
 
 ## Part 3b. Store listing, Hungarian (magyar)
 
-**Név (max 30):** magyarotyesz: WC-kódok
+**Név (max 30):** LooKey: WC-ajtókódok
 
 **Rövid leírás (max 80):** Budapesti mosdók ajtókódjai, azoktól, akik épp bejutottak.
 
@@ -69,7 +69,7 @@ magyarotyesz is a community project. Codes are shared by users and can be wrong 
 
 Soha többé ne találgasd a mosdókódot.
 
-Sok budapesti kávézó, étterem és üzlet kódzár mögé teszi a mosdóját. A magyarotyesz ezeknek az ajtókódoknak az ingyenes, közösségi térképe, olyanok megosztásában, akik épp használták őket.
+Sok budapesti kávézó, étterem és üzlet kódzár mögé teszi a mosdóját. A LooKey ezeknek az ajtókódoknak az ingyenes, közösségi térképe, olyanok megosztásában, akik épp használták őket.
 
 Mit tehetsz
 • Nézd a közeli mosdókat a térképen, és lásd, mennyire friss a kód: a zöld pontok a nemrég bevált kódok.
@@ -88,7 +88,7 @@ Nincs reklám, nincs követés. Nem kell fiók: a telefonod véletlenszerű azon
 
 Kérjük, csak mosdóajtók kódját oszd meg, soha lakásokét, személyzeti helyiségekét vagy épületbejáratokét, és tartsd tiszteletben a vendégeknek szánt helyeket. A helyek üzemeltetői bármikor kérhetik a kódjuk eltávolítását.
 
-A magyarotyesz közösségi projekt. A kódokat a felhasználók osztják meg, és lehetnek tévesek vagy elavultak.
+A LooKey közösségi projekt. A kódokat a felhasználók osztják meg, és lehetnek tévesek vagy elavultak.
 
 **Újdonságok (első béta):** Első béta. Találj mosdókódokat Budapesten, add hozzá a sajátjaidat, és írd meg, mit javítsunk: Beállítások > Visszajelzés küldése.
 

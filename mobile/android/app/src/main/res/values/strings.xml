@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">magyarotyesz</string>
-    <string name="title_activity_main">magyarotyesz</string>
-    <string name="package_name">hu.magyarotyesz.app</string>
-    <string name="custom_url_scheme">hu.magyarotyesz.app</string>
+    <string name="app_name">LooKey</string>
+    <string name="title_activity_main">LooKey</string>
+    <string name="package_name">hu.lookey.app</string>
+    <string name="custom_url_scheme">hu.lookey.app</string>
 </resources>

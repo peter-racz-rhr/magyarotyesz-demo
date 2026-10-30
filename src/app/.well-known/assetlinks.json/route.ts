@@ -1,7 +1,7 @@
 /*
   Digital Asset Links: the file that lets the Android app (Google Play) open this site as itself,
   without the browser bar. Set these in the Vercel project, then redeploy:
-    ANDROID_PACKAGE_NAME           e.g. hu.magyarotyesz.app (the package name you chose in PWABuilder)
+    ANDROID_PACKAGE_NAME           e.g. hu.lookey.app (the Android package name)
     ANDROID_SHA256_FINGERPRINTS    the SHA-256 fingerprint(s) of the app signing key, comma separated
                                    (Play Console > App integrity > App signing, plus your upload key)
   Until both are set the answer is an empty list, which is valid and harmless.

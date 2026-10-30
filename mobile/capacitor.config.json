@@ -1,9 +1,9 @@
 {
-  "appId": "hu.magyarotyesz.app",
-  "appName": "magyarotyesz",
+  "appId": "hu.lookey.app",
+  "appName": "LooKey",
   "webDir": "www",
   "server": {
-    "url": "https://project-1y1mw.vercel.app",
+    "url": "https://lookey.hu",
     "androidScheme": "https",
     "cleartext": false
   },

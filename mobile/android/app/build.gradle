@@ -9,10 +9,10 @@ if (keystoreFile.exists()) {
 }
 
 android {
-    namespace = "hu.magyarotyesz.app"
+    namespace = "hu.lookey.app"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "hu.magyarotyesz.app"
+        applicationId "hu.lookey.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 3

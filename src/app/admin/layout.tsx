@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 // Not linked from the app and kept out of search engines.
 export const metadata: Metadata = {
-  title: "Admin · magyarotyesz",
+  title: "Admin · LooKey",
   robots: { index: false, follow: false },
 };
 
