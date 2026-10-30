@@ -5,7 +5,7 @@
 */
 export const OPERATOR = {
   name: process.env.NEXT_PUBLIC_OPERATOR_NAME?.trim() || "Péter Rácz",
-  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "peter.racz.rhr@gmail.com",
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "contact@lookey.hu",
   address: process.env.NEXT_PUBLIC_OPERATOR_ADDRESS?.trim() || "1183 Budapest, Kálti Márk u. 2/B, Hungary",
   /** Optional: shown on the Imprint only when set. */
   phone: process.env.NEXT_PUBLIC_OPERATOR_PHONE?.trim() || "+36 50 104 5007",

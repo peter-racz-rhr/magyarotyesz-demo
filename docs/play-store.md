@@ -23,7 +23,7 @@
 
 - Privacy policy: `https://<your address>/privacy`
 - Account deletion page (Play requires a public web link because the app lets people sign in): `https://<your address>/delete-account`
-- Contact email: peter.racz.rhr@gmail.com
+- Contact email: contact@lookey.hu
 - Website: `https://<your address>`
 
 ## Part 3. Store listing, English
