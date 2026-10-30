@@ -30,7 +30,8 @@ export async function nativeGoogleIdToken(webClientId: string): Promise<string |
     initialized = webClientId;
   }
   try {
-    const res = await call<{ result?: { idToken?: string | null } }>("SocialLogin", "login", { provider: "google", options: { scopes: ["email"] } });
+    // No extra scopes: the ID token already carries the email, and asking for scopes needs native changes.
+    const res = await call<{ result?: { idToken?: string | null } }>("SocialLogin", "login", { provider: "google", options: {} });
     return res.result?.idToken ?? null;
   } catch (e) {
     // Closing the sheet is a rejection too; only a real failure should say so.

@@ -129,35 +129,6 @@ function TapToAdd({ onTap, onDismiss }: { onTap: (draft: Draft) => void; onDismi
   return null;
 }
 
-/** Reports the map's rotation, so the locate button can turn into a compass (like Google Maps). */
-function BearingWatch({ onChange }: { onChange: (bearing: number) => void }) {
-  const { map } = useMap();
-  const onChangeRef = useRef(onChange);
-  useEffect(() => {
-    onChangeRef.current = onChange;
-  });
-  useEffect(() => {
-    if (!map) return;
-    const update = () => onChangeRef.current(map.getBearing());
-    update();
-    map.on("rotate", update);
-    return () => {
-      map.off("rotate", update);
-    };
-  }, [map]);
-  return null;
-}
-
-/** A compass needle: red end to the north, turned with the map. */
-function CompassNeedle({ bearing }: { bearing: number }) {
-  return (
-    <svg viewBox="0 0 24 24" className="size-6" style={{ transform: `rotate(${-bearing}deg)` }} aria-hidden>
-      <path d="M12 2.5 15.5 12h-7z" fill="var(--bad)" />
-      <path d="M12 21.5 8.5 12h7z" fill="currentColor" opacity="0.85" />
-    </svg>
-  );
-}
-
 /** A row of choices that look like pills. */
 function Choice<T extends string>({
   keys,
@@ -384,7 +355,7 @@ export default function MapPage() {
   useEffect(() => {
     if (!here.coords || flownRef.current) return;
     flownRef.current = true;
-    mapRef.current?.flyTo({ center: [here.coords.longitude, here.coords.latitude], zoom: 15, duration: 1800 });
+    mapRef.current?.flyTo({ center: [here.coords.longitude, here.coords.latitude], zoom: 15, bearing: 0, duration: 1800 });
   }, [here.coords]);
 
   // While the add sheet is open the dock steps aside, and on Android the
@@ -479,15 +450,12 @@ export default function MapPage() {
 
   const { box: detailsBox, inner: detailsInner, grip } = useSheetPull({ onOpenChange: setDetails, onClose: closeSheet });
 
-  // Turned map: the button is a compass, and the first tap puts north back at the top (like Google Maps).
-  const [bearing, setBearing] = useState(0);
-  const turned = Math.abs(bearing) > 2;
+  // One tap: back to where you are, with north at the top again (however the map was turned).
   const locate = async () => {
-    if (turned) {
+    if (here.status === "off") {
       mapRef.current?.easeTo({ bearing: 0, duration: 500 });
-      return;
+      return flash(t.map.locationOff);
     }
-    if (here.status === "off") return flash(t.map.locationOff);
     if (here.coords) {
       mapRef.current?.flyTo({ center: [here.coords.longitude, here.coords.latitude], zoom: 16, bearing: 0, duration: 1200 });
     } else {
@@ -610,7 +578,6 @@ export default function MapPage() {
           className="h-full w-full"
         >
           <TapToAdd onTap={startDraft} onDismiss={() => setFocus(null)} />
-          <BearingWatch onChange={setBearing} />
           <ZoomCap max={base.key === "satellite" ? 19 : 22} />
           <Buildings3D enabled={buildings3d && base.key !== "satellite"} variant={base.key === "light" ? "light" : "dark"} />
 
@@ -736,8 +703,8 @@ export default function MapPage() {
                 </button>
               </LiquidSurface>
               <LiquidSurface radius={999} className="size-14">
-                <button type="button" aria-label={turned ? t.map.north : t.map.locate} onClick={locate} className="grid size-full place-items-center rounded-full">
-                  {turned ? <CompassNeedle bearing={bearing} /> : <LocateFixed className={cn("size-5", here.status === "locating" && "animate-pulse")} />}
+                <button type="button" aria-label={t.map.locate} onClick={locate} className="grid size-full place-items-center rounded-full">
+                  <LocateFixed className={cn("size-5", here.status === "locating" && "animate-pulse")} />
                 </button>
               </LiquidSurface>
             </div>,

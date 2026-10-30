@@ -143,7 +143,6 @@ export const de: Dict = {
     hint: "Du kennst einen Code? Tippe auf der Karte dorthin, wo er ist.",
     added: (name: string) => `${name} hinzugefügt. Danke.`,
     locate: "Zeig mir, wo ich bin",
-    north: "Karte nach Norden drehen",
     nearest: "Nächste",
     nearestNone: "Noch keine geöffnete Toilette in der Nähe, die meistens funktioniert.",
     locationOff: "Der Standort ist aus. Schalte ihn in den Einstellungen ein.",
