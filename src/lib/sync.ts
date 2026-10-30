@@ -76,6 +76,9 @@ export const useUserId = () => identity.useValue()?.userId ?? null;
 export const useAccount = () => meStore.useValue().account ?? { google: false, email: false };
 export const useGotInTotal = () => meStore.useValue().gotIn ?? 0;
 export const useOnBoard = () => meStore.useValue().onBoard ?? false;
+/** Whether this profile has a Google or email account (as last told by the server). */
+export const hasAccount = () => { const a = meStore.get().account; return !!(a?.google || a?.email); };
+export const subscribeMe = meStore.subscribe;
 const outbox = createLocalStore<OutAction[]>("magyarotyesz:outbox", []);
 /** The name we last tried to send, so a name the server turned down is not sent over and over. */
 const profileTried = createLocalStore<string>("magyarotyesz:profile-tried", "");

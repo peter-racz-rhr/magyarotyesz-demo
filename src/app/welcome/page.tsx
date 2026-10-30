@@ -1,5 +1,6 @@
 "use client";
 
+import { pullProfileNow } from "@/lib/profile-sync";
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "motion/react";
 import { MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -259,7 +260,13 @@ export default function WelcomePage() {
         )}
         {open && step === "account" && (
           <div className="absolute inset-0 z-20 bg-night">
-            <AccountStep onDone={() => setStep("profile")} />
+            <AccountStep
+              onDone={async (how) => {
+                // A returning account: bring back its photo, name and settings before the profile step shows them.
+                if (how === "account") await pullProfileNow().catch(() => {});
+                setStep("profile");
+              }}
+            />
           </div>
         )}
         {open && step === "profile" && (

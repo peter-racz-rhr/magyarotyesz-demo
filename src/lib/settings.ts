@@ -66,5 +66,6 @@ const store = createLocalStore<Settings>("magyarotyesz:settings", {
 });
 
 export const useSettings = store.useValue;
+export const subscribeSettings = store.subscribe;
 export const getSettings = store.get;
 export const updateSettings = (change: Partial<Settings>) => store.set((s) => ({ ...s, ...change }));

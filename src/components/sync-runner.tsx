@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { REMOTE } from "@/lib/api";
 import { alertLine, useT } from "@/lib/i18n";
 import { notify } from "@/lib/notify";
+import { startProfileSync } from "@/lib/profile-sync";
 import { onNewAlerts, syncNow } from "@/lib/sync";
 
 /**
@@ -26,6 +27,9 @@ export function SyncRunner() {
     });
     return () => onNewAlerts(null);
   }, [t]);
+
+  // Photo, colour, saved places and settings follow the account.
+  useEffect(() => startProfileSync(), []);
 
   useEffect(() => {
     if (!REMOTE) return;

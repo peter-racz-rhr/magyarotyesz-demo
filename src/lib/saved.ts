@@ -6,5 +6,7 @@ import { createLocalStore } from "./local-store";
 const store = createLocalStore<string[]>("magyarotyesz:saved", []);
 
 export const useSaved = store.useValue;
+export const subscribeSaved = store.subscribe;
+export const setSaved = (ids: string[]) => store.set(ids);
 export const getSaved = store.get;
 export const toggleSaved = (id: string) => store.set((list) => (list.includes(id) ? list.filter((x) => x !== id) : [id, ...list]));

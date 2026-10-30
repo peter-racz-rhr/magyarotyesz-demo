@@ -480,7 +480,7 @@ export const de: Dict = {
     photoZoom: "Zoom",
     photoUse: "Foto verwenden",
     photoBad: "Dieses Handy kann das Bild nicht öffnen. Versuche ein JPG oder PNG (oder einen Screenshot davon).",
-    photoHint: "Dein Foto bleibt auf diesem Handy.",
+    photoHint: "Dein Foto bleibt auf diesem Handy, und in deinem Konto, wenn du angemeldet bist.",
     profileTitle: "Profil bearbeiten",
     nameLabel: "Dein Name",
     namePlaceholder: "Wie sollen wir dich nennen?",
