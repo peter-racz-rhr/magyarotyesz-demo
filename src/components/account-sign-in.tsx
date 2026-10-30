@@ -125,13 +125,15 @@ export function AccountSignIn({ onDone, className, light = false }: { onDone: ()
         setBusy(null);
         if (outcome === "ok") done.current();
         else say(outcome);
-      } catch {
+      } catch (e) {
         setBusy(null);
-        setProblem(t.account.problems.google);
+        // Android's own reason (a setup mismatch says so plainly), so a failure can be traced.
+        const why = String((e as Error)?.message ?? e).slice(0, 160);
+        setProblem(`${t.account.problems.google} (${why})`);
       }
       return;
     }
-    if (!tokenClient.current) return setProblem(t.account.problems.google);
+    if (!tokenClient.current) return setProblem(`${t.account.problems.google} (web)`);
     setProblem(null);
     setBusy("google");
     tokenClient.current.requestAccessToken();
