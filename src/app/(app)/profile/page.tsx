@@ -1,6 +1,7 @@
 "use client";
 
-import { Bell, Bookmark, Camera, Check, ChevronRight, Copy, Settings, Trash2, Trophy } from "lucide-react";
+import { Bell, Bookmark, Camera, Check, ChevronRight, Coffee, Copy, ExternalLink, Settings, Trash2, Trophy } from "lucide-react";
+import { SUPPORT_URL, useShowSupport } from "@/lib/support";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ProfileEditor } from "@/components/profile-editor";
@@ -19,6 +20,7 @@ import { cn } from "@/lib/utils";
 
 export default function ProfilePage() {
   const { t, lang } = useT();
+  const showSupport = useShowSupport();
   const toilets = useToilets();
   const alerts = useAlerts();
   const notices = useNotices();
@@ -158,6 +160,14 @@ export default function ProfilePage() {
           <span className="flex-1">{t.board.link}</span>
           <ChevronRight className="size-5 text-haze" aria-hidden />
         </Link>
+
+        {showSupport && (
+          <a href={SUPPORT_URL} target="_blank" rel="noreferrer" className={cn(CARD, "mt-3 flex items-center gap-3 px-4 py-3.5 text-[1rem] active:opacity-70")}>
+            <Coffee className="size-5 text-[#fab387]" aria-hidden />
+            <span className="min-w-0 flex-1 break-words">{t.settings.support}</span>
+            <ExternalLink className="size-4 shrink-0 text-haze" aria-hidden />
+          </a>
+        )}
 
         <Link href="/nearby?saved=1" className={cn(CARD, "mt-3 flex items-center gap-3 px-4 py-3.5 text-[1rem] active:opacity-70")}>
           <Bookmark className="size-5 text-brand" aria-hidden />
