@@ -12,8 +12,10 @@ person swipes from 1 to 2 the picture continues; images 3, 4 and 5 stand alone.
 | 4 | 1080×1920 | **"Rank up when people get in."** Newcomer, Regular, Trusted, Local legend. | The rank-up screen (`/profile?rankup=2`). |
 | 5 | 1080×1920 | **"Free. Private. Works offline."** No ads, no tracking. | Four short promises (no account needed, offline map, colours, 3 languages). |
 
-`play-store-screenshots-plan.png` next to this file shows the layout with the real screens in place (the Add form slot is a grey placeholder:
-take that one on your phone).
+`play-store-screenshots-plan.png` next to this file shows the layout with the real app screens in place. Ready-to-use drafts of all five
+images (1080×1920) are in `store-images/`: `01-left.png` and `02-right.png` are the two halves of `panorama-2160x1920.png` (a tilted phone cut in half by the seam, with
+floating chips, pins, a code chip and a rank badge), then `03-add.png`, `04-rank.png`, `05-promises.png`. Upload them as they are, or use them as the layout reference for the
+generator prompts below. Replace the app screens with fresh screenshots from your phone (with real data) before the final upload.
 
 ## What makes store screenshots work (short, and honest about the evidence)
 
