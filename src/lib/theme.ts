@@ -1,5 +1,6 @@
 "use client";
 
+import { setNativeBarStyle } from "./native";
 import { useEffect, useSyncExternalStore } from "react";
 import { normalizePalette } from "./palettes";
 import { updateSettings, useSettings, type Settings } from "./settings";
@@ -63,6 +64,8 @@ export function ThemeRunner() {
       document.head.appendChild(meta);
     }
   }, [look, navStyle, glass, palette, flavour, textSize, lang]);
+  // In the Android app the status bar icons follow the look too.
+  useEffect(() => setNativeBarStyle(look), [look]);
   return null;
 }
 

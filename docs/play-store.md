@@ -4,7 +4,7 @@
 
 1. **Developer account.** https://play.google.com/console/signup, one-time $25, personal account, identity check (can take a few days). Use the same Google account you want to own the app.
 2. **Own domain (recommended).** The Android app is tied to the web address. If you will ever move from `project-1y1mw.vercel.app`, do it **before** the first upload, then use the new address everywhere below.
-3. **Build the Android app.** The `android/` folder of this repository is a ready Android Studio project (see `android/README.md`: open it, build a signed `.aab`). Or, instead, use PWABuilder:
+3. **Build the Android app.** The `mobile/` folder of this repository is the standalone Android app (Capacitor, see `mobile/README.md`: run `npm install`, open `mobile/android`, build a signed `.aab`). Or, instead, use PWABuilder:
    **Build the Android app with PWABuilder.** Open https://www.pwabuilder.com, enter the app address, press Start, then Package for stores > Android.
    - Package ID: pick one and never change it, for example `hu.magyarotyesz.app`.
    - App name: `magyarotyesz`. Display mode: standalone. Notifications: on. Location delegation: on.

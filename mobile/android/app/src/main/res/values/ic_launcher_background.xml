@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#000000</color>
+    <!-- The app's dark background: shown before the first page paints, and behind the splash icon. -->
+    <color name="night">#121212</color>
+</resources>

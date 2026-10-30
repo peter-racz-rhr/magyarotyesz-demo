@@ -1,3 +1,7 @@
+# Superseded
+
+This is the older Chrome-based (Trusted Web Activity) app. The standalone app is in `../mobile/` (see its README).
+
 # magyarotyesz for Android (APK / Play Store)
 
 This folder is an Android Studio project. The app is a thin shell (a **Trusted Web Activity**) that opens the website

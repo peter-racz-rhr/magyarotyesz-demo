@@ -1,0 +1,18 @@
+{
+  "name": "magyarotyesz-mobile",
+  "private": true,
+  "description": "The standalone Android app: a Capacitor shell that shows the website in its own WebView (no Chrome).",
+  "scripts": {
+    "postinstall": "cap sync android",
+    "sync": "cap sync android",
+    "open": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.0",
+    "@capacitor/core": "8.6.0",
+    "@capgo/capacitor-social-login": "8.7.5"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0"
+  }
+}

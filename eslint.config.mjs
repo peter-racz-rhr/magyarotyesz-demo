@@ -28,6 +28,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Copied from node_modules on install.
     "public/maplibre/**",
+    // The Android app project (its own packages and generated files).
+    "mobile/**",
+    "android-twa/**",
   ]),
 ]);
 

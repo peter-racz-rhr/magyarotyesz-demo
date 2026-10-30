@@ -1,5 +1,6 @@
 "use client";
 
+import { isNativeApp, nativeGoogleIdToken } from "@/lib/native";
 import { Mail } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { btn } from "@/components/ui/buttons";
@@ -85,7 +86,7 @@ export function AccountSignIn({ onDone, className, light = false }: { onDone: ()
   // (browsers only allow the popup when it opens right after the tap).
   const clientId = options?.google ?? null;
   useEffect(() => {
-    if (!clientId) return;
+    if (!clientId || isNativeApp()) return;
     let cancelled = false;
     loadGoogle()
       .then(() => {
@@ -112,7 +113,24 @@ export function AccountSignIn({ onDone, className, light = false }: { onDone: ()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientId]);
 
-  const google = () => {
+  const google = async () => {
+    // In the Android app Google doesn't allow its web sign-in; Android's own account sheet is used instead.
+    if (isNativeApp() && clientId) {
+      setProblem(null);
+      setBusy("google");
+      try {
+        const idToken = await nativeGoogleIdToken(clientId);
+        if (!idToken) return setBusy(null);
+        const outcome = await signInWithGoogle({ idToken });
+        setBusy(null);
+        if (outcome === "ok") done.current();
+        else say(outcome);
+      } catch {
+        setBusy(null);
+        setProblem(t.account.problems.google);
+      }
+      return;
+    }
     if (!tokenClient.current) return setProblem(t.account.problems.google);
     setProblem(null);
     setBusy("google");
