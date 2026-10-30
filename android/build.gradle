@@ -1,0 +1,5 @@
+// The Android app is a thin shell (a Trusted Web Activity) around the web app: all the screens come from the website,
+// so website updates reach everyone at once. Only this shell needs a new release, rarely.
+plugins {
+    id 'com.android.application' version '8.7.3' apply false
+}

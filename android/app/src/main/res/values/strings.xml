@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appName">magyarotyesz</string>
+    <string name="shortcutNearestShort">Nearest</string>
+    <string name="shortcutNearestLong">Nearest toilet</string>
+    <string name="shortcutUrgentShort">Urgent</string>
+    <string name="shortcutUrgentLong">I need a toilet now</string>
+    <string name="shortcutSavedShort">Saved</string>
+    <string name="shortcutSavedLong">Saved places</string>
+</resources>

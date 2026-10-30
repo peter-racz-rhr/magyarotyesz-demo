@@ -1,0 +1,73 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Signing: put the key's details in android/keystore.properties (see README). Without it, release builds are unsigned
+// and the "debug" build is signed with Android Studio's own debug key (fine for trying the app on your phone).
+def keystoreFile = rootProject.file('keystore.properties')
+def keystoreProps = new Properties()
+if (keystoreFile.exists()) {
+    keystoreFile.withInputStream { keystoreProps.load(it) }
+}
+
+android {
+    namespace 'hu.magyarotyesz.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId MAGYAR_PACKAGE
+        minSdk 23
+        targetSdk 35
+        versionCode MAGYAR_VERSION_CODE.toInteger()
+        versionName MAGYAR_VERSION_NAME
+
+        // The address is written once here and used by the manifest and the strings.
+        def host = MAGYAR_HOST
+        manifestPlaceholders = [hostName: host]
+        resValue "string", "hostName", host
+        resValue "string", "launchUrl", "https://${host}/"
+        resValue "string", "webManifestUrl", "https://${host}/manifest.webmanifest"
+        resValue "string", "providerAuthority", "${MAGYAR_PACKAGE}.fileprovider"
+        resValue "string", "shortcutNearest", "https://${host}/map?nearest=1"
+        resValue "string", "shortcutUrgent", "https://${host}/urgent"
+        resValue "string", "shortcutSaved", "https://${host}/nearby?saved=1"
+        resValue "string", "assetStatements", "[{ \"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": {\"namespace\": \"web\", \"site\": \"https://${host}\"}}]"
+    }
+
+    signingConfigs {
+        if (keystoreFile.exists()) {
+            release {
+                storeFile rootProject.file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (keystoreFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    buildFeatures {
+        buildConfig false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+    // Lets the website ask for the phone's location through the app (the "Nearest" button and the on-the-spot check).
+    implementation 'com.google.androidbrowserhelper:locationdelegation:1.1.1'
+}

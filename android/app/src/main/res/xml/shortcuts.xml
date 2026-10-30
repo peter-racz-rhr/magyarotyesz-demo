@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="nearest"
+        android:shortcutShortLabel="@string/shortcutNearestShort"
+        android:shortcutLongLabel="@string/shortcutNearestLong">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/shortcutNearest"
+            android:targetClass="com.google.androidbrowserhelper.trusted.LauncherActivity"
+            android:targetPackage="hu.magyarotyesz.app" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="urgent"
+        android:shortcutShortLabel="@string/shortcutUrgentShort"
+        android:shortcutLongLabel="@string/shortcutUrgentLong">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/shortcutUrgent"
+            android:targetClass="com.google.androidbrowserhelper.trusted.LauncherActivity"
+            android:targetPackage="hu.magyarotyesz.app" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="saved"
+        android:shortcutShortLabel="@string/shortcutSavedShort"
+        android:shortcutLongLabel="@string/shortcutSavedLong">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/shortcutSaved"
+            android:targetClass="com.google.androidbrowserhelper.trusted.LauncherActivity"
+            android:targetPackage="hu.magyarotyesz.app" />
+    </shortcut>
+</shortcuts>
