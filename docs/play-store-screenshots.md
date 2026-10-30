@@ -14,8 +14,14 @@ person swipes from 1 to 2 the picture continues; images 3, 4 and 5 stand alone.
 
 `play-store-screenshots-plan.png` next to this file shows the layout with the real app screens in place. Ready-to-use drafts of all five
 images (1080×1920) are in `store-images/`: `01-left.png` and `02-right.png` are the two halves of `panorama-2160x1920.png` (a tilted phone cut in half by the seam, with
-floating chips, pins, a code chip and a rank badge), then `03-add.png`, `04-rank.png`, `05-promises.png`. Upload them as they are, or use them as the layout reference for the
+three small chips), then `03-add.png`, `04-rank.png`, `05-promises.png`. Upload them as they are, or use them as the layout reference for the
 generator prompts below. Replace the app screens with fresh screenshots from your phone (with real data) before the final upload.
+
+## Look
+
+Minimal, on Catppuccin Mocha: crust/base background, one soft glow per image in its own accent (green, mauve, yellow, lavender), the app's own font
+(Instrument Sans) with tight letter spacing, one highlighted word per headline, and a modern phone (19.5:9 screen, thin bezel, punch-hole camera) drawn
+in HTML, so there is no licence question about a downloaded mockup. The app screens were taken with the app's Catppuccin Green palette.
 
 ## What makes store screenshots work (short, and honest about the evidence)
 
