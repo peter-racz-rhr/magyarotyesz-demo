@@ -167,6 +167,13 @@ function PersonPage({ token, id, onBack, onAuthError }: { token: string; id: str
               {person.banned && <span className="shrink-0 rounded-full bg-bad/20 px-2 py-0.5 text-xs text-bad">banned</span>}
             </div>
             <p className="mt-1 font-mono text-xs break-all text-haze">{person.id}</p>
+            {person.email ? (
+              <a href={`mailto:${person.email}`} className="mt-1 block text-sm font-semibold break-all text-brand">
+                {person.email}
+              </a>
+            ) : (
+              <p className="mt-1 text-sm text-haze">No email (a guest, or signed in before addresses were kept)</p>
+            )}
             <p className="mt-2 text-sm text-haze">
               Joined {when(person.createdAt)} · {person.places} {person.places === 1 ? "place" : "places"} · {person.gotIn} got in with their codes
             </p>

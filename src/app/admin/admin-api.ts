@@ -23,7 +23,7 @@ export type Item = {
   flagged: string | null;
 };
 export type Counts = { visible: number; hidden: number; reported: number; flagged: number; users: number; banned: number };
-export type Person = { id: string; displayName: string; createdAt: string; banned: boolean; places: number; gotIn: number };
+export type Person = { id: string; displayName: string; createdAt: string; banned: boolean; places: number; gotIn: number; email?: string | null };
 export type PersonDetail = Person & {
   toilets: Item[];
   messages: { id: string; text: string; at: string; read: boolean }[];
