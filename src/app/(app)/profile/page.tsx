@@ -169,7 +169,7 @@ export default function ProfilePage() {
           <p className="text-[0.75rem] font-semibold tracking-wide text-haze uppercase">{t.profile.cityTitle}</p>
           <p className="mt-1 text-[1rem]">
             {t.profile.cityPlaces(toilets.length)}
-            <span className="text-haze"> · {t.profile.cityChecked(toilets.filter((x) => now - Date.parse(x.confirmedAt) < 86400000).length)}</span>
+            <span className="text-haze"> · {t.profile.cityChecked(toilets.filter((x) => x.confirms > 0 && now - Date.parse(x.confirmedAt) < 86400000).length)}</span>
           </p>
         </div>
 

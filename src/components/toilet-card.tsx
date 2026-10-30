@@ -588,7 +588,7 @@ export function ToiletCard({
       {toilet.note && (
         <div className="mt-3 flex items-start gap-2.5 rounded-2xl bg-fg/[0.05] px-3 py-2.5">
           <Signpost className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
-          <p className="min-w-0 text-sm">
+          <p className="min-w-0 text-sm break-words [overflow-wrap:anywhere]">
             <span className="block text-xs font-semibold text-haze">{t.card.howToFind}</span>
             {toilet.note}
           </p>

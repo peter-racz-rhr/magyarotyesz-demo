@@ -442,6 +442,7 @@ export const de: Dict = {
     countWithin: (n: number) => (n === 1 ? "1 Toilette im Umkreis von 500 m" : `${n} Toiletten im Umkreis von 500 m`),
     noneWithin: (place: string) => `Keine Toiletten im Umkreis von 500 m um ${place}.`,
     showFarther: "Weiter entfernte zeigen",
+    showMore: (n: number) => `${n} weitere zeigen`,
     onlyWithin: "Nur im Umkreis von 500 m",
     allByDistance: "Alles, die nächsten zuerst",
     backToMe: "Zurück zu meinem Standort",

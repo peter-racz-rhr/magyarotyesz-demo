@@ -84,7 +84,7 @@ export default function UrgentPage() {
               <p className="mt-6 rounded-3xl border-2 border-good/50 bg-good/[0.08] px-4 py-5 text-center text-[1.25rem] font-bold">{t.card.freeNoCode}</p>
             )}
 
-            {pick.toilet.note && <p className="mt-4 text-[1.0625rem] leading-snug text-ink/85">{pick.toilet.note}</p>}
+            {pick.toilet.note && <p className="mt-4 text-[1.0625rem] leading-snug break-words text-ink/85 [overflow-wrap:anywhere]">{pick.toilet.note}</p>}
 
             <div className="mt-auto flex flex-col gap-3 pt-8">
               <a

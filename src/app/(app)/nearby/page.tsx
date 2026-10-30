@@ -23,6 +23,8 @@ const CITY_CENTRE = { latitude: 47.4979, longitude: 19.0544 };
 
 /** Lowercase, without accents, so "kor" finds "Kör". */
 const fold = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+/** How many rows the list shows at first, and adds with each "Show more". */
+const PAGE = 40;
 const matches = (t: Toilet, q: string, d: Dict) => fold(`${t.name} ${d.kinds[t.kind]} ${t.note}`).includes(fold(q));
 
 /**
@@ -77,6 +79,9 @@ export default function NearbyPage() {
   const [retry, setRetry] = useState(0);
   // Past the radius too, when you ask for it.
   const [farther, setFarther] = useState(false);
+  // Thousands of places would be thousands of rows: the nearest first, more on request.
+  const [shown, setShown] = useState(PAGE);
+  const [pagedFor, setPagedFor] = useState("");
   const input = useRef<HTMLInputElement>(null);
   useKeyboardMode(focused);
 
@@ -137,6 +142,12 @@ export default function NearbyPage() {
   const aroundAnchor = anchor ? byDistance(toilets, anchor) : [];
   const within = aroundAnchor.filter((x) => x.metres <= ADDRESS_RADIUS);
   const sorted = anchor ? (farther ? aroundAnchor : within) : named;
+  // A new search starts the list from the top again.
+  const pageKey = `${q}|${anchor ? `${anchor.latitude},${anchor.longitude}` : ""}|${farther}`;
+  if (pageKey !== pagedFor) {
+    setPagedFor(pageKey);
+    setShown(PAGE);
+  }
 
   const done = () => {
     input.current?.blur();
@@ -293,7 +304,7 @@ export default function NearbyPage() {
             </p>
           )}
           <ul className="mt-3 divide-y divide-dusk-edge border-y border-dusk-edge">
-            {sorted.map(({ toilet, metres }) => {
+            {sorted.slice(0, shown).map(({ toilet, metres }) => {
               const isOpen = open === toilet.id;
               return (
                 <li key={toilet.id} id={`toilet-${toilet.id}`}>
@@ -339,6 +350,11 @@ export default function NearbyPage() {
               );
             })}
           </ul>
+          {sorted.length > shown && (
+            <button type="button" onClick={() => setShown((n) => n + PAGE)} className="mt-4 h-12 w-full rounded-full border border-dusk-edge text-[0.9375rem] font-semibold active:bg-fg/10">
+              {d.nearby.showMore(Math.min(PAGE, sorted.length - shown))}
+            </button>
+          )}
           </>
         )}
         <footer className="mt-10 text-center text-xs text-haze">
@@ -452,7 +468,7 @@ export default function NearbyPage() {
                 }}
                 placeholder={d.nearby.search}
                 aria-label={d.nearby.search}
-                className="h-full min-w-0 flex-1 bg-transparent text-[1rem] outline-none placeholder:text-haze [&::-webkit-search-cancel-button]:hidden"
+                className="h-full min-w-0 flex-1 truncate bg-transparent text-[1rem] outline-none placeholder:text-haze [&::-webkit-search-cancel-button]:hidden"
               />
               {(query || focused) && (
                 <button

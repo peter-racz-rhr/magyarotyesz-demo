@@ -419,6 +419,8 @@ export const walkIfNear = (metres: number) => (metres <= 6000 ? walkMinutes(metr
 
 /** How recently a code was confirmed: 0 (long ago) to 3 (today). */
 export function freshness(t: Toilet, now = Date.now()) {
+  // Nobody has said it works yet (an imported public toilet): not "checked today".
+  if (t.confirms === 0) return 0;
   const last = t.confirmedAt ? Date.parse(t.confirmedAt) : Number.NaN;
   if (Number.isNaN(last)) return 0;
   const days = (now - last) / 86400000;
