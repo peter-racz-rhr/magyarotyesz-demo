@@ -161,14 +161,6 @@ export default function ProfilePage() {
           <ChevronRight className="size-5 text-haze" aria-hidden />
         </Link>
 
-        {showSupport && (
-          <a href={SUPPORT_URL} target="_blank" rel="noreferrer" className={cn(CARD, "mt-3 flex items-center gap-3 px-4 py-3.5 text-[1rem] active:opacity-70")}>
-            <Coffee className="size-5 text-[#fab387]" aria-hidden />
-            <span className="min-w-0 flex-1 break-words">{t.settings.support}</span>
-            <ExternalLink className="size-4 shrink-0 text-haze" aria-hidden />
-          </a>
-        )}
-
         <Link href="/nearby?saved=1" className={cn(CARD, "mt-3 flex items-center gap-3 px-4 py-3.5 text-[1rem] active:opacity-70")}>
           <Bookmark className="size-5 text-brand" aria-hidden />
           <span className="flex-1">{t.profile.savedPlaces(saved.length)}</span>
@@ -182,6 +174,17 @@ export default function ProfilePage() {
             <span className="text-haze"> · {t.profile.cityChecked(toilets.filter((x) => x.confirms > 0 && now - Date.parse(x.confirmedAt) < 86400000).length)}</span>
           </p>
         </div>
+
+        {showSupport && (
+          <a href={SUPPORT_URL} target="_blank" rel="noreferrer" className={cn(CARD, "mt-3 flex items-center gap-3 px-4 py-3.5 text-[0.9375rem] active:opacity-70")}>
+            <Coffee className="size-5 text-[#fab387]" aria-hidden />
+            <span className="min-w-0 flex-1">
+              <span className="block break-words">{t.settings.support}</span>
+              <span className="block text-[0.8125rem] leading-snug break-words text-haze">{t.settings.supportFooter}</span>
+            </span>
+            <ExternalLink className="size-4 shrink-0 text-haze" aria-hidden />
+          </a>
+        )}
 
         {REMOTE && (pending > 0 || sync.online === false) && !sync.syncing && (
           <button type="button" onClick={() => void syncNow()} className={cn(btn.secondary, btn.sm, "mt-3 w-full")}>

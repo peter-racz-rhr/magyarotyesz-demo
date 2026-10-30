@@ -1,14 +1,13 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, CloudDownload, Coffee, ExternalLink, Layers, Megaphone, MessageSquare, Moon, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, UserRound, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, CloudDownload, Layers, Megaphone, MessageSquare, Moon, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, UserRound, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BACK, PageTransition } from "@/components/page-transition";
 import { MapStylePicker } from "@/components/map-style-picker";
 import { PalettePicker } from "@/components/palette-picker";
-import { Group, LinkRow, ROW, SwitchRow, Tile } from "@/components/settings-ui";
-import { SUPPORT_URL, useShowSupport } from "@/lib/support";
+import { Group, LinkRow, SwitchRow, Tile } from "@/components/settings-ui";
 import { btn } from "@/components/ui/buttons";
 import { REMOTE } from "@/lib/api";
 import { alertLine, useT } from "@/lib/i18n";
@@ -135,7 +134,6 @@ function ChoiceRow<K extends "navStyle" | "glass" | "flavour">({
 export default function SettingsPage() {
   const router = useRouter();
   const { t, lang } = useT();
-  const showSupport = useShowSupport();
   const settings = useSettings();
   const look = useLook();
   const toilets = useToilets();
@@ -346,19 +344,6 @@ export default function SettingsPage() {
           <LinkRow icon={<Megaphone />} hue={42} title={t.settings.whatsNew} href="/changelog" />
         </Group>
 
-        {showSupport && (
-          <Group id="support-heading" title={t.settings.supportGroup} footer={t.settings.supportFooter}>
-            <li>
-              <a href={SUPPORT_URL} target="_blank" rel="noreferrer" className={ROW}>
-                <Tile hue={28}>
-                  <Coffee />
-                </Tile>
-                <span className="min-w-0 flex-1 break-words">{t.settings.support}</span>
-                <ExternalLink className="size-4 shrink-0 text-haze" aria-hidden />
-              </a>
-            </li>
-          </Group>
-        )}
 
         {REMOTE && authOptions && (authOptions.google || authOptions.email) && (
           <Group id="account-heading" title={t.account.group} footer={t.account.footer}>
