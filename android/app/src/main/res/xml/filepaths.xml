@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- The splash image is saved to files/twa_splash/ (androidbrowserhelper's SplashImageTransferTask) and handed to
+     Chrome through this provider; a path that doesn't match makes the app crash on start. -->
 <paths>
-    <cache-path name="shared_files" path="twa_splash/" />
+    <files-path name="twa_splash" path="twa_splash/" />
 </paths>
