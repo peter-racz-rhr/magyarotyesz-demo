@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@liquefy-ui/core@1.1.0':
+    hash: 0fdaea75e4e3323d4ed5a19735883196c9fe91415d9cba013bc28eb91bfc1d87
+    path: patches/@liquefy-ui__core@1.1.0.patch
+
 importers:
 
   .:
@@ -16,7 +21,7 @@ importers:
         version: 5.3.0
       '@liquefy-ui/core':
         specifier: ^1.1.0
-        version: 1.1.0
+        version: 1.1.0(patch_hash=0fdaea75e4e3323d4ed5a19735883196c9fe91415d9cba013bc28eb91bfc1d87)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -3589,7 +3594,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@liquefy-ui/core@1.1.0': {}
+  '@liquefy-ui/core@1.1.0(patch_hash=0fdaea75e4e3323d4ed5a19735883196c9fe91415d9cba013bc28eb91bfc1d87)': {}
 
   '@mapbox/jsonlint-lines-primitives@2.0.3': {}
 

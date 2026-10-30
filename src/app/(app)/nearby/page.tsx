@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Bookmark, ChevronDown, MapPin, Search, Siren, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LegalLinks } from "@/components/legal-page";
 import { ActionButton } from "@/components/onboarding/action-button";
 import { PageTransition } from "@/components/page-transition";
@@ -25,7 +25,8 @@ const CITY_CENTRE = { latitude: 47.4979, longitude: 19.0544 };
 const fold = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
 /** How many rows the list shows at first, and adds with each "Show more". */
 const PAGE = 40;
-const matches = (t: Toilet, q: string, d: Dict) => fold(`${t.name} ${d.kinds[t.kind]} ${t.note}`).includes(fold(q));
+/** Each place's searchable text, folded once (not on every keystroke for thousands of places). */
+const searchIndex = (list: Toilet[], d: Dict) => new Map(list.map((t) => [t.id, fold(`${t.name} ${d.kinds[t.kind]} ${t.note}`)]));
 
 /**
  * While you type, the dock steps aside and (on Android) the page shrinks
@@ -126,7 +127,12 @@ export default function NearbyPage() {
 
   const shownPlaces = q.length >= 3 ? places : [];
   const looking = q.length >= 3 && lookup === "loading";
-  const nameMatches = q ? toilets.filter((t) => matches(t, q, d)) : toilets;
+  const index = useMemo(() => searchIndex(toilets, d), [toilets, d]);
+  const nameMatches = useMemo(() => {
+    if (!q) return toilets;
+    const needle = fold(q);
+    return toilets.filter((t) => index.get(t.id)?.includes(needle));
+  }, [toilets, index, q]);
 
   // Typing an address (nothing is called that) already shows what's closest to
   // the first match; tapping a suggestion or pressing search makes it stick.
@@ -137,9 +143,11 @@ export default function NearbyPage() {
     list.map((t) => ({ toilet: t, metres: distance(from, t) })).sort((a, b) => a.metres - b.metres);
   // Names you typed, nearest to you (or the address you picked); the list is
   // everything, nearest to the address, when you're searching for a place.
-  const named = byDistance(nameMatches, origin ?? mine);
+  const from = origin ?? mine;
+  // Distances and sorting for thousands of places: only again when the places or the point change.
+  const named = useMemo(() => byDistance(nameMatches, from), [nameMatches, from.latitude, from.longitude]); // eslint-disable-line react-hooks/exhaustive-deps
   // Searching for a place shows what is within walking distance of it, nothing farther unless you ask.
-  const aroundAnchor = anchor ? byDistance(toilets, anchor) : [];
+  const aroundAnchor = useMemo(() => (anchor ? byDistance(toilets, anchor) : []), [toilets, anchor?.latitude, anchor?.longitude]); // eslint-disable-line react-hooks/exhaustive-deps
   const within = aroundAnchor.filter((x) => x.metres <= ADDRESS_RADIUS);
   const sorted = anchor ? (farther ? aroundAnchor : within) : named;
   // A new search starts the list from the top again.

@@ -69,7 +69,7 @@ export type OutAction = {
 /** Something the server turned down after the phone had already shown it as done. */
 export type Notice = { id: string; type: string; code: string; message: string; name?: string; at: string };
 
-const cache = createLocalStore<Cache>("magyarotyesz:server", { seq: null, toilets: [] });
+const cache = createLocalStore<Cache>("magyarotyesz:server", { seq: null, toilets: [] }, { lazy: true });
 const identity = createLocalStore<{ userId: string; token: string } | null>("magyarotyesz:identity", null);
 const meStore = createLocalStore<Me>("magyarotyesz:me", { owns: [], votes: {}, suggestions: {}, alerts: [], addsLeftToday: 10, gotIn: 0 });
 export const useUserId = () => identity.useValue()?.userId ?? null;

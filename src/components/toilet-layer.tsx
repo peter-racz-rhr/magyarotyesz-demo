@@ -114,7 +114,7 @@ function addLayers(map: MapLibreGL.Map, data: GeoJSON.FeatureCollection) {
 export function ToiletLayer({ toilets, onOpen, theme }: { toilets: Toilet[]; onOpen: (toilet: Toilet) => void; theme: string }) {
   const { map, isLoaded } = useMap();
   // Only rebuilt when a place, a vote or a filter actually changed.
-  const key = toilets.map((t) => t.id + t.confirms + t.reports + t.access + t.code.length).join();
+  const key = useMemo(() => toilets.map((t) => t.id + t.confirms + t.reports + t.access + t.code.length).join(), [toilets]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const data = useMemo(() => features(toilets), [key]);
   const byId = useRef(new Map<string, Toilet>());

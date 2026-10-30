@@ -1,0 +1,52 @@
+diff --git a/dist/index.cjs b/dist/index.cjs
+index 7a0801363429a31e075b47afeacb4eb2d3a654cc..7b9689dc6216165aa5505641a3a2ae0fcdef73dc 100644
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -171,7 +171,21 @@ const getLensContext = () => {
+ 	return sharedContext;
+ };
+ const isLensRenderingSupported = () => getLensContext() !== null;
++// Patched (magyarotyesz): every glass surface of the same size and shape needs the same map, and drawing one
++// (WebGL + a PNG encode) costs tens of milliseconds on a phone. Remember the last few by their parameters.
++const lensMapCache = /* @__PURE__ */ new Map();
+ const createLensMap = (options) => {
++	const cacheKey = [Math.round(options.width), Math.round(options.height), options.radius, options.bezel, options.curve, options.strength].join("|");
++	const cached = lensMapCache.get(cacheKey);
++	if (cached) return cached;
++	const made = drawLensMap(options);
++	if (made) {
++		if (lensMapCache.size >= 48) lensMapCache.delete(lensMapCache.keys().next().value);
++		lensMapCache.set(cacheKey, made);
++	}
++	return made;
++};
++const drawLensMap = (options) => {
+ 	const context = getLensContext();
+ 	const width = Math.max(2, Math.round(options.width));
+ 	const height = Math.max(2, Math.round(options.height));
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 716e324f3c33405a5ccc411bb28f57807631aa46..73a51b220e0906dffad4d16c7c995a438fa09285 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -170,7 +170,21 @@ const getLensContext = () => {
+ 	return sharedContext;
+ };
+ const isLensRenderingSupported = () => getLensContext() !== null;
++// Patched (magyarotyesz): every glass surface of the same size and shape needs the same map, and drawing one
++// (WebGL + a PNG encode) costs tens of milliseconds on a phone. Remember the last few by their parameters.
++const lensMapCache = /* @__PURE__ */ new Map();
+ const createLensMap = (options) => {
++	const cacheKey = [Math.round(options.width), Math.round(options.height), options.radius, options.bezel, options.curve, options.strength].join("|");
++	const cached = lensMapCache.get(cacheKey);
++	if (cached) return cached;
++	const made = drawLensMap(options);
++	if (made) {
++		if (lensMapCache.size >= 48) lensMapCache.delete(lensMapCache.keys().next().value);
++		lensMapCache.set(cacheKey, made);
++	}
++	return made;
++};
++const drawLensMap = (options) => {
+ 	const context = getLensContext();
+ 	const width = Math.max(2, Math.round(options.width));
+ 	const height = Math.max(2, Math.round(options.height));

@@ -4,7 +4,7 @@ import { TAPPABLE, ToiletLayer } from "@/components/toilet-layer";
 import { requireAccount } from "@/lib/sync";
 import "@/lib/maplibre-worker";
 import { Accessibility, Baby, BadgeCheck, ChevronUp, Clock, ThumbsUp, LocateFixed, SlidersHorizontal, Users, Zap, X } from "lucide-react";
-import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { AddedBurst, AddedCheck, DropIn } from "@/components/added-burst";
 import { HintChips } from "@/components/hint-chips";
@@ -339,14 +339,19 @@ export default function MapPage() {
   const [busy, setBusy] = useState(false);
   const [justAdded, setJustAdded] = useState<{ id: string; name: string } | null>(null);
 
-  const visible = toilets.filter(
-    (toilet) =>
-      (!filters.open || isOpen(toilet) === true) &&
-      (!filters.free || toilet.access === "free") &&
-      (!filters.works || trust(toilet) >= TRUSTED) &&
-      (!filters.accessible || toilet.wheelchair === true) &&
-      (!filters.baby || toilet.babyChanging === true) &&
-      (!filters.neutral || toilet.genderNeutral === true),
+  // Thousands of places: filtered again only when they or the filters change, not on every small re-render.
+  const visible = useMemo(
+    () =>
+      toilets.filter(
+        (toilet) =>
+          (!filters.open || isOpen(toilet) === true) &&
+          (!filters.free || toilet.access === "free") &&
+          (!filters.works || trust(toilet) >= TRUSTED) &&
+          (!filters.accessible || toilet.wheelchair === true) &&
+          (!filters.baby || toilet.babyChanging === true) &&
+          (!filters.neutral || toilet.genderNeutral === true),
+      ),
+    [toilets, filters],
   );
   const filtering = Object.values(filters).some(Boolean);
 
