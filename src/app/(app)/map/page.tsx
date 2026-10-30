@@ -1,5 +1,6 @@
 "use client";
 
+import { TAPPABLE, ToiletLayer } from "@/components/toilet-layer";
 import { requireAccount } from "@/lib/sync";
 import "@/lib/maplibre-worker";
 import { Accessibility, Baby, BadgeCheck, ChevronUp, Clock, ThumbsUp, LocateFixed, SlidersHorizontal, Users, Zap, X } from "lucide-react";
@@ -109,6 +110,9 @@ function TapToAdd({ onTap, onDismiss }: { onTap: (draft: Draft) => void; onDismi
     const click = (event: { lngLat: { lat: number; lng: number }; originalEvent: Event }) => {
       const target = event.originalEvent.target as Element | null;
       if (target?.closest(".maplibregl-marker, .maplibregl-popup")) return;
+      // A tap on a toilet or a bubble is theirs (they open a card or zoom in), not "add here".
+      const layers = TAPPABLE.filter((id) => map.getLayer(id));
+      if (layers.length && map.queryRenderedFeatures((event as unknown as { point: [number, number] }).point, { layers }).length) return;
       if (popupWasOpen) return onDismissRef.current();
       onTapRef.current({ latitude: event.lngLat.lat, longitude: event.lngLat.lng });
     };
@@ -282,7 +286,7 @@ export default function MapPage() {
   const [start] = useState(startPlace);
   const mapRef = useRef<MapRef>(null);
   const here = useHere();
-  const { buildings3d } = useSettings();
+  const { buildings3d, palette, flavour, theme: look } = useSettings();
   const base = useMapStyle();
   const toilets = useToilets();
 
@@ -573,37 +577,24 @@ export default function MapPage() {
           <ZoomCap max={base.key === "satellite" ? 19 : 22} />
           <Buildings3D enabled={buildings3d && base.key !== "satellite"} variant={base.key === "light" ? "light" : "dark"} />
 
-          {visible.map((toilet) => (
-            <MapMarker key={toilet.id} latitude={toilet.latitude} longitude={toilet.longitude}>
-              {/* A small dot, coloured by how many got in, with a finger-sized tap area */}
-              <MarkerContent>
-                <span
-                  role="button"
-                  aria-label={toilet.name}
-                  onClick={() => openCard(toilet)}
-                  className="relative grid size-8 place-items-center"
-                >
-                  {justAdded?.id === toilet.id && <AddedBurst />}
-                  {(() => {
-                    const dot = <HealthDot toilet={toilet} className={cn(isOpen(toilet) === false && "opacity-45")} />;
-                    return justAdded?.id === toilet.id ? <DropIn>{dot}</DropIn> : dot;
-                  })()}
-                  {/* A paid place carries a small "Ft" tag, so it reads as paid by its shape and letters, not only by colour */}
-                  {toilet.access === "paid" && (
-                    <span
-                      aria-hidden
-                      className={cn(
-                        "pointer-events-none absolute top-[calc(50%-17px)] left-[calc(50%+3px)] grid h-[14px] place-items-center rounded-[5px] bg-stale px-[3px] text-[0.5625rem] leading-none font-extrabold text-night ring-2 ring-night",
-                        isOpen(toilet) === false && "opacity-45",
-                      )}
-                    >
-                      Ft
+          <ToiletLayer toilets={visible} onOpen={(toilet) => openCard(toilet)} theme={`${base.key}-${palette}-${flavour}-${look}`} />
+          {/* The place you just added drops in with a little burst (one HTML marker; the rest are drawn by the map) */}
+          {justAdded &&
+            (() => {
+              const toilet = visible.find((x) => x.id === justAdded.id);
+              return toilet ? (
+                <MapMarker key={`added-${toilet.id}`} latitude={toilet.latitude} longitude={toilet.longitude}>
+                  <MarkerContent>
+                    <span className="pointer-events-none relative grid size-8 place-items-center">
+                      <AddedBurst />
+                      <DropIn>
+                        <HealthDot toilet={toilet} />
+                      </DropIn>
                     </span>
-                  )}
-                </span>
-              </MarkerContent>
-            </MapMarker>
-          ))}
+                  </MarkerContent>
+                </MapMarker>
+              ) : null;
+            })()}
 
           {/* The open card, hanging below its dot; it scrolls if it's taller than the screen */}
           {focus && (
