@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Bookmark, Camera, Check, ChevronRight, Copy, Settings, Trash2 } from "lucide-react";
+import { Bell, Bookmark, Camera, Check, ChevronRight, Copy, Settings, Trash2, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ProfileEditor } from "@/components/profile-editor";
@@ -152,6 +152,12 @@ export default function ProfilePage() {
             </div>
           );
         })()}
+
+        <Link href="/leaders" className={cn(CARD, "mt-3 flex items-center gap-3 px-4 py-3.5 text-[1rem] active:opacity-70")}>
+          <Trophy className="size-5 text-[#f9e2af]" aria-hidden />
+          <span className="flex-1">{t.board.link}</span>
+          <ChevronRight className="size-5 text-haze" aria-hidden />
+        </Link>
 
         <Link href="/nearby?saved=1" className={cn(CARD, "mt-3 flex items-center gap-3 px-4 py-3.5 text-[1rem] active:opacity-70")}>
           <Bookmark className="size-5 text-brand" aria-hidden />

@@ -5,7 +5,7 @@
   names change with every build). The codes themselves already live on the
   phone. Map pieces you have already seen are kept too (MAP_CACHE); new areas and address search need the internet.
 */
-const CACHE = "magyarotyesz-v3";
+const CACHE = "magyarotyesz-v4";
 // Map pieces from other servers (vector tiles, fonts, satellite). Seen once, they stay on the phone, so
 // the places you have looked at still show up with no signal. Capped so it never fills the storage.
 const MAP_CACHE = "magyarotyesz-map-v1";
@@ -20,7 +20,7 @@ const trimMap = async () => {
   await Promise.all(keys.slice(0, Math.max(0, keys.length - MAP_LIMIT)).map((key) => cache.delete(key)));
 };
 
-const PAGES = ["/", "/welcome", "/map", "/nearby", "/profile", "/urgent", "/settings", "/terms", "/privacy", "/imprint", "/manifest.webmanifest", "/icons/icon-192.png"];
+const PAGES = ["/", "/welcome", "/map", "/nearby", "/profile", "/urgent", "/leaders", "/settings", "/terms", "/privacy", "/imprint", "/manifest.webmanifest", "/icons/icon-192.png"];
 
 // Fetches the pages again, skipping the browser's own cache, and saves them. The app asks for this every time it
 // opens with a connection, because moving between pages inside the app never fetches the page itself: without it

@@ -51,6 +51,8 @@ type Me = {
   /** Running total of people who got in with this phone's codes; kept by the server across code changes. */
   gotIn?: number;
   displayName?: string;
+  /** Whether the name is shown on the public top lists. */
+  onBoard?: boolean;
   /** Whether a Google account and/or an email address is linked to this profile. */
   account?: { google: boolean; email: boolean };
 };
@@ -73,6 +75,7 @@ const meStore = createLocalStore<Me>("magyarotyesz:me", { owns: [], votes: {}, s
 export const useUserId = () => identity.useValue()?.userId ?? null;
 export const useAccount = () => meStore.useValue().account ?? { google: false, email: false };
 export const useGotInTotal = () => meStore.useValue().gotIn ?? 0;
+export const useOnBoard = () => meStore.useValue().onBoard ?? false;
 const outbox = createLocalStore<OutAction[]>("magyarotyesz:outbox", []);
 /** The name we last tried to send, so a name the server turned down is not sent over and over. */
 const profileTried = createLocalStore<string>("magyarotyesz:profile-tried", "");
@@ -463,6 +466,32 @@ export async function fetchMyData(): Promise<unknown | null> {
   }
 }
 
+/* ------------------------------ top lists ------------------------------ */
+
+export type BoardRow = { name: string; score: number; places: number; you: boolean };
+export type BoardList = { top: BoardRow[]; you: (BoardRow & { rank: number }) | null };
+export type Board = { radiusKm: number; onBoard: boolean; named: boolean; world: BoardList; near: BoardList | null };
+
+/** The world and near-you lists. Null when offline or there is no server. */
+export async function fetchLeaderboard(near: { latitude: number; longitude: number } | null): Promise<Board | null> {
+  if (!REMOTE) return null;
+  const query = near ? `?lat=${near.latitude.toFixed(3)}&lon=${near.longitude.toFixed(3)}` : "";
+  try {
+    const res = await api<Board>("/v1/leaderboard" + query, { token: identity.get()?.token });
+    return res.notModified ? null : res.data;
+  } catch {
+    return null;
+  }
+}
+
+/** Show (or hide) this profile's name on the top lists. Needs a name; goes out with the next sync. */
+export function setOnBoard(on: boolean) {
+  const name = getSettings().name.trim();
+  if (!name) return;
+  meStore.set((me) => ({ ...me, onBoard: on }));
+  enqueue("set_profile", { displayName: name, onBoard: on });
+}
+
 /** Tell the server which version of the terms this profile agreed to (once per version; kept as proof of acceptance). */
 async function reportTerms() {
   const me = identity.get();
@@ -606,10 +635,12 @@ async function refreshMe() {
     throw e;
   }
   if (res.notModified) return;
-  const { owns, votes, suggestions, alerts: list, addsLeftToday, gotIn, displayName, account } = res.data;
+  const { owns, votes, suggestions, alerts: list, addsLeftToday, gotIn, displayName, onBoard, account } = res.data;
   // A name chosen on another visit (same id) shows up here too; one typed on this phone wins.
   if (displayName && !getSettings().name) updateSettings({ name: displayName });
-  meStore.set({ owns, votes, suggestions, alerts: list, addsLeftToday, gotIn: gotIn ?? 0, account });
+  // A choice still waiting in the outbox wins over what the server last knew.
+  const pendingBoard = outbox.get().findLast((a) => a.type === "set_profile" && typeof a.payload.onBoard === "boolean")?.payload.onBoard as boolean | undefined;
+  meStore.set({ owns, votes, suggestions, alerts: list, addsLeftToday, gotIn: gotIn ?? 0, onBoard: pendingBoard ?? onBoard ?? false, account });
   // The server knows about names (it sent the field) but not ours: send it once.
   const mine = getSettings().name;
   if (displayName !== undefined && mine && mine !== displayName && profileTried.get() !== mine && !outbox.get().some((a) => a.type === "set_profile")) {
