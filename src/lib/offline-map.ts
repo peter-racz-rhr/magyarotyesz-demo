@@ -3,7 +3,7 @@
 import { createLocalStore } from "./local-store";
 
 /*
-  "Save Budapest": downloads every map piece for the city once, so the map (streets, buildings,
+  "Save this area": downloads every map piece for about 25 km around you once, so the map (streets, buildings,
   names) works with no signal at all. The pieces go into the same cache the service worker
   already keeps the map in (public/sw.js), so it answers from there when the network is gone.
   Satellite pictures are never saved: Esri's licence does not allow it.
@@ -12,8 +12,13 @@ import { createLocalStore } from "./local-store";
 /** The same cache name as public/sw.js. */
 const MAP_CACHE = "magyarotyesz-map-v1";
 const TILEJSON = "https://tiles.openfreemap.org/planet";
-/** Budapest, the box the server accepts. */
-const BBOX = { west: 18.92, south: 47.35, east: 19.34, north: 47.62 };
+type Box = { west: number; south: number; east: number; north: number };
+/** About 25 km across around a point (longitude degrees shrink towards the poles). */
+export const boxAround = (c: { latitude: number; longitude: number }): Box => {
+  const dLat = 0.115;
+  const dLon = dLat / Math.max(0.2, Math.cos((c.latitude * Math.PI) / 180));
+  return { west: c.longitude - dLon, east: c.longitude + dLon, south: c.latitude - dLat, north: c.latitude + dLat };
+};
 /** The tiles stop at this zoom; closer views are drawn from them. */
 const MAX_ZOOM = 14;
 /** Letters, accents (Hungarian ő and ű are in the second block) and punctuation. */
@@ -30,8 +35,8 @@ const tileY = (lat: number, z: number) => {
   return Math.floor(((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * 2 ** z);
 };
 
-/** Every tile that touches the city, from zoom 0 to `maxZoom`. */
-export function tilesFor(maxZoom: number, minZoom = 0) {
+/** Every tile that touches the area, from zoom 0 to `maxZoom`. */
+export function tilesFor(BBOX: Box, maxZoom: number, minZoom = 0) {
   const out: { z: number; x: number; y: number }[] = [];
   for (let z = minZoom; z <= maxZoom; z++) {
     for (let x = tileX(BBOX.west, z); x <= tileX(BBOX.east, z); x++) {
@@ -52,12 +57,12 @@ type StyleJson = {
 };
 
 /** Every address to save: the vector tiles, the low-zoom picture tiles, the sprite and the letters. */
-async function listFiles(signal: AbortSignal) {
+async function listFiles(box: Box, signal: AbortSignal) {
   const tilejson = (await (await fetch(TILEJSON, { signal })).json()) as { tiles?: string[]; maxzoom?: number };
   const vector = tilejson.tiles?.[0];
   if (!vector) throw new Error("no tile address");
   const zoom = Math.min(MAX_ZOOM, tilejson.maxzoom ?? MAX_ZOOM);
-  const urls = tilesFor(zoom).map((t) => fill(vector, t));
+  const urls = tilesFor(box, zoom).map((t) => fill(vector, t));
 
   const fonts = new Set<string>();
   let sprite: string | undefined;
@@ -68,7 +73,7 @@ async function listFiles(signal: AbortSignal) {
     glyphs = style.glyphs ?? glyphs;
     for (const source of Object.values(style.sources ?? {})) {
       if (source.type === "raster" && source.tiles?.[0]) {
-        for (const t of tilesFor(Math.min(source.maxzoom ?? 6, 6))) urls.push(fill(source.tiles[0], t));
+        for (const t of tilesFor(box, Math.min(source.maxzoom ?? 6, 6))) urls.push(fill(source.tiles[0], t));
       }
     }
     for (const layer of style.layers ?? []) {
@@ -82,11 +87,11 @@ async function listFiles(signal: AbortSignal) {
 }
 
 /**
- * Saves the city. `onProgress` gets 0..1. A few failures are fine (a piece nobody ever needs);
+ * Saves the area. `onProgress` gets 0..1. A few failures are fine (a piece nobody ever needs);
  * too many mean the connection is bad, and the whole attempt reports that.
  */
-export async function downloadOfflineMap(onProgress: (done: number) => void, signal: AbortSignal) {
-  const urls = await listFiles(signal);
+export async function downloadOfflineMap(onProgress: (done: number) => void, signal: AbortSignal, around: { latitude: number; longitude: number }) {
+  const urls = await listFiles(boxAround(around), signal);
   const cache = await caches.open(MAP_CACHE);
   let done = 0;
   let failed = 0;

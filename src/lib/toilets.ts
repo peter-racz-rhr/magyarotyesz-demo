@@ -39,6 +39,8 @@ export type Toilet = {
   access: Access;
   /** For paid toilets, in forints. */
   price?: number;
+  /** ISO 4217 code of the price (HUF when missing: places from before other countries). */
+  currency?: string;
   hours?: Hours;
   wheelchair?: boolean;
   babyChanging?: boolean;
@@ -67,7 +69,7 @@ export type Suggestion = { id: string; code: string; at: string };
 
 export type ToiletInput = Pick<
   Toilet,
-  "name" | "code" | "kind" | "access" | "price" | "hours" | "wheelchair" | "babyChanging" | "genderNeutral" | "note" | "latitude" | "longitude"
+  "name" | "code" | "kind" | "access" | "price" | "currency" | "hours" | "wheelchair" | "babyChanging" | "genderNeutral" | "note" | "latitude" | "longitude"
 >;
 
 const store = createLocalStore<Toilet[]>("magyarotyesz:toilets", []);
@@ -83,9 +85,25 @@ export function addedToday(now = Date.now()) {
   return addLog.get().filter((at) => now - new Date(at).getTime() < 24 * 60 * 60 * 1000).length;
 }
 
-/** The server only knows Budapest. */
-export const inBudapest = (p: { latitude: number; longitude: number }) =>
-  p.latitude >= 47.35 && p.latitude <= 47.62 && p.longitude >= 18.92 && p.longitude <= 19.34;
+/** "300 Ft", "€2", "¥200": a price in its own currency, written the way the app's language writes money. */
+export function formatPrice(price: number, currency: string | undefined, lang: string) {
+  try {
+    return new Intl.NumberFormat(lang === "hu" ? "hu-HU" : lang === "de" ? "de-DE" : "en-GB", { style: "currency", currency: currency ?? "HUF", maximumFractionDigits: 2, minimumFractionDigits: 0 }).format(price);
+  } catch {
+    return `${price} ${currency ?? "HUF"}`;
+  }
+}
+
+/** Currencies people can pick for a paid toilet: the local one first (see guessCurrency), then these. */
+export const CURRENCIES = ["EUR", "HUF", "USD", "GBP", "CHF", "CZK", "PLN", "RON", "SEK", "NOK", "DKK", "JPY", "CAD", "AUD", "TRY", "INR"] as const;
+
+const EURO = ["AT", "BE", "HR", "CY", "EE", "FI", "FR", "DE", "GR", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PT", "SK", "SI", "ES"];
+const BY_REGION: Record<string, string> = { HU: "HUF", US: "USD", GB: "GBP", CH: "CHF", CZ: "CZK", PL: "PLN", RO: "RON", SE: "SEK", NO: "NOK", DK: "DKK", JP: "JPY", CA: "CAD", AU: "AUD", TR: "TRY", IN: "INR" };
+/** The phone's own currency, from its region setting (hu-HU gives HUF); euro when unknown. */
+export function guessCurrency() {
+  const region = (typeof navigator !== "undefined" ? navigator.language : "").split("-")[1]?.toUpperCase() ?? "";
+  return BY_REGION[region] ?? (EURO.includes(region) ? "EUR" : "EUR");
+}
 
 export function addToilet(raw: ToiletInput, location?: Location) {
   // Whatever the form did, nothing outside the limits goes any further.
@@ -102,6 +120,7 @@ export function addToilet(raw: ToiletInput, location?: Location) {
         kind: input.kind,
         access: input.access,
         price: input.access === "paid" ? (input.price ?? null) : null,
+        ...(input.access === "paid" && input.price && input.currency ? { currency: input.currency } : {}),
         hours: input.hours ?? null,
         wheelchair: !!input.wheelchair,
         babyChanging: !!input.babyChanging,

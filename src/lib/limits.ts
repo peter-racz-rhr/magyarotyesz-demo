@@ -3,7 +3,7 @@
   limits (it has the last word); this keeps the app from sending what it
   would turn down, and keeps random junk out of the first place.
 */
-export const LIMITS = { name: 60, code: 16, note: 120, price: 1000 } as const;
+export const LIMITS = { name: 60, code: 16, note: 120, price: 100000 } as const;
 
 const EMOJI = /[\p{Extended_Pictographic}️‍⃣\u{1F1E6}-\u{1F1FF}]/gu;
 // eslint-disable-next-line no-control-regex

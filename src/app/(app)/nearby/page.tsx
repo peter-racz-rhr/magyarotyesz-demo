@@ -10,10 +10,11 @@ import { PageTransition } from "@/components/page-transition";
 import { HealthDot, HoursLine, ToiletCard } from "@/components/toilet-card";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { searchPlaces, type Place } from "@/lib/geocode";
+import { lastPlace } from "@/lib/location";
 import { useT, type Dict } from "@/lib/i18n";
 import { useSettings } from "@/lib/settings";
 import { useSaved } from "@/lib/saved";
-import { distance, formatDistance, useToilets, walkIfNear, type Toilet } from "@/lib/toilets";
+import { distance, formatDistance, formatPrice, useToilets, walkIfNear, type Toilet } from "@/lib/toilets";
 import { useHere } from "@/lib/use-here";
 import { cn } from "@/lib/utils";
 
@@ -49,10 +50,15 @@ function useKeyboardMode(active: boolean) {
 const ADDRESS_RADIUS = 500;
 
 export default function NearbyPage() {
-  const { t: d } = useT();
+  const { t: d, lang } = useT();
   // Beside the orb the bottom is free, so the search bar sits lower.
   const { navStyle } = useSettings();
   const here = useHere();
+  // Where address results should lean (read when searching; a new position does not search again).
+  const near = useRef(here.coords);
+  useEffect(() => {
+    near.current = here.coords ?? lastPlace();
+  }, [here.coords]);
   const allToilets = useToilets();
   const saved = useSaved();
   // /nearby?saved=1 (the "Saved places" app shortcut) opens on the places you kept.
@@ -89,14 +95,14 @@ export default function NearbyPage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Addresses as you type (after a short pause), kept to Budapest.
+  // Addresses as you type (after a short pause), nearest to you first.
   const q = query.trim();
   useEffect(() => {
     if (q.length < 3) return;
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
       setLookup("loading");
-      searchPlaces(q, controller.signal)
+      searchPlaces(q, controller.signal, false, near.current, lang)
         .then((found) => {
           setPlaces(found);
           setLookup("done");
@@ -111,7 +117,7 @@ export default function NearbyPage() {
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [q, retry]);
+  }, [q, retry, lang]);
 
   const shownPlaces = q.length >= 3 ? places : [];
   const looking = q.length >= 3 && lookup === "loading";
@@ -159,7 +165,7 @@ export default function NearbyPage() {
     if (!place && q.length >= 3) {
       setLookup("loading");
       try {
-        place = (await searchPlaces(q, undefined, true))[0];
+        place = (await searchPlaces(q, undefined, true, here.coords ?? lastPlace(), lang))[0];
         setLookup("done");
       } catch {
         // No connection: fall back to the toilets you can already see.
@@ -302,7 +308,7 @@ export default function NearbyPage() {
                       <span className="line-clamp-2 block font-semibold break-words">{toilet.name}</span>
                       <span className="flex items-center gap-2 text-sm text-haze">
                         {d.kinds[toilet.kind]}
-                        {toilet.access === "paid" && <span className="rounded-full bg-stale/[0.14] px-2 py-0.5 text-xs font-bold text-stale">{toilet.price ? `${toilet.price} Ft` : d.access.paid}</span>}
+                        {toilet.access === "paid" && <span className="rounded-full bg-stale/[0.14] px-2 py-0.5 text-xs font-bold text-stale">{toilet.price ? formatPrice(toilet.price, toilet.currency, lang) : d.access.paid}</span>}
                         {toilet.code === "" && <span className="rounded-full bg-good/[0.14] px-2 py-0.5 text-xs font-semibold text-good">{d.card.noCodeTag}</span>}
                         <HoursLine toilet={toilet} className="text-xs" />
                       </span>

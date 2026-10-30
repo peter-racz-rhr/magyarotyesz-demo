@@ -78,7 +78,7 @@ export function PlaceList({
                 <p className="font-semibold break-words">{t.name}</p>
                 <p className="text-sm text-haze">
                   {t.kind} · {t.access}
-                  {t.price ? ` ${t.price} Ft` : ""} · {when(t.addedAt)}
+                  {t.price ? ` ${t.price} ${t.currency ?? "HUF"}` : ""} · {when(t.addedAt)}
                 </p>
               </div>
               <span className="shrink-0 rounded-md bg-night px-2 py-1 font-mono text-sm tracking-widest">{t.code}</span>

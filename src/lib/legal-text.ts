@@ -15,7 +15,7 @@ const en: Record<DocKey, Doc> = {
   terms: {
     title: "Terms of use",
     updated: "Last updated: 29 October 2026",
-    intro: "magyarotyesz is a free community map of toilet door codes in Budapest, run by {operator} ({address}, {email}). By tapping \"I am 16 or older and I agree\" you accept these terms.",
+    intro: "magyarotyesz is a free community map of toilet door codes, run by {operator} ({address}, {email}). By tapping \"I am 16 or older and I agree\" you accept these terms.",
     sections: [
       {
         h: "What this is",
@@ -163,7 +163,7 @@ const en: Record<DocKey, Doc> = {
       {
         h: "Service",
         p: [
-          "magyarotyesz, a free community map of toilet door codes in Budapest. Not a commercial service; no fee is charged.",
+          "magyarotyesz, a free community map of toilet door codes. Not a commercial service; no fee is charged.",
         ],
       },
       {
@@ -195,7 +195,7 @@ const hu: Record<DocKey, Doc> = {
   terms: {
     title: "Felhasználási feltételek",
     updated: "Utolsó frissítés: 2026. október 29.",
-    intro: "A magyarotyesz ingyenes, közösségi térkép budapesti mosdók ajtókódjairól. Üzemeltetője: {operator} ({address}, {email}). Az „Elmúltam 16 éves, és elfogadom” gomb megnyomásával elfogadod ezeket a feltételeket.",
+    intro: "A magyarotyesz ingyenes, közösségi térkép mosdók ajtókódjairól. Üzemeltetője: {operator} ({address}, {email}). Az „Elmúltam 16 éves, és elfogadom” gomb megnyomásával elfogadod ezeket a feltételeket.",
     sections: [
       {
         h: "Mi ez",
@@ -343,7 +343,7 @@ const hu: Record<DocKey, Doc> = {
       {
         h: "Szolgáltatás",
         p: [
-          "magyarotyesz, ingyenes közösségi térkép budapesti mosdók ajtókódjairól. Nem üzleti szolgáltatás, díjat nem számítunk fel.",
+          "magyarotyesz, ingyenes közösségi térkép mosdók ajtókódjairól. Nem üzleti szolgáltatás, díjat nem számítunk fel.",
         ],
       },
       {

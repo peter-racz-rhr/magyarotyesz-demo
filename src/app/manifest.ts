@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "magyarotyesz",
     short_name: "magyarotyesz",
-    description: "Toilet door codes in Budapest, shared by people who needed them too.",
+    description: "Toilet door codes, shared by people who needed them too.",
     start_url: "/",
     display: "standalone",
     orientation: "portrait",

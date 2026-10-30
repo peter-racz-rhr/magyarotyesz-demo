@@ -8,6 +8,7 @@ export type Item = {
   kind: string;
   access: string;
   price: number | null;
+  currency?: string;
   note: string;
   latitude: number;
   longitude: number;

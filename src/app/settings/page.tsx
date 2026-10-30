@@ -12,7 +12,7 @@ import { btn } from "@/components/ui/buttons";
 import { REMOTE } from "@/lib/api";
 import { alertLine, useT } from "@/lib/i18n";
 import { legalFor } from "@/lib/legal-text";
-import { requestLocation } from "@/lib/location";
+import { DEFAULT_PLACE, lastPlace, requestLocation } from "@/lib/location";
 import { downloadOfflineMap, removeOfflineMap, useOfflineMap } from "@/lib/offline-map";
 import { askForNotifications, notify } from "@/lib/notify";
 import { replayIntro } from "@/lib/onboarding";
@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 
 /** Everything you can change, in groups. Reached from the gear on the Profile page. */
 
-/** Save Budapest for offline use: a button, a progress line, and what is saved. */
+/** Save the area around you for offline use: a button, a progress line, and what is saved. */
 function OfflineMapRow() {
   const { t, lang } = useT();
   const saved = useOfflineMap();
@@ -41,7 +41,7 @@ function OfflineMapRow() {
     const abort = new AbortController();
     controller.current = abort;
     try {
-      await downloadOfflineMap(setProgress, abort.signal);
+      await downloadOfflineMap(setProgress, abort.signal, lastPlace() ?? DEFAULT_PLACE);
     } catch (e) {
       if (!(e instanceof DOMException && e.name === "AbortError")) setFailed(true);
     } finally {

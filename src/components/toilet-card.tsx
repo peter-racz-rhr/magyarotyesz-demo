@@ -35,6 +35,7 @@ import {
   trustColor,
   walkIfNear,
   type Toilet,
+  formatPrice,
 } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
 
@@ -370,7 +371,7 @@ export function ToiletCard({
     );
   }
 
-  const access = toilet.access === "paid" && toilet.price ? `${t.access.paid} ${toilet.price} Ft` : t.access[toilet.access];
+  const access = toilet.access === "paid" && toilet.price ? `${t.access.paid} ${formatPrice(toilet.price, toilet.currency, lang)}` : t.access[toilet.access];
 
   return (
     <div ref={root} className={cn("text-left", className)}>

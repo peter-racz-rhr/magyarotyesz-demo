@@ -14,7 +14,7 @@ import { LimitedInput } from "@/components/limited-input";
 import { LiquidSurface } from "@/components/ui/liquid-surface";
 import { Map, MapMarker, MapPopup, MarkerContent, useMap, type MapRef } from "@/components/ui/map";
 import { spotMessage, useT } from "@/lib/i18n";
-import { requestLocation } from "@/lib/location";
+import { DEFAULT_PLACE, lastPlace, requestLocation } from "@/lib/location";
 import { Buildings3D } from "@/components/buildings-3d";
 import { checkFields } from "@/lib/moderation";
 import { buzz } from "@/lib/haptics";
@@ -28,7 +28,6 @@ import {
   addToilet,
   addedToday,
   getToilets,
-  inBudapest,
   distance,
   isOpen,
   trust,
@@ -37,6 +36,8 @@ import {
   type Hours,
   type Kind,
   type Toilet,
+  CURRENCIES,
+  guessCurrency,
 } from "@/lib/toilets";
 import { useMapStyle } from "@/lib/map-style";
 import { useHere } from "@/lib/use-here";
@@ -44,8 +45,8 @@ import { cn } from "@/lib/utils";
 
 const noSubscription = () => () => {};
 
-// Budapest, until we know where you are.
-const BUDAPEST: [number, number] = [19.0402, 47.4979];
+// Where the map opens before we know where you are: the last place the phone gave, or Budapest.
+const startPlace = () => (typeof window === "undefined" ? null : lastPlace()) ?? DEFAULT_PLACE;
 // "Usually works": at least this share of people got in.
 const TRUSTED = 0.6;
 
@@ -277,6 +278,7 @@ function useSheetPull({ onOpenChange, onClose }: { onOpenChange: (open: boolean)
 
 export default function MapPage() {
   const { t } = useT();
+  const [start] = useState(startPlace);
   const mapRef = useRef<MapRef>(null);
   const here = useHere();
   const { buildings3d } = useSettings();
@@ -316,6 +318,7 @@ export default function MapPage() {
   const [onlyToilet, setOnlyToilet] = useState(false);
   const [access, setAccess] = useState<Access>("customers");
   const [price, setPrice] = useState("");
+  const [currency, setCurrency] = useState(guessCurrency);
   const [hoursMode, setHoursMode] = useState<"unknown" | "always" | "set">("unknown");
   const [opens, setOpens] = useState("08:00");
   const [closes, setCloses] = useState("22:00");
@@ -459,7 +462,7 @@ export default function MapPage() {
       try {
         from = await requestLocation();
       } catch {
-        from = { latitude: BUDAPEST[1], longitude: BUDAPEST[0] };
+        from = startPlace();
       }
     }
     // The filters you set count: with "Free" on, the nearest is the nearest free one.
@@ -519,7 +522,6 @@ export default function MapPage() {
     if (code.trim() && !onlyToilet) return setError(t.add.errOnlyToilet);
     if (!checkFields({ name: cleanName, note: tidy(note, LIMITS.note) }).ok) return setError(t.add.errBad);
     if (access === "paid" && Number(price) > LIMITS.price) return setError(t.add.errPriceMax(LIMITS.price));
-    if (!inBudapest(draft)) return setError(t.add.errCity);
     if (addedToday() >= DAILY_LIMIT) return setError(t.add.errLimit);
     setBusy(true);
     setError(null);
@@ -535,6 +537,7 @@ export default function MapPage() {
       kind,
       access: finalAccess,
       price: paidFor ? Number(price) : undefined,
+      currency: paidFor ? currency : undefined,
       hours,
       wheelchair: wheelchair || undefined,
       babyChanging: baby || undefined,
@@ -559,7 +562,7 @@ export default function MapPage() {
           ref={mapRef}
           theme={base.theme}
           styles={base.styles}
-          center={here.coords ? [here.coords.longitude, here.coords.latitude] : BUDAPEST}
+          center={here.coords ? [here.coords.longitude, here.coords.latitude] : [start.longitude, start.latitude]}
           zoom={here.coords ? 15 : 12}
           className="h-full w-full"
         >
@@ -793,7 +796,18 @@ export default function MapPage() {
                       aria-invalid={Number(price) > LIMITS.price}
                       className={cn(field, "h-10 w-24", Number(price) > LIMITS.price && "border-bad focus:border-bad")}
                     />
-                    <span className="text-sm text-haze">Ft</span>
+                    <select
+                      aria-label={t.add.currency}
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
+                      className={cn(field, "h-10 w-auto px-2 text-sm")}
+                    >
+                      {[...new Set([guessCurrency(), ...CURRENCIES])].map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
                     {Number(price) > LIMITS.price && (
                       <span role="alert" className="text-sm text-bad">
                         {t.add.priceMax(LIMITS.price)}

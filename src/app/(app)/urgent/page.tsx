@@ -6,7 +6,7 @@ import { useState } from "react";
 import { BACK, PageTransition } from "@/components/page-transition";
 import { HoursLine } from "@/components/toilet-card";
 import { useT } from "@/lib/i18n";
-import { distance, formatDistance, directionsUrl, isOpen, trust, useToilets, walkIfNear } from "@/lib/toilets";
+import { distance, formatDistance, formatPrice, directionsUrl, isOpen, trust, useToilets, walkIfNear } from "@/lib/toilets";
 import { useHere } from "@/lib/use-here";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +19,7 @@ const TRUSTED = 0.6;
  * code come first (a few hundred metres count for them), since nobody wants to buy a coffee in a hurry.
  */
 export default function UrgentPage() {
-  const { t } = useT();
+  const { t, lang } = useT();
   const here = useHere();
   const toilets = useToilets();
   const [skip, setSkip] = useState(0);
@@ -59,7 +59,7 @@ export default function UrgentPage() {
           <section className="mt-8 flex flex-1 flex-col" aria-live="polite">
             <p className="text-[1.5rem] leading-tight font-semibold break-words">{pick.toilet.name}</p>
             <p className="mt-1 text-[1.0625rem] text-haze">
-              {t.kinds[pick.toilet.kind]} · {pick.toilet.access === "paid" && pick.toilet.price ? `${t.access.paid} ${pick.toilet.price} Ft` : t.access[pick.toilet.access]}
+              {t.kinds[pick.toilet.kind]} · {pick.toilet.access === "paid" && pick.toilet.price ? `${t.access.paid} ${formatPrice(pick.toilet.price, pick.toilet.currency, lang)}` : t.access[pick.toilet.access]}
             </p>
             <HoursLine toilet={pick.toilet} className="mt-0.5 text-[1.0625rem]" />
 

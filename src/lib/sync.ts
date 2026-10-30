@@ -25,6 +25,7 @@ type ServerToilet = {
   kind: Toilet["kind"];
   access: Toilet["access"];
   price: number | null;
+  currency?: string;
   hours: Toilet["hours"] | null;
   wheelchair: boolean;
   babyChanging: boolean;
@@ -117,6 +118,7 @@ function fromServer(s: ServerToilet, me: Me): Toilet {
     kind: s.kind,
     access: s.access,
     price: s.price ?? undefined,
+    currency: s.currency,
     hours: s.hours ?? undefined,
     wheelchair: s.wheelchair || undefined,
     babyChanging: s.babyChanging || undefined,
@@ -153,6 +155,7 @@ function build(server: ServerToilet[], me: Me, actions: OutAction[]): Toilet[] {
         kind: p.kind,
         access: p.access,
         price,
+        currency: p.currency,
         hours: p.hours ?? undefined,
         wheelchair: p.wheelchair || undefined,
         babyChanging: p.babyChanging || undefined,

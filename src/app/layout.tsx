@@ -9,7 +9,7 @@ import { THEME_BOOT, ThemeRunner } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: "magyarotyesz",
-  description: "Toilet door codes in Budapest, shared by people who needed them too.",
+  description: "Toilet door codes, shared by people who needed them too.",
   applicationName: "magyarotyesz",
   appleWebApp: {
     capable: true,

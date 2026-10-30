@@ -1,5 +1,5 @@
 /*
-  Address search for Budapest, from OpenStreetMap data. Two free services:
+  Address search anywhere, from OpenStreetMap data, leaning towards where you are. Two free services:
   Photon suggests places while you type (it allows that); Nominatim, whose usage
   policy forbids search-as-you-type, is asked only when you press Search, at most
   once a second. (A browser cannot set its own User-Agent; it identifies the site by Referer.)
@@ -8,13 +8,8 @@
 
 export type Place = { id: string; label: string; detail: string; latitude: number; longitude: number };
 
-// Budapest's bounding box.
-const WEST = 18.92;
-const SOUTH = 47.35;
-const EAST = 19.34;
-const NORTH = 47.62;
-// Without a location to go by, results lean towards Deák Ferenc tér.
-const CENTRE = { lat: 47.4979, lon: 19.0402 };
+/** Where results should lean: the phone's position, or where the map last was. */
+export type Near = { latitude: number; longitude: number };
 
 /** What people type is shorter than what maps say: "Fő u.", "Bajcsy krt". */
 export function normalizeQuery(query: string) {
@@ -73,8 +68,10 @@ async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
   }
 }
 
-async function photon(q: string, signal?: AbortSignal): Promise<Place[]> {
-  const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=8&bbox=${WEST},${SOUTH},${EAST},${NORTH}&lat=${CENTRE.lat}&lon=${CENTRE.lon}`;
+async function photon(q: string, near: Near | null, lang: string, signal?: AbortSignal): Promise<Place[]> {
+  const bias = near ? `&lat=${near.latitude.toFixed(3)}&lon=${near.longitude.toFixed(3)}` : "";
+  const language = ["en", "de", "fr", "it"].includes(lang) ? `&lang=${lang}` : "";
+  const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=8${bias}${language}`;
   const data = await getJson<{ features?: PhotonFeature[] }>(url, signal);
   return (data.features ?? []).map((f, i) => {
     const p = f.properties;
@@ -84,7 +81,7 @@ async function photon(q: string, signal?: AbortSignal): Promise<Place[]> {
     return {
       id: `p${p.osm_id ?? i}-${i}`,
       label,
-      detail: detail || "Budapest",
+      detail,
       latitude: f.geometry.coordinates[1],
       longitude: f.geometry.coordinates[0],
     };
@@ -94,13 +91,15 @@ async function photon(q: string, signal?: AbortSignal): Promise<Place[]> {
 // Nominatim asks for at most one request a second.
 let lastNominatim = 0;
 
-async function nominatim(q: string, signal?: AbortSignal): Promise<Place[]> {
+async function nominatim(q: string, near: Near | null, lang: string, signal?: AbortSignal): Promise<Place[]> {
   const wait = lastNominatim + 1100 - Date.now();
   if (wait > 0) await new Promise((resolve) => window.setTimeout(resolve, wait));
   lastNominatim = Date.now();
   const url =
-    `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&countrycodes=hu` +
-    `&viewbox=${WEST},${NORTH},${EAST},${SOUTH}&bounded=1&accept-language=hu&q=${encodeURIComponent(q)}`;
+    `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&accept-language=${lang}` +
+    // A box of about 100 km around you makes nearby results come first, without hiding the rest of the world.
+    (near ? `&viewbox=${near.longitude - 0.7},${near.latitude + 0.5},${near.longitude + 0.7},${near.latitude - 0.5}` : "") +
+    `&q=${encodeURIComponent(q)}`;
   const data = await getJson<NominatimItem[]>(url, signal);
   return data.map((item, i) => {
     const a = item.address ?? {};
@@ -110,22 +109,21 @@ async function nominatim(q: string, signal?: AbortSignal): Promise<Place[]> {
     return {
       id: `n${item.place_id ?? i}-${i}`,
       label,
-      detail: detail || "Budapest",
+      detail,
       latitude: Number(item.lat),
       longitude: Number(item.lon),
     };
   });
 }
 
-const inBudapest = (p: Place) =>
-  Number.isFinite(p.latitude) && Number.isFinite(p.longitude) && p.latitude >= SOUTH && p.latitude <= NORTH && p.longitude >= WEST && p.longitude <= EAST;
+const valid = (p: Place) => Number.isFinite(p.latitude) && Number.isFinite(p.longitude);
 
 /** Same name in the same district (a street comes back as many pieces) is one result. */
 function tidy(places: Place[]) {
   const seen = new Set<string>();
   const out: Place[] = [];
   for (const place of places) {
-    if (!place.label || !inBudapest(place)) continue;
+    if (!place.label || !valid(place)) continue;
     const key = `${place.label.toLowerCase()}|${place.detail.toLowerCase()}`;
     if (seen.has(key)) continue;
     seen.add(key);
@@ -141,7 +139,7 @@ const cache = new Map<string, Place[]>();
  * `submit` (the Search key) Nominatim is asked first and Photon is the fallback. Rejects only
  * when no service could be reached; "found nothing" is an empty list.
  */
-export async function searchPlaces(query: string, signal?: AbortSignal, submit = false): Promise<Place[]> {
+export async function searchPlaces(query: string, signal?: AbortSignal, submit = false, near: Near | null = null, lang = "en"): Promise<Place[]> {
   const q = normalizeQuery(query);
   if (q.length < 2) return [];
   const cached = cache.get((submit ? "s:" : "t:") + q.toLowerCase());
@@ -151,7 +149,7 @@ export async function searchPlaces(query: string, signal?: AbortSignal, submit =
   let failure: unknown = null;
   for (const service of submit ? [nominatim, photon] : [photon]) {
     try {
-      const found = tidy(await service(q, signal));
+      const found = tidy(await service(q, near, lang, signal));
       answered = true;
       if (found.length > 0) {
         cache.set((submit ? "s:" : "t:") + q.toLowerCase(), found);
