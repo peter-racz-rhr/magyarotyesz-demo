@@ -13,8 +13,8 @@ person swipes from 1 to 2 the picture continues; images 3, 4 and 5 stand alone.
 | 5 | 1080×1920 | **"Free. Private. Works offline."** No ads, no tracking. | Four short promises (no account needed, offline map, colours, 3 languages). |
 
 `play-store-screenshots-plan.png` next to this file shows the layout with the real app screens in place. Ready-to-use drafts of all five
-images (1080×1920) are in `store-images/`: `01-left.png` and `02-right.png` are the two halves of `panorama-2160x1920.png` (a tilted phone cut in half by the seam, with
-three small chips), then `03-add.png`, `04-rank.png`, `05-promises.png`. Upload them as they are, or use them as the layout reference for the
+images, at Google Play's maximum size (2160×3840 each), are in `store-images/`: `01-left.png` and `02-right.png` are the two halves of `panorama-4320x3840.png` (a tilted phone cut in half by the seam, with
+three small chips), then `03-add.png`, `04-rank.png`, `05-why.png` ("No more locked doors.": four reasons to download). Upload them as they are, or use them as the layout reference for the
 generator prompts below. Replace the app screens with fresh screenshots from your phone (with real data) before the final upload.
 
 ## Look
