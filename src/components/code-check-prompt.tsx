@@ -9,6 +9,7 @@ import { spotMessage, useT } from "@/lib/i18n";
 import { checkOnTheSpot } from "@/lib/on-the-spot";
 import { buzz } from "@/lib/haptics";
 import { confirmCode, reportCode, useToilets } from "@/lib/toilets";
+import { requireAccount } from "@/lib/sync";
 import { cn } from "@/lib/utils";
 
 /** Ask after this long: enough time to have tried the door. */
@@ -52,6 +53,7 @@ export function CodeCheckPrompt() {
   if (!pending || !toilet || nothingToAsk || age < ASK_AFTER_MS || document.visibilityState === "hidden") return null;
 
   const answer = async (works: boolean) => {
+    if (!requireAccount()) return;
     setBusy(true);
     setMessage("");
     const spot = await checkOnTheSpot(toilet);

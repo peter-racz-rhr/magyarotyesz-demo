@@ -1,5 +1,6 @@
 "use client";
 
+import { requireAccount } from "@/lib/sync";
 import { Accessibility, Baby, Bookmark, Check, Coins, Eye, Flag, Navigation, Pencil, Share2, Signpost, ThumbsDown, ThumbsUp, Users } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { buzz } from "@/lib/haptics";
@@ -247,6 +248,7 @@ export function ToiletCard({
   };
 
   const vote = async (works: boolean) => {
+    if (!requireAccount()) return;
     setBlocked(null);
     setChecking(true);
     const spot = await checkOnTheSpot(toilet);
@@ -271,6 +273,7 @@ export function ToiletCard({
     event.preventDefault();
     const code = cleanCode(newCode);
     if (!validCode(code)) return;
+    if (!requireAccount()) return;
     if (toilet.mine) {
       editToilet(toilet.id, { code });
       setStep("thanks");
@@ -407,7 +410,7 @@ export function ToiletCard({
         {toilet.mine && (
           <button
             type="button"
-            onClick={() => setEditing(true)}
+            onClick={() => requireAccount() && setEditing(true)}
             aria-label={t.card.edit}
             className={cn(btn.quiet, "-mt-1 -mr-1 size-9")}
           >

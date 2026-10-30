@@ -1,5 +1,6 @@
 "use client";
 
+import { requireAccount } from "@/lib/sync";
 import "@/lib/maplibre-worker";
 import { Accessibility, Baby, BadgeCheck, ChevronUp, Clock, ThumbsUp, LocateFixed, SlidersHorizontal, Users, Zap, X } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
@@ -478,6 +479,8 @@ export default function MapPage() {
   });
 
   const startDraft = (next: Draft) => {
+    // A guest's tap on the map asks them to sign in first: places need someone behind them.
+    if (!draft && !requireAccount()) return;
     if (!draft) {
       setName("");
       setCode("");

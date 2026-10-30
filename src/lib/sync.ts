@@ -390,7 +390,8 @@ export async function rotateBackup(): Promise<"ok" | "unknown" | "offline"> {
 
 /* ------------------------- accounts: Google and email ------------------------- */
 
-export type AuthOptions = { google: string | null; email: boolean };
+/** signInToShare: guests can look and report, but adding places, codes and votes need an account. */
+export type AuthOptions = { google: string | null; email: boolean; signInToShare?: boolean };
 const authOptionsStore = createLocalStore<AuthOptions | null>("magyarotyesz:auth-options", null);
 /** Which sign-in methods the server offers (null until it answered once). */
 export const useAuthOptions = authOptionsStore.useValue;
@@ -409,9 +410,38 @@ type SignInResult = { userId: string; token: string | null; created: boolean; li
 export type SignInOutcome = "ok" | "bad_code" | "banned" | "conflict" | "offline" | "failed";
 
 /** Takes the server's answer to a sign-in: a new token for another profile signs this browser into it; a link keeps ours. */
-function takeSignIn(result: SignInResult) {
+function takeSignIn(result: SignInResult, kind: "google" | "email") {
   if (result.token) identity.set({ userId: result.userId, token: result.token });
+  // Shown as signed in right away; the next sync brings the rest of the profile.
+  meStore.set((me) => ({ ...me, account: { ...(me.account ?? { google: false, email: false }), [kind]: true } }));
   scheduleSync(100);
+}
+
+/** Whether this phone may add places, codes and votes now: always without a server or when the server lets guests share. */
+export function canShare() {
+  if (!REMOTE || !authOptionsStore.get()?.signInToShare) return true;
+  const account = meStore.get().account;
+  return !!(account?.google || account?.email);
+}
+export function useCanShare() {
+  const options = authOptionsStore.useValue();
+  const account = meStore.useValue().account;
+  return !REMOTE || !options?.signInToShare || !!(account?.google || account?.email);
+}
+
+/* The "sign in to share" sheet: anything a guest can't do opens it instead. */
+const askListeners = new Set<() => void>();
+let asking = false;
+export const useSignInAsked = () => useSyncExternalStore((cb) => (askListeners.add(cb), () => askListeners.delete(cb)), () => asking, () => false);
+export function setSignInAsked(open: boolean) {
+  asking = open;
+  askListeners.forEach((l) => l());
+}
+/** True when the action may go ahead; otherwise opens the sign-in sheet and returns false. */
+export function requireAccount() {
+  if (canShare()) return true;
+  setSignInAsked(true);
+  return false;
 }
 function outcomeOf(e: unknown): SignInOutcome {
   if (e instanceof Offline) return "offline";
@@ -419,12 +449,12 @@ function outcomeOf(e: unknown): SignInOutcome {
   return "failed";
 }
 
-/** With a Google ID token (from the Google button). Links to this profile if it has one and the Google account is new. */
-export async function signInWithGoogle(idToken: string): Promise<SignInOutcome> {
+/** With a Google token: an access token from our own button (or an ID token from Google's). Links to this profile if it has one and the Google account is new. */
+export async function signInWithGoogle(token: { accessToken: string } | { idToken: string }): Promise<SignInOutcome> {
   try {
-    const res = await api<SignInResult>("/v1/auth/google", { method: "POST", token: identity.get()?.token, body: { idToken } });
+    const res = await api<SignInResult>("/v1/auth/google", { method: "POST", token: identity.get()?.token, body: token });
     if (res.notModified) return "offline";
-    takeSignIn(res.data);
+    takeSignIn(res.data, "google");
     return "ok";
   } catch (e) {
     return outcomeOf(e);
@@ -447,7 +477,7 @@ export async function finishEmailSignIn(email: string, code: string): Promise<Si
   try {
     const res = await api<SignInResult>("/v1/auth/email/verify", { method: "POST", token: identity.get()?.token, body: { email, code } });
     if (res.notModified) return "offline";
-    takeSignIn(res.data);
+    takeSignIn(res.data, "email");
     return "ok";
   } catch (e) {
     return outcomeOf(e);

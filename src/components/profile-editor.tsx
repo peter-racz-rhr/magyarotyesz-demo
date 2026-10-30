@@ -61,7 +61,15 @@ function loadImage(src: string) {
 }
 
 /** Choose which part of a picture to keep: drag to move, pinch / scroll / slide to zoom (react-easy-crop). */
-function PhotoCrop({ file, onDone, onCancel }: { file: File; onDone: (dataUrl: string) => void; onCancel: () => void }) {
+function PhotoCrop({
+  file,
+  onDone,
+  onCancel,
+}: {
+  file: File;
+  onDone: (dataUrl: string) => void;
+  onCancel: () => void;
+}) {
   const { t } = useT();
   const [src, setSrc] = useState<string | null>(null);
   const [bad, setBad] = useState(false);
@@ -98,7 +106,11 @@ function PhotoCrop({ file, onDone, onCancel }: { file: File; onDone: (dataUrl: s
         <p role="alert" className="max-w-[28ch] text-[0.9375rem] text-stale">
           {t.profile.photoBad}
         </p>
-        <button type="button" onClick={onCancel} className={cn(btn.secondary, btn.md, "px-8")}>
+        <button
+          type="button"
+          onClick={onCancel}
+          className={cn(btn.secondary, btn.md, "px-8")}
+        >
           {t.card.cancel}
         </button>
       </div>
@@ -127,18 +139,37 @@ function PhotoCrop({ file, onDone, onCancel }: { file: File; onDone: (dataUrl: s
             }}
           />
         ) : (
-          <div className="absolute inset-0 grid place-items-center text-sm text-haze">…</div>
+          <div className="absolute inset-0 grid place-items-center text-sm text-haze">
+            …
+          </div>
         )}
       </div>
       <label className="mx-auto flex w-full max-w-[22rem] items-center gap-3 text-sm text-haze">
         <span className="shrink-0">{t.profile.photoZoom}</span>
-        <input type="range" min={1} max={4} step={0.01} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} className="h-8 w-full accent-[var(--brand)]" />
+        <input
+          type="range"
+          min={1}
+          max={4}
+          step={0.01}
+          value={zoom}
+          onChange={(e) => setZoom(Number(e.target.value))}
+          className="h-8 w-full accent-[var(--brand)]"
+        />
       </label>
       <div className="mx-auto flex w-full max-w-[22rem] gap-2">
-        <button type="button" onClick={onCancel} className={cn(btn.quiet, btn.md, "flex-1")}>
+        <button
+          type="button"
+          onClick={onCancel}
+          className={cn(btn.quiet, btn.md, "flex-1")}
+        >
           {t.card.cancel}
         </button>
-        <button type="button" onClick={save} disabled={!src} className={cn(btn.primary, btn.md, "flex-1")}>
+        <button
+          type="button"
+          onClick={save}
+          disabled={!src}
+          className={cn(btn.primary, btn.md, "flex-1")}
+        >
           {t.profile.photoUse}
         </button>
       </div>
@@ -147,7 +178,16 @@ function PhotoCrop({ file, onDone, onCancel }: { file: File; onDone: (dataUrl: s
 }
 
 /** Edit profile: photo, name and colour, on a screen of its own. */
-export function ProfileEditor({ onClose }: { onClose: () => void }) {
+/** The name, photo and colour fields with their save button: in the profile editor and in the intro. */
+export function ProfileForm({
+  onSaved,
+  submitLabel,
+  children,
+}: {
+  onSaved: () => void;
+  submitLabel?: string;
+  children?: React.ReactNode;
+}) {
   const { t } = useT();
   const settings = useSettings();
   const [name, setName] = useState(settings.name);
@@ -156,15 +196,6 @@ export function ProfileEditor({ onClose }: { onClose: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const input = useRef<HTMLInputElement>(null);
-
-  // The page behind doesn't scroll while this is open.
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, []);
 
   const pick = (f: File | undefined) => {
     if (!f) return;
@@ -178,99 +209,169 @@ export function ProfileEditor({ onClose }: { onClose: () => void }) {
     const clean = tidyName(name);
     if (!checkFields({ name: clean }).ok) return setError(t.add.errBad);
     saveProfile(clean, hue, photo);
-    onClose();
+    onSaved();
   };
 
+  return file ? (
+    <div className="mt-8">
+      <PhotoCrop
+        file={file}
+        onCancel={() => setFile(null)}
+        onDone={(url) => {
+          setPhoto(url);
+          setFile(null);
+        }}
+      />
+    </div>
+  ) : (
+    <form onSubmit={save} className="mt-6 flex flex-1 flex-col items-center">
+      <button
+        type="button"
+        onClick={() => input.current?.click()}
+        aria-label={photo ? t.profile.changePhoto : t.profile.addPhoto}
+        className="group relative rounded-full"
+      >
+        <Avatar name={name} hue={hue} photo={photo} size={132} />
+        <span className="absolute right-0 bottom-0 grid size-10 place-items-center rounded-full bg-ink text-night shadow-[0_2px_10px_rgb(0_0_0/0.5)] ring-4 ring-night">
+          <Camera className="size-[1.125rem]" strokeWidth={2} aria-hidden />
+        </span>
+      </button>
+      <input
+        ref={input}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={(e) => {
+          pick(e.target.files?.[0]);
+          e.target.value = "";
+        }}
+      />
+      <div className="mt-4 flex items-center gap-5 text-[0.9375rem]">
+        <button
+          type="button"
+          onClick={() => input.current?.click()}
+          className="font-semibold text-brand"
+        >
+          {photo ? t.profile.changePhoto : t.profile.addPhoto}
+        </button>
+        {photo && (
+          <button
+            type="button"
+            onClick={() => setPhoto("")}
+            className="text-haze"
+          >
+            {t.profile.removePhoto}
+          </button>
+        )}
+      </div>
+      <p className="mt-1.5 text-xs text-haze">{t.profile.photoHint}</p>
+
+      <label className="mt-8 block w-full">
+        <span className="mb-2 block px-5 text-[0.9375rem] font-semibold text-haze">
+          {t.profile.nameLabel}
+        </span>
+        <input
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value.slice(0, NAME_MAX));
+            setError("");
+          }}
+          maxLength={NAME_MAX}
+          placeholder={t.profile.namePlaceholder}
+          autoComplete="nickname"
+          enterKeyHint="done"
+          className="h-[3.25rem] w-full rounded-[22px] bg-fg/[0.055] px-4 text-[1.0625rem] outline-none placeholder:text-haze/60 focus:bg-fg/[0.08]"
+        />
+      </label>
+
+      {!photo && (
+        <div className="mt-6 w-full">
+          <span className="mb-2 block px-5 text-[0.9375rem] font-semibold text-haze">
+            {t.profile.colourLabel}
+          </span>
+          <div
+            role="radiogroup"
+            aria-label={t.profile.colourLabel}
+            className="flex justify-between px-3"
+          >
+            {AVATAR_HUES.map((h, i) => (
+              <button
+                key={h}
+                type="button"
+                role="radio"
+                aria-checked={hue === i}
+                aria-label={`${t.profile.colourLabel} ${i + 1}`}
+                onClick={() => setHue(i)}
+                className={cn(
+                  "size-8 rounded-full transition-transform",
+                  hue === i
+                    ? "scale-110 ring-2 ring-ink ring-offset-2 ring-offset-night"
+                    : "opacity-85",
+                )}
+                style={{ background: `hsl(${h} 65% 58%)` }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <p role="alert" className="mt-4 text-sm text-stale">
+          {error}
+        </p>
+      )}
+      <div className="flex-1" />
+      <button
+        type="submit"
+        className={cn(
+          btn.primary,
+          "mt-10 h-14 w-full rounded-full text-[1.0625rem]",
+        )}
+      >
+        {submitLabel ?? t.card.save}
+      </button>
+      {children}
+    </form>
+  );
+}
+
+export function ProfileEditor({ onClose }: { onClose: () => void }) {
+  const { t } = useT();
+
+  // The page behind doesn't scroll while this is open.
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   return (
-    <div role="dialog" aria-modal="true" aria-label={t.profile.profileTitle} className="fixed inset-0 z-[80] overflow-y-auto bg-night pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={t.profile.profileTitle}
+      className="fixed inset-0 z-[80] overflow-y-auto bg-night pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+    >
       <div className="mx-auto flex min-h-full w-full max-w-md flex-col px-5 pt-3 pb-8">
         <div className="flex h-11 items-center">
-          <button type="button" onClick={onClose} aria-label={t.card.cancel} className="-ml-2.5 grid size-11 place-items-center rounded-full text-ink/80 active:bg-fg/10">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t.card.cancel}
+            className="-ml-2.5 grid size-11 place-items-center rounded-full text-ink/80 active:bg-fg/10"
+          >
             <X className="size-[1.375rem]" strokeWidth={1.75} aria-hidden />
           </button>
-          <h2 className="flex-1 text-center text-[1.0625rem] font-semibold">{t.profile.profileTitle}</h2>
+          <h2 className="flex-1 text-center text-[1.0625rem] font-semibold">
+            {t.profile.profileTitle}
+          </h2>
           <span className="size-11" />
         </div>
-
-        {file ? (
-          <div className="mt-8">
-            <PhotoCrop
-              file={file}
-              onCancel={() => setFile(null)}
-              onDone={(url) => {
-                setPhoto(url);
-                setFile(null);
-              }}
-            />
-          </div>
-        ) : (
-          <form onSubmit={save} className="mt-6 flex flex-1 flex-col items-center">
-            <button type="button" onClick={() => input.current?.click()} aria-label={photo ? t.profile.changePhoto : t.profile.addPhoto} className="group relative rounded-full">
-              <Avatar name={name} hue={hue} photo={photo} size={132} />
-              <span className="absolute right-0 bottom-0 grid size-10 place-items-center rounded-full bg-ink text-night shadow-[0_2px_10px_rgb(0_0_0/0.5)] ring-4 ring-night">
-                <Camera className="size-[1.125rem]" strokeWidth={2} aria-hidden />
-              </span>
-            </button>
-            <input ref={input} type="file" accept="image/*" hidden onChange={(e) => { pick(e.target.files?.[0]); e.target.value = ""; }} />
-            <div className="mt-4 flex items-center gap-5 text-[0.9375rem]">
-              <button type="button" onClick={() => input.current?.click()} className="font-semibold text-brand">
-                {photo ? t.profile.changePhoto : t.profile.addPhoto}
-              </button>
-              {photo && (
-                <button type="button" onClick={() => setPhoto("")} className="text-haze">
-                  {t.profile.removePhoto}
-                </button>
-              )}
-            </div>
-            <p className="mt-1.5 text-xs text-haze">{t.profile.photoHint}</p>
-
-            <label className="mt-8 block w-full">
-              <span className="mb-2 block px-5 text-[0.9375rem] font-semibold text-haze">{t.profile.nameLabel}</span>
-              <input
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value.slice(0, NAME_MAX));
-                  setError("");
-                }}
-                maxLength={NAME_MAX}
-                placeholder={t.profile.namePlaceholder}
-                autoComplete="nickname"
-                enterKeyHint="done"
-                className="h-[3.25rem] w-full rounded-[22px] bg-fg/[0.055] px-4 text-[1.0625rem] outline-none placeholder:text-haze/60 focus:bg-fg/[0.08]"
-              />
-            </label>
-
-            {!photo && (
-              <div className="mt-6 w-full">
-                <span className="mb-2 block px-5 text-[0.9375rem] font-semibold text-haze">{t.profile.colourLabel}</span>
-                <div role="radiogroup" aria-label={t.profile.colourLabel} className="flex justify-between px-3">
-                  {AVATAR_HUES.map((h, i) => (
-                    <button
-                      key={h}
-                      type="button"
-                      role="radio"
-                      aria-checked={hue === i}
-                      aria-label={`${t.profile.colourLabel} ${i + 1}`}
-                      onClick={() => setHue(i)}
-                      className={cn("size-8 rounded-full transition-transform", hue === i ? "scale-110 ring-2 ring-ink ring-offset-2 ring-offset-night" : "opacity-85")}
-                      style={{ background: `hsl(${h} 65% 58%)` }}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {error && (
-              <p role="alert" className="mt-4 text-sm text-stale">
-                {error}
-              </p>
-            )}
-            <div className="flex-1" />
-            <button type="submit" className={cn(btn.primary, "mt-10 h-12 w-full text-base")}>
-              {t.card.save}
-            </button>
-          </form>
-        )}
+        <div className="mt-6 flex flex-1 flex-col">
+          <ProfileForm onSaved={onClose} />
+        </div>
       </div>
     </div>
   );

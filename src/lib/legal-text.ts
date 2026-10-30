@@ -14,7 +14,7 @@ export type Doc = { title: string; updated: string; intro?: string; sections: Se
 const en: Record<DocKey, Doc> = {
   terms: {
     title: "Terms of use",
-    updated: "Last updated: 29 October 2026",
+    updated: "Last updated: 30 October 2026",
     intro: "magyarotyesz is a free community map of toilet door codes, run by {operator} ({address}, {email}). By tapping \"I am 16 or older and I agree\" you accept these terms.",
     sections: [
       {
@@ -82,14 +82,14 @@ const en: Record<DocKey, Doc> = {
   },
   privacy: {
     title: "Privacy policy",
-    updated: "Last updated: 29 October 2026",
+    updated: "Last updated: 30 October 2026",
     intro: "The controller of your data is {operator}, {address}, {email}, {phone}. We process only what the app needs.",
     sections: [
       {
         h: "What we process",
         p: [
           "**Your ID.** When you first use the shared map your phone gets a random ID and a secret token. The server keeps the ID, a hash of the token, and which places you added and when. There is no name, email or phone number unless you sign in with an account (see below), but the ID is still personal data under the GDPR, because it links your contributions together. We call it pseudonymous, not anonymous.",
-          "**Account (optional).** If you press \"Continue with Google\", Google's sign-in script is loaded (Google sees your IP address) and Google tells our server a stable id for your Google account. If you choose \"Continue with email\", we send a six-digit code to the address you type. In both cases our server stores only a keyed hash of that id or address, enough to recognise you next time, and not the address itself. The address exists on our server only while the code is sent. The hash is linked to your ID, so it is personal data. This lets you sign in to the same profile in another browser or on another phone.",
+          "**Account (optional).** If you press \"Continue with Google\", Google's sign-in script is loaded (Google sees your IP address) and Google tells our server a stable id for your Google account. If you choose \"Continue with email\", we send a six-digit code to the address you type. Our server stores a keyed hash of the Google id, enough to recognise you next time, and your email address (the one you type, or the verified address Google gives us). We keep the address so we can contact you about places and codes you add, for example if one is reported as offensive or illegal. It is not shown to other users, and it is deleted with \"Delete my data\". This lets you sign in to the same profile in another browser or on another phone. Without an account you can use the app as a guest: you can see every place and its code and report problems, but adding places and codes and voting need an account.",
           "**Profile name (optional).** If you choose a name, it is saved with your ID on the server. Only you and the administrator can see it; it is not shown on any place. If you turn on \"Show my name on the lists\" on the Top list, your name, your rank and your counts (places added, people who got in, votes) are shown to everyone using the app. Your location never is. You can turn it off at any time, and your name disappears from the lists at once.",
           "**Your contributions.** Places you add (name, code, kind, opening hours, note, position, date), your votes, your code suggestions and your reports, including the optional message in a report. Because a place shows where its toilet is and when you added it, it can show where you were at that time.",
           "**Location.** Your phone's position is read on the phone to show where you are and to sort nearby places. When you add a place, vote, suggest a code or report a place, your position is sent with the request so the server can check that you are within about 150 m of the toilet. The server uses it for that check and does not store it. Location is off unless you allow it, and you can turn it off at any time in Settings (\"Use my location\") or in your phone or browser settings. Without it you can still browse the map; only adding and checking codes need it.",
@@ -143,7 +143,7 @@ const en: Record<DocKey, Doc> = {
   },
   imprint: {
     title: "Imprint",
-    updated: "Last updated: 29 October 2026",
+    updated: "Last updated: 30 October 2026",
     sections: [
       {
         h: "Service provider",
@@ -194,7 +194,7 @@ const en: Record<DocKey, Doc> = {
 const hu: Record<DocKey, Doc> = {
   terms: {
     title: "Felhasználási feltételek",
-    updated: "Utolsó frissítés: 2026. október 29.",
+    updated: "Utolsó frissítés: 2026. október 30.",
     intro: "A magyarotyesz ingyenes, közösségi térkép mosdók ajtókódjairól. Üzemeltetője: {operator} ({address}, {email}). Az „Elmúltam 16 éves, és elfogadom” gomb megnyomásával elfogadod ezeket a feltételeket.",
     sections: [
       {
@@ -262,14 +262,14 @@ const hu: Record<DocKey, Doc> = {
   },
   privacy: {
     title: "Adatkezelési tájékoztató",
-    updated: "Utolsó frissítés: 2026. október 29.",
+    updated: "Utolsó frissítés: 2026. október 30.",
     intro: "Az adataid kezelője: {operator}, {address}, {email}, {phone}. Csak azt kezeljük, amire az appnak szüksége van.",
     sections: [
       {
         h: "Milyen adatokat kezelünk",
         p: [
           "**Azonosító.** Amikor először használod a közös térképet, a telefonod kap egy véletlenszerű azonosítót és egy titkos tokent. A szerver tárolja az azonosítót, a token hash-ét, és azt, hogy mely helyeket és mikor adtad hozzá. Nincs név, e-mail-cím vagy telefonszám, hacsak nem lépsz be fiókkal (lásd alább), de az azonosító a GDPR szerint így is személyes adat, mert összeköti a hozzájárulásaidat. Ezért álnevesnek, nem névtelennek nevezzük.",
-          "**Fiók (nem kötelező).** Ha a „Folytatás Google-lel” gombot nyomod meg, betöltődik a Google belépési szkriptje (a Google látja az IP-címedet), és a Google átad a szerverünknek egy állandó azonosítót a Google-fiókodról. Ha a „Folytatás e-maillel” lehetőséget választod, hat számjegyű kódot küldünk a megadott címre. Mindkét esetben a szerverünk csak az azonosító vagy a cím kulcsolt hash-ét tárolja, ami elég ahhoz, hogy legközelebb felismerjen, magát a címet nem. A cím a szerverünkön csak a kód elküldéséig létezik. A hash az azonosítódhoz kapcsolódik, ezért személyes adat. Ezáltal ugyanabba a profilba léphetsz be másik böngészőben vagy másik telefonon.",
+          "**Fiók (nem kötelező).** Ha a „Folytatás Google-lel” gombot nyomod meg, betöltődik a Google belépési szkriptje (a Google látja az IP-címedet), és a Google átad a szerverünknek egy állandó azonosítót a Google-fiókodról. Ha a „Folytatás e-maillel” lehetőséget választod, hat számjegyű kódot küldünk a megadott címre. A szerverünk a Google-azonosító kulcsolt hash-ét tárolja (ez elég ahhoz, hogy legközelebb felismerjen), valamint az e-mail-címedet (amit beírsz, vagy amit a Google ellenőrzött címként átad). A címet azért őrizzük meg, hogy kapcsolatba léphessünk veled az általad felvett helyekkel és kódokkal kapcsolatban, például ha valamelyiket sértőnek vagy jogellenesnek jelentik. Más felhasználók nem látják, és az „Adataim törlése” funkcióval törlődik. Ezáltal ugyanabba a profilba léphetsz be másik böngészőben vagy másik telefonon. Fiók nélkül vendégként is használhatod az appot: minden helyet és kódot látsz, és jelezhetsz problémát, de hely és kód felvételéhez, valamint szavazáshoz fiók kell.",
           "**Profilnév (nem kötelező).** Ha megadsz egy nevet, az az azonosítódhoz kötve tárolódik a szerveren. Csak te és az adminisztrátor látja, egyetlen helynél sem jelenik meg. Ha a Toplistán bekapcsolod a „Mutasd a nevem a listákon” kapcsolót, a neved, a helyezésed és a számaid (felvett helyek, bejutások, szavazatok) az app minden használója számára láthatók. A helyzeted soha. Bármikor kikapcsolhatod, és a neved azonnal lekerül a listákról.",
           "**Hozzájárulásaid.** A hozzáadott helyek (név, kód, fajta, nyitva tartás, megjegyzés, helyzet, dátum), a szavazataid, a kódjavaslataid és a jelentéseid, a jelentéshez írt üzenettel együtt. Mivel egy hely megmutatja, hol van a mosdó és mikor adtad hozzá, abból kiderülhet, hol voltál akkor.",
           "**Helyadat.** A telefonod pozícióját a telefonon olvassuk, hogy megmutassuk, hol vagy, és sorba rendezzük a közeli helyeket. Hely hozzáadásakor, szavazáskor, kódjavaslatkor és jelentéskor a pozíciódat elküldjük a kéréssel, hogy a szerver ellenőrizze, hogy kb. 150 méteren belül vagy a mosdótól. A szerver csak erre az ellenőrzésre használja, és nem tárolja. A helymeghatározás csak akkor működik, ha engedélyezed, és bármikor kikapcsolhatod a Beállításokban („Helyem használata”) vagy a telefon, illetve a böngésző beállításaiban. Nélküle is böngészheted a térképet; csak a kódok hozzáadásához és ellenőrzéséhez kell.",
@@ -323,7 +323,7 @@ const hu: Record<DocKey, Doc> = {
   },
   imprint: {
     title: "Impresszum",
-    updated: "Utolsó frissítés: 2026. október 29.",
+    updated: "Utolsó frissítés: 2026. október 30.",
     sections: [
       {
         h: "Szolgáltató",

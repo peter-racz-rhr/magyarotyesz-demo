@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActionButton } from "@/components/onboarding/action-button";
 import { HowStep } from "@/components/onboarding/how-step";
 import { AccountStep } from "@/components/onboarding/account-step";
+import { ProfileStep } from "@/components/onboarding/profile-step";
 import { TermsStep } from "@/components/onboarding/terms-step";
 import { FORWARD, PageTransition } from "@/components/page-transition";
 import { Wordmark } from "@/components/wordmark";
@@ -106,7 +107,7 @@ export default function WelcomePage() {
   const [pressed, setPressed] = useState<{ key: string; n: number } | null>(null);
   const [open, setOpen] = useState(false);
   const [locating, setLocating] = useState(false);
-  const [step, setStep] = useState<"hero" | "how" | "terms" | "account" | "perms">("hero");
+  const [step, setStep] = useState<"hero" | "how" | "terms" | "account" | "profile" | "perms">("hero");
   // Someone who agreed to an earlier version of the terms is shown that they changed.
   const [returning, setReturning] = useState(false);
   // Which sign-in methods the server offers: asked now, so the answer is there by the time the terms are read.
@@ -251,14 +252,19 @@ export default function WelcomePage() {
               onAgree={() => {
                 markTermsAccepted();
                 if (hasOnboarded()) router.replace("/map", { transitionTypes: FORWARD });
-                else setStep(auth && (auth.google || auth.email) ? "account" : "perms");
+                else setStep(auth && (auth.google || auth.email) ? "account" : "profile");
               }}
             />
           </div>
         )}
         {open && step === "account" && (
           <div className="absolute inset-0 z-20 bg-night">
-            <AccountStep onDone={() => setStep("perms")} />
+            <AccountStep onDone={() => setStep("profile")} />
+          </div>
+        )}
+        {open && step === "profile" && (
+          <div className="absolute inset-0 z-20 bg-night">
+            <ProfileStep onDone={() => setStep("perms")} />
           </div>
         )}
         {open && step === "perms" && (

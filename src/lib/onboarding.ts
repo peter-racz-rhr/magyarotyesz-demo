@@ -20,7 +20,7 @@ function write(key: string, value: string) {
 export const hasOnboarded = () => read(ONBOARDED_KEY) === "1";
 export const markOnboarded = () => write(ONBOARDED_KEY, "1");
 /** Bump when the terms change in a way people must agree to again. */
-export const TERMS_VERSION = "2026-10-29";
+export const TERMS_VERSION = "2026-10-30";
 /** The version of the terms this phone agreed to, and when (null before it did). */
 export const acceptedTerms = (): { v: string; at: string } | null => {
   try {
