@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, Bookmark, Camera, Check, ChevronRight, Coffee, Copy, ExternalLink, Settings, Sparkles, Trash2, Trophy } from "lucide-react";
+import { BadgeShelf, BadgesSection } from "@/components/badges";
 import { previewRankUp } from "@/components/rank-up";
 import { SUPPORT_URL, useShowSupport } from "@/lib/support";
 import Link from "next/link";
@@ -114,11 +115,8 @@ export default function ProfilePage() {
               {settings.name || t.profile.noName}
             </span>
           </button>
-          {supporter && (
-            <span className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-[#fab387]/15 px-3 py-1 text-[0.8125rem] font-semibold text-[#fab387]">
-              <Coffee className="size-3.5" aria-hidden /> {t.profile.supporter}
-            </span>
-          )}
+          {/* Up to 3 badges you picked (or your best rank and Supporter) */}
+          <BadgeShelf gotIn={gotIn} supporter={supporter} />
           {userId && (
             <button type="button" onClick={copyId} className="mt-1 inline-flex max-w-full items-center gap-1.5 text-[0.8125rem] text-haze" aria-label={`${t.profile.idLabel} ${userId}`}>
               <span className="truncate font-mono">{userId.slice(0, 11)}</span>
@@ -173,6 +171,8 @@ export default function ProfilePage() {
             </div>
           );
         })()}
+
+        <BadgesSection gotIn={gotIn} supporter={supporter} />
 
         <Link href="/leaders" className={cn(CARD, "mt-3 flex items-center gap-3 px-4 py-3.5 text-[1rem] active:opacity-70")}>
           <Trophy className="size-5 text-[#f9e2af]" aria-hidden />

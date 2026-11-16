@@ -13,7 +13,7 @@ import { getIdentityToken, hasAccount, subscribeMe, syncNow } from "./sync";
   notifications) stay here.
 */
 
-const SYNCED = ["lang", "theme", "textSize", "palette", "flavour", "navStyle", "glass", "mapStyle", "showCodes", "haptics", "animations", "buildings3d"] as const satisfies readonly (keyof Settings)[];
+const SYNCED = ["lang", "theme", "textSize", "palette", "flavour", "navStyle", "glass", "mapStyle", "showCodes", "haptics", "animations", "buildings3d", "badges"] as const satisfies readonly (keyof Settings)[];
 const MAX_PHOTO = 200_000;
 
 type Remote = { photo: string; avatar: number; saved: string[]; settings: Record<string, string | boolean | number>; updatedAt: string };

@@ -41,6 +41,8 @@ export type Settings = {
   avatar: number;
   /** Your profile photo as a small picture (a data address); stays on this phone. Empty: none. */
   photo: string;
+  /** The badges shown under your name, comma-separated ids (at most 3). Empty: your best rank and Supporter. */
+  badges: string;
 };
 
 
@@ -63,6 +65,7 @@ const store = createLocalStore<Settings>("magyarotyesz:settings", {
   name: "",
   avatar: 0,
   photo: "",
+  badges: "",
 });
 
 export const useSettings = store.useValue;
