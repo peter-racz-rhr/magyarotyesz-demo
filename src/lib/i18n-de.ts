@@ -545,6 +545,7 @@ export const de: Dict = {
     locationSub: "Zeigt, wo du bist, und die nächsten Toiletten. Nötig, um Codes hinzuzufügen und zu sagen, ob sie funktionieren.",
     locationBlocked: "Der Standort ist in den Browser- oder Handyeinstellungen blockiert. Erlaube ihn dort und schalte dies dann ein.",
     buildings3d: "3D-Gebäude",
+    terrain: "3D-Gelände (Hügel)",
     buildings3dSub: "Kippt die Karte und hebt die Gebäude an. Schalte es aus, wenn die Karte langsam wirkt.",
     intro: "Einführung noch einmal zeigen",
     introSub: "Deine Codes bleiben.",

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Bell, Box, CloudDownload, Layers, Megaphone, MessageSquare, Moon, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, UserRound, Trash2, Users, Vibrate } from "lucide-react";
+import { ArrowLeft, Bell, Box, CloudDownload, Mountain, Layers, Megaphone, MessageSquare, Moon, PanelBottom, Type, Download, KeyRound, Eye, FileText, Globe, Landmark, LocateFixed, SunMoon, MapPinCheck, RotateCcw, ShieldCheck, Smartphone, Sparkles, UserRound, Trash2, Users, Vibrate } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -326,6 +326,7 @@ export default function SettingsPage() {
           <OfflineMapRow />
           <SwitchRow icon={<LocateFixed />} hue={212} title={t.profile.location} on={settings.location} onChange={toggleLocation} />
           <SwitchRow icon={<Box />} hue={150} title={t.profile.buildings3d} on={settings.buildings3d} onChange={(on) => updateSettings({ buildings3d: on })} />
+          <SwitchRow icon={<Mountain />} hue={100} title={t.profile.terrain} on={settings.terrain} onChange={(on) => updateSettings({ terrain: on })} />
           {!REMOTE && <SwitchRow icon={<MapPinCheck />} hue={32} title={t.profile.onTheSpot} on={settings.nearbyCheck} onChange={(on) => updateSettings({ nearbyCheck: on })} />}
         </Group>
 

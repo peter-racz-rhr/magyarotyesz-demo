@@ -1,5 +1,6 @@
 "use client";
 
+import { Terrain3D } from "@/components/terrain-3d";
 import { TAPPABLE, ToiletLayer } from "@/components/toilet-layer";
 import { requireAccount } from "@/lib/sync";
 import "@/lib/maplibre-worker";
@@ -286,7 +287,7 @@ export default function MapPage() {
   const [start] = useState(startPlace);
   const mapRef = useRef<MapRef>(null);
   const here = useHere();
-  const { buildings3d, palette, flavour, theme: look } = useSettings();
+  const { buildings3d, terrain, palette, flavour, theme: look } = useSettings();
   const base = useMapStyle();
   const toilets = useToilets();
 
@@ -585,6 +586,7 @@ export default function MapPage() {
           <TapToAdd onTap={startDraft} onDismiss={() => setFocus(null)} />
           <ZoomCap max={base.key === "satellite" ? 19 : 22} />
           <Buildings3D enabled={buildings3d && base.key !== "satellite"} variant={base.key === "light" ? "light" : "dark"} />
+          <Terrain3D enabled={terrain} variant={base.key === "light" ? "light" : "dark"} />
 
           <ToiletLayer toilets={visible} onOpen={(toilet) => openCard(toilet)} theme={`${base.key}-${palette}-${flavour}-${look}`} />
           {/* The place you just added drops in with a little burst (one HTML marker; the rest are drawn by the map) */}

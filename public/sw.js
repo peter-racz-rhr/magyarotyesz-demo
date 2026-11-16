@@ -5,7 +5,7 @@
   names change with every build). The codes themselves already live on the
   phone. Map pieces you have already seen are kept too (MAP_CACHE); new areas and address search need the internet.
 */
-const CACHE = "magyarotyesz-v4";
+const CACHE = "magyarotyesz-v5";
 // Map pieces from other servers (vector tiles, fonts, satellite). Seen once, they stay on the phone, so
 // the places you have looked at still show up with no signal. Capped so it never fills the storage.
 const MAP_CACHE = "magyarotyesz-map-v1";
@@ -61,7 +61,8 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
 
-  if (MAP_HOSTS.includes(url.hostname)) {
+  // The elevation tiles for 3D terrain are cached like the map's own.
+  if (MAP_HOSTS.includes(url.hostname) || (url.hostname === "s3.amazonaws.com" && url.pathname.startsWith("/elevation-tiles-prod/"))) {
     // The tile list ("/planet") names the current tile version, so it goes to the network first.
     const fresh = url.pathname === "/planet" || url.pathname.endsWith("style.json");
     event.respondWith(

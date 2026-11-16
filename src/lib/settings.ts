@@ -15,6 +15,8 @@ export type Settings = {
   location: boolean;
   /** Draw the buildings on the map as 3D blocks and tilt the map. */
   buildings3d: boolean;
+  /** Raise the ground with the land's height (hills look like hills) and shade the slopes. */
+  terrain: boolean;
   /** The app's look: follow the phone, or always dark or light. */
   theme: "system" | "dark" | "light";
   /** How big the text is: the whole app scales with it. */
@@ -52,6 +54,7 @@ const store = createLocalStore<Settings>("magyarotyesz:settings", {
   notify: false,
   location: true,
   buildings3d: true,
+  terrain: true,
   theme: "system",
   palette: "classic",
   flavour: "mocha",
