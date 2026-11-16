@@ -243,6 +243,7 @@ export const de: Dict = {
     people: (n: number) => `${n} Menschen sind mit deinen Codes hineingekommen.`,
     next: "Fortschritt zum nächsten Rang",
     cta: "Weiter so",
+    preview: "Abzeichen-Animation abspielen",
   },
   deleteAccount: {
     title: "Dein LooKey-Konto und deine Daten löschen",

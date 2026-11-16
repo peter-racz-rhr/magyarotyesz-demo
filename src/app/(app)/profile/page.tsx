@@ -1,6 +1,7 @@
 "use client";
 
-import { Bell, Bookmark, Camera, Check, ChevronRight, Coffee, Copy, ExternalLink, Settings, Trash2, Trophy } from "lucide-react";
+import { Bell, Bookmark, Camera, Check, ChevronRight, Coffee, Copy, ExternalLink, Settings, Sparkles, Trash2, Trophy } from "lucide-react";
+import { previewRankUp } from "@/components/rank-up";
 import { SUPPORT_URL, useShowSupport } from "@/lib/support";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -21,6 +22,7 @@ import { cn } from "@/lib/utils";
 export default function ProfilePage() {
   const { t, lang } = useT();
   const showSupport = useShowSupport();
+  const [previewRank, setPreviewRank] = useState(1);
   const toilets = useToilets();
   const alerts = useAlerts();
   const notices = useNotices();
@@ -151,6 +153,17 @@ export default function ProfilePage() {
               <p className="mt-2 text-[0.8125rem] text-haze">
                 {level.next ? t.profile.levelNext(level.next - gotIn, t.profile.levels[level.index + 1]) : t.profile.levelTop}
               </p>
+              {/* Try the badge animation: each tap shows the next rank (Regular, Trusted, Local legend). */}
+              <button
+                type="button"
+                onClick={() => {
+                  previewRankUp(previewRank);
+                  setPreviewRank((r) => (r >= 3 ? 1 : r + 1));
+                }}
+                className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-full bg-fg/[0.08] px-3.5 text-[0.8125rem] font-semibold active:bg-fg/[0.14]"
+              >
+                <Sparkles className="size-3.5 text-brand" aria-hidden /> {t.rank.preview}
+              </button>
             </div>
           );
         })()}

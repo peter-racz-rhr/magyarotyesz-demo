@@ -18,6 +18,12 @@ import { LEVEL_STEPS, levelFor } from "@/lib/toilets";
 */
 
 const KEY = "magyarotyesz:rank-seen";
+const PREVIEW_EVENT = "lookey:rankup-preview";
+
+/** Play the rank-up animation for a rank (1-3) without changing anything: the Profile page's preview button. */
+export function previewRankUp(index: number) {
+  window.dispatchEvent(new CustomEvent(PREVIEW_EVENT, { detail: index }));
+}
 const RANKS: { icon: ReactNode; color: string }[] = [
   { icon: <Leaf className="size-12" strokeWidth={1.75} />, color: "#9aa3ad" },
   { icon: <Star className="size-12" strokeWidth={1.75} />, color: "#4fe08a" },
@@ -67,6 +73,15 @@ export function RankUp() {
       queueMicrotask(() => setShown(index));
     }
   }, [gotIn]);
+
+  useEffect(() => {
+    const play = (e: Event) => {
+      const index = (e as CustomEvent<number>).detail;
+      if (index >= 1 && index < LEVEL_STEPS.length) setShown(index);
+    };
+    window.addEventListener(PREVIEW_EVENT, play);
+    return () => window.removeEventListener(PREVIEW_EVENT, play);
+  }, []);
 
   return <AnimatePresence>{shown !== null && <Overlay index={shown} gotIn={Math.max(gotIn, LEVEL_STEPS[shown])} onClose={() => setShown(null)} />}</AnimatePresence>;
 }

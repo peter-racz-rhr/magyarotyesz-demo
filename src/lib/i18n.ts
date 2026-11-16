@@ -249,6 +249,7 @@ const en = {
     people: (n: number) => `${n} people got in with your codes.`,
     next: "Progress to the next rank",
     cta: "Keep going",
+    preview: "Play the badge animation",
   },
   deleteAccount: {
     title: "Delete your LooKey account and data",
@@ -798,6 +799,7 @@ const hu: Dict = {
     people: (n: number) => `${n} ember jutott be a te kódjaiddal.`,
     next: "Haladás a következő szintig",
     cta: "Tovább",
+    preview: "Jelvény-animáció lejátszása",
   },
   deleteAccount: {
     title: "A LooKey fiókod és adataid törlése",
