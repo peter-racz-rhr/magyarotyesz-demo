@@ -1,6 +1,6 @@
 "use client";
 
-import { Crown, Leaf, ShieldCheck, Star } from "lucide-react";
+import { Crown, Gem, KeyRound, Leaf, ShieldCheck, Star } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState, type ReactNode } from "react";
 import { buzz } from "@/lib/haptics";
@@ -13,7 +13,7 @@ import { LEVEL_STEPS, levelFor } from "@/lib/toilets";
   The rank-up moment: when enough people have got in with your codes to reach the next rank, the whole
   screen lights up in that rank's colour: a glow blooms, rings spread, sparks fly, the badge drops in with a
   bounce, the old rank name slides out and the new one in, and a bar fills toward the next goal, so the
-  next rank is already in sight. It plays once per rank, on any page. Preview: add ?rankup=1 (or 2, 3) to a
+  next rank is already in sight. It plays once per rank, on any page. Preview: add ?rankup=1 (up to 5) to a
   page's address. Reduced motion, or "Celebration animation" off, gets a calm fade.
 */
 
@@ -28,7 +28,9 @@ const RANKS: { icon: ReactNode; color: string }[] = [
   { icon: <Leaf className="size-12" strokeWidth={1.75} />, color: "#9aa3ad" },
   { icon: <Star className="size-12" strokeWidth={1.75} />, color: "#4fe08a" },
   { icon: <ShieldCheck className="size-12" strokeWidth={1.75} />, color: "#5db4f0" },
+  { icon: <KeyRound className="size-12" strokeWidth={1.75} />, color: "#cba6f7" },
   { icon: <Crown className="size-12" strokeWidth={1.75} />, color: "#ffc247" },
+  { icon: <Gem className="size-12" strokeWidth={1.75} />, color: "#f5a3c7" },
 ];
 const EASE = [0.22, 1, 0.36, 1] as const;
 // Fixed "random" spread so the sparks look the same every time and render the same on both sides.

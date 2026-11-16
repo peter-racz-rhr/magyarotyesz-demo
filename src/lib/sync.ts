@@ -53,6 +53,8 @@ type Me = {
   displayName?: string;
   /** Whether the name is shown on the public top lists. */
   onBoard?: boolean;
+  /** Supports LooKey on Ko-fi (or was given the badge by hand). */
+  supporter?: boolean;
   /** Whether a Google account and/or an email address is linked to this profile. */
   account?: { google: boolean; email: boolean };
 };
@@ -76,6 +78,7 @@ export const useUserId = () => identity.useValue()?.userId ?? null;
 export const useAccount = () => meStore.useValue().account ?? { google: false, email: false };
 export const useGotInTotal = () => meStore.useValue().gotIn ?? 0;
 export const useOnBoard = () => meStore.useValue().onBoard ?? false;
+export const useSupporter = () => meStore.useValue().supporter ?? false;
 /** Whether this profile has a Google or email account (as last told by the server). */
 export const hasAccount = () => { const a = meStore.get().account; return !!(a?.google || a?.email); };
 export const subscribeMe = meStore.subscribe;
@@ -501,7 +504,7 @@ export async function fetchMyData(): Promise<unknown | null> {
 
 /* ------------------------------ top lists ------------------------------ */
 
-export type BoardRow = { name: string; score: number; places: number; you: boolean };
+export type BoardRow = { name: string; score: number; places: number; you: boolean; supporter?: boolean };
 export type BoardList = { top: BoardRow[]; you: (BoardRow & { rank: number }) | null };
 export type Board = { radiusKm: number; onBoard: boolean; named: boolean; world: BoardList; near: BoardList | null };
 
@@ -668,12 +671,12 @@ async function refreshMe() {
     throw e;
   }
   if (res.notModified) return;
-  const { owns, votes, suggestions, alerts: list, addsLeftToday, gotIn, displayName, onBoard, account } = res.data;
+  const { owns, votes, suggestions, alerts: list, addsLeftToday, gotIn, displayName, onBoard, supporter, account } = res.data;
   // A name chosen on another visit (same id) shows up here too; one typed on this phone wins.
   if (displayName && !getSettings().name) updateSettings({ name: displayName });
   // A choice still waiting in the outbox wins over what the server last knew.
   const pendingBoard = outbox.get().findLast((a) => a.type === "set_profile" && typeof a.payload.onBoard === "boolean")?.payload.onBoard as boolean | undefined;
-  meStore.set({ owns, votes, suggestions, alerts: list, addsLeftToday, gotIn: gotIn ?? 0, onBoard: pendingBoard ?? onBoard ?? false, account });
+  meStore.set({ owns, votes, suggestions, alerts: list, addsLeftToday, gotIn: gotIn ?? 0, onBoard: pendingBoard ?? onBoard ?? false, supporter: supporter ?? false, account });
   // The server knows about names (it sent the field) but not ours: send it once.
   const mine = getSettings().name;
   if (displayName !== undefined && mine && mine !== displayName && profileTried.get() !== mine && !outbox.get().some((a) => a.type === "set_profile")) {

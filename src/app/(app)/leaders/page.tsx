@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Crown, MapPin, RefreshCw } from "lucide-react";
+import { ArrowLeft, Coffee, Crown, MapPin, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BACK, PageTransition } from "@/components/page-transition";
@@ -137,21 +137,21 @@ function Rows({ list, near }: { list: BoardList; near: boolean }) {
   return (
     <ol className="mt-5 space-y-2">
       {list.top.map((row, i) => (
-        <Row key={`${i}-${row.name}`} rank={i + 1} name={row.name} score={t.board.score(row.score, near)} places={t.board.places(row.places)} you={row.you} />
+        <Row key={`${i}-${row.name}`} rank={i + 1} name={row.name} score={t.board.score(row.score, near)} places={t.board.places(row.places)} you={row.you} supporter={row.supporter} />
       ))}
       {outside && (
         <>
           <li aria-hidden className="py-1 text-center text-haze">
             ⋯
           </li>
-          <Row rank={outside.rank} name={outside.name} score={t.board.score(outside.score, near)} places={t.board.places(outside.places)} you />
+          <Row rank={outside.rank} name={outside.name} score={t.board.score(outside.score, near)} places={t.board.places(outside.places)} you supporter={outside.supporter} />
         </>
       )}
     </ol>
   );
 }
 
-function Row({ rank, name, score, places, you }: { rank: number; name: string; score: string; places: string; you: boolean }) {
+function Row({ rank, name, score, places, you, supporter = false }: { rank: number; name: string; score: string; places: string; you: boolean; supporter?: boolean }) {
   const { t } = useT();
   return (
     <li className={cn(CARD, "flex items-center gap-3 px-4 py-3", you && "ring-2 ring-brand")}>
@@ -161,6 +161,7 @@ function Row({ rank, name, score, places, you }: { rank: number; name: string; s
       <span className="min-w-0 flex-1">
         <span className="block text-[1rem] font-semibold break-words">
           {name}
+          {supporter && <Coffee className="ml-1.5 inline size-4 align-[-2px] text-[#fab387]" aria-label={t.profile.supporter} />}
           {you && <span className="ml-2 rounded-full bg-brand/20 px-2 py-0.5 align-middle text-[0.6875rem] font-bold text-brand uppercase">{t.board.you}</span>}
         </span>
         <span className="block text-[0.8125rem] text-haze">{places}</span>

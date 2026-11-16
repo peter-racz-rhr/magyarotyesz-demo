@@ -428,7 +428,7 @@ export function freshness(t: Toilet, now = Date.now()) {
 }
 
 /** Contributor levels, by how many people got in with your codes. */
-export const LEVEL_STEPS = [0, 5, 25, 100] as const;
+export const LEVEL_STEPS = [0, 5, 25, 50, 100, 250] as const;
 export function levelFor(gotIn: number) {
   let index = 0;
   LEVEL_STEPS.forEach((from, i) => {

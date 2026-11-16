@@ -14,14 +14,15 @@ import { REMOTE } from "@/lib/api";
 import { alertLine, useT } from "@/lib/i18n";
 import { askForNotifications } from "@/lib/notify";
 import { updateSettings, useSettings } from "@/lib/settings";
-import { dismissNotice, syncNow, useGotInTotal, usePendingCount, useNotices, useSyncStatus, useUserId } from "@/lib/sync";
+import { dismissNotice, syncNow, useGotInTotal, useSupporter, usePendingCount, useNotices, useSyncStatus, useUserId } from "@/lib/sync";
 import { useSaved } from "@/lib/saved";
-import { ago, clearAlerts, levelFor, markAlertsRead, removeToilet, useAlerts, useToilets } from "@/lib/toilets";
+import { ago, clearAlerts, LEVEL_STEPS, levelFor, markAlertsRead, removeToilet, useAlerts, useToilets } from "@/lib/toilets";
 import { cn } from "@/lib/utils";
 
 export default function ProfilePage() {
   const { t, lang } = useT();
   const showSupport = useShowSupport();
+  const supporter = useSupporter();
   const [previewRank, setPreviewRank] = useState(1);
   const toilets = useToilets();
   const alerts = useAlerts();
@@ -113,6 +114,11 @@ export default function ProfilePage() {
               {settings.name || t.profile.noName}
             </span>
           </button>
+          {supporter && (
+            <span className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-[#fab387]/15 px-3 py-1 text-[0.8125rem] font-semibold text-[#fab387]">
+              <Coffee className="size-3.5" aria-hidden /> {t.profile.supporter}
+            </span>
+          )}
           {userId && (
             <button type="button" onClick={copyId} className="mt-1 inline-flex max-w-full items-center gap-1.5 text-[0.8125rem] text-haze" aria-label={`${t.profile.idLabel} ${userId}`}>
               <span className="truncate font-mono">{userId.slice(0, 11)}</span>
@@ -153,12 +159,12 @@ export default function ProfilePage() {
               <p className="mt-2 text-[0.8125rem] text-haze">
                 {level.next ? t.profile.levelNext(level.next - gotIn, t.profile.levels[level.index + 1]) : t.profile.levelTop}
               </p>
-              {/* Try the badge animation: each tap shows the next rank (Regular, Trusted, Local legend). */}
+              {/* Try the badge animation: each tap shows the next rank, up to Legend. */}
               <button
                 type="button"
                 onClick={() => {
                   previewRankUp(previewRank);
-                  setPreviewRank((r) => (r >= 3 ? 1 : r + 1));
+                  setPreviewRank((r) => (r >= LEVEL_STEPS.length - 1 ? 1 : r + 1));
                 }}
                 className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-full bg-fg/[0.08] px-3.5 text-[0.8125rem] font-semibold active:bg-fg/[0.14]"
               >

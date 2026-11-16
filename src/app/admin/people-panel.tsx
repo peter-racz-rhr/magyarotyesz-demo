@@ -1,6 +1,6 @@
 "use client";
 
-import { Ban, ChevronLeft, RefreshCw, Send, Undo2 } from "lucide-react";
+import { Ban, ChevronLeft, Coffee, RefreshCw, Send, Undo2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { btn } from "@/components/ui/buttons";
 import { cn } from "@/lib/utils";
@@ -146,6 +146,9 @@ function PersonPage({ token, id, onBack, onAuthError }: { token: string; id: str
   const unban = async () => {
     if (await run(async () => void (await call(token, `/v1/admin/users/${id}/unban`, "POST")))) void load();
   };
+  const setSupporter = async (on: boolean) => {
+    if (await run(async () => void (await call(token, `/v1/admin/users/${id}/supporter`, "POST", { on })))) void load();
+  };
 
   return (
     <>
@@ -178,6 +181,9 @@ function PersonPage({ token, id, onBack, onAuthError }: { token: string; id: str
               Joined {when(person.createdAt)} · {person.places} {person.places === 1 ? "place" : "places"} · {person.gotIn} got in with their codes
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
+              <button type="button" disabled={busy} onClick={() => setSupporter(!person.supporter)} className={cn(btn.secondary, btn.sm, "px-3", person.supporter && "border-[#fab387] text-[#fab387]")}>
+                <Coffee className="size-4" aria-hidden /> {person.supporter ? "Supporter (tap to remove)" : "Make supporter"}
+              </button>
               {person.banned ? (
                 <button type="button" disabled={busy} onClick={unban} className={cn(btn.secondary, btn.sm, "px-3")}>
                   <Undo2 className="size-4" aria-hidden /> Unban
