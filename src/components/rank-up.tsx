@@ -120,7 +120,7 @@ function Overlay({ index, gotIn, onClose }: { index: number; gotIn: number; onCl
       onClick={onClose}
     >
       {/* Three rows: the title above, the badge exactly in the middle of the screen, everything else below. */}
-      <div className="relative grid h-full w-full max-w-xs grid-rows-[1fr_auto_1fr] justify-items-center text-center" onClick={(e) => e.stopPropagation()}>
+      <div className="relative grid h-full w-full max-w-xs grid-rows-[1fr_auto_1fr] justify-items-center text-center">
         <motion.p
           className="mb-5 self-end text-[0.8125rem] font-bold tracking-[0.4em] uppercase"
           style={{ color: rank.color }}
@@ -130,13 +130,13 @@ function Overlay({ index, gotIn, onClose }: { index: number; gotIn: number; onCl
         >
           {t.rank.title}
         </motion.p>
-        {/* The glow, rings and sparks start from the badge. */}
+        {/* The glow, rings and sparks start from the badge; they never catch a tap (the glow covers the button). */}
         <div className="relative grid place-items-center">
           {!calm && (
             <>
               <motion.div
                 aria-hidden
-                className="absolute top-1/2 left-1/2 size-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                className="pointer-events-none absolute top-1/2 left-1/2 size-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full"
                 style={{ background: `radial-gradient(closest-side, ${rank.color}66, transparent)` }}
                 initial={{ scale: 0.2, opacity: 0 }}
                 animate={{ scale: [0.2, 1.15, 1], opacity: [0, 1, 0.75] }}
@@ -146,7 +146,7 @@ function Overlay({ index, gotIn, onClose }: { index: number; gotIn: number; onCl
                 <motion.span
                   key={delay}
                   aria-hidden
-                  className="absolute top-1/2 left-1/2 size-40 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
+                  className="pointer-events-none absolute top-1/2 left-1/2 size-40 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
                   style={{ borderColor: rank.color }}
                   initial={{ scale: 0.4, opacity: 0.9 }}
                   animate={{ scale: 4.2, opacity: 0 }}
@@ -157,7 +157,7 @@ function Overlay({ index, gotIn, onClose }: { index: number; gotIn: number; onCl
                 <motion.span
                   key={i}
                   aria-hidden
-                  className="absolute top-1/2 left-1/2 rounded-[2px]"
+                  className="pointer-events-none absolute top-1/2 left-1/2 rounded-[2px]"
                   style={{ width: s.size, height: s.size * 1.6, background: i % 4 === 0 ? "#fff" : rank.color }}
                   initial={{ x: 0, y: 0, opacity: 1, scale: 0.4, rotate: 0 }}
                   animate={{ x: s.x, y: s.y + 90, opacity: [1, 1, 0], scale: 1, rotate: s.spin }}
